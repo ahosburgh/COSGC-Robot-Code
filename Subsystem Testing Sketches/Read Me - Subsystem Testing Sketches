@@ -1,0 +1,16 @@
+Please include as comments at the top of your sketch:
+
+// Your Name (so we know who to yell at :p)
+// What component this sketch is testing
+// What other components are required to make it work (if your testing a motor, what driver goes with it?) 
+// What the expected outcome of the sketch is (This sketch turns an LED one for 1 second and off for 1 second)
+// What we need to know about wiring the component up to the arduino (LED connected to Arduino pin 9)
+// Anything else you can think of to make it easier for someone else opening your sketch to use it as reference and get up and running
+
+In the sketch itself:
+
+> Try to write an example of every action the component can take
+ex:
+> an LED would turn on and off
+> a bluetooth module would send and recieve data
+> a motor would spin in both directions AND we sould see how the speed is set (if possible)
