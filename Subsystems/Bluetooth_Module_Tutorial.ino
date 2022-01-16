@@ -1,4 +1,5 @@
 //Make sure to download the SoftwareSerial library incase you don't have it
+//Before uplaoding unplug RX pin, replug after uploaded succesfully
 #include <SoftwareSerial.h>
 SoftwareSerial EEBlue(0, 1); // RX | TX
 void setup()
