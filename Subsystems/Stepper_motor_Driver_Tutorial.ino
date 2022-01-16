@@ -1,23 +1,28 @@
-//Make sure to download the library Stepper incase you dont have it
-//Pin layout: IN1 - 8, IN2 - 9, IN3 - 10, IN4 - 11
+/* Stepper Motor Driver Tutorial
 
-#include <Stepper.h>
+*** Wiring Instructions ***
+Arduino Pin 8 --- Driver 1N1
+Arduino Pin 9 --- Driver 1N2
+Arduino Pin 10 --- Driver 1N3
+Arduino Pin 11 --- Driver 1N4
 
-#define steps 64
-#define degree 5.625
-int sped = 600; //fastest speed motor will allow
-Stepper ralph(steps, 8, 10, 9, 11); //stepper pins
+*/
+
+#include <Stepper.h>    // Stepper motor library (Included with Arduino IDE)
+
+#define steps 64                      // Setting the number of steps per rotation the motor takes. This is mechanically 
+#define degree 5.625                  // Setting the number of degrees the motor rotates per step
+int sped = 600;                       //fastest speed motor will allow
+Stepper ralph(steps, 8, 10, 9, 11);   //stepper pins
 
 
 void setup() {
-  // put your setup code here, to run once:
-
 }
 
 void loop() {
   //move 45 degrees forward
-  ralph.setSpeed(sped); //10 rpm
-  ralph.step(degToSteps(45)); // 1 rotation
+  ralph.setSpeed(sped);         //10 rpm
+  ralph.step(degToSteps(45));   // 1 rotation
   delay(1000);
   
   //move 45 degrees backward
@@ -26,8 +31,8 @@ void loop() {
   delay(1000);
 
   //move 90 degrees forward
-  ralph.setSpeed(sped); //10 rpm
-  ralph.step(degToSteps(90)); // 1 rotation
+  ralph.setSpeed(sped);         //10 rpm
+  ralph.step(degToSteps(90));   // 1 rotation
   delay(1000);
 
   //move 90 degrees backward
@@ -36,8 +41,8 @@ void loop() {
   delay(1000);
 
   //move 180 degrees forward
-  ralph.setSpeed(sped); //10 rpm
-  ralph.step(degToSteps(180)); // 1 rotation
+  ralph.setSpeed(sped);         //10 rpm
+  ralph.step(degToSteps(180));  // 1 rotation
   delay(1000);
 
   //move 180 degrees backward
@@ -46,8 +51,8 @@ void loop() {
   delay(1000);
 
   //move 360 degrees forward
-  ralph.setSpeed(sped); //10 rpm
-  ralph.step(degToSteps(360)); // 1 rotation
+  ralph.setSpeed(sped);         //10 rpm
+  ralph.step(degToSteps(360));  // 1 rotation
   delay(1000);
 
   //move 360 degrees backward
