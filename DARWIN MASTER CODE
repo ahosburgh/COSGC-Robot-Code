@@ -1,0 +1,131 @@
+/* 2021-2022 NASA COSGC FRCC
+Project DARWIN 
+Team Members
+Adam Hosburgh
+Nick Woolsey
+Giovani Casillas
+*/
+
+// COMPONENT SETUP
+
+
+// Bluetooth HC-05
+#include <SoftwareSerial.h>      // Software Serial Library for using different pins as serial busses   
+SoftwareSerial EEBlue(23, 22);   // Creating object named EEBlue, and defining pins 23, and 22 as software RX and TX respectfully 
+
+
+// IMU Sensor
+#include <Wire.h>                               // I2C comunication library (built into Arduino)
+#include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
+#include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
+#include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
+#define BN0055_SAMPLERATE_DELAY_MS (100)        // Instructing the sensor to sample every 100 ms
+Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
+
+
+// TOF Sensor
+#include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
+Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF" 
+
+
+// Servo (TOF up and down)
+#include <Servo.h>              // Including the servo library 
+Servo TOFServo;                 // Creating a new servo object named TOFServo
+#define TOFServoPin 10       // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
+int TOFServoPos = 90;          // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
+
+
+// Stepper Motors
+#include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
+#define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
+#define degree 5.625                                // Setting the number of degrees the motor rotates per step
+int StepperSpeed = 600;                             // Fastest speed motor will allow
+Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
+Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
+Stepper FrontRightStepper(steps, 25, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
+Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
+Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
+
+
+// DC Motors
+//DC motors only require that we define their pins. No libraries or special objects required. 
+#define DCmotorFrontPWMA 48     
+#define DCmotorFrontAI1 52
+#define DCmotorFrontAI2 53
+#define DCmotorFrontBI1 50
+#define DCmotorFrontBI2 51
+#define DCmotorFrontPWMB 49
+
+#define DCmotorMiddlePWMA 42
+#define DCmotorMiddleAI1 46
+#define DCmotorMiddleAI2 47
+#define DCmotorMiddleBI1 44
+#define DCmotorMiddleBI2 54
+#define DCmotorMiddlePWMB 43
+
+#define DCmotorBackPWMA 36
+#define DCmotorBackAI1 40
+#define DCmotorBackAI2 41
+#define DCmotorBackBI1 38
+#define DCmotorBackBI2 39
+#define DCmotorBackPWMB 37
+
+
+// LED Pins
+// Defining LED pins for the taillights
+#define LeftTailLight 10
+#define RightTailLight 11
+
+//*****BEGIN VOID SETUP*****
+void setup() {
+
+// LED Taillights
+ pinMode(LeftTailLight, OUTPUT);      // Set LED Pin as Output
+ pinMode(RightTailLight, OUTPUT);     // Set LED Pin as Output
+ digitalWrite(LeftTailLight, LOW);    // Turn OFF the LED Pin at the start
+ digitalWrite(RightTailLight, LOW);   // Turn OFF the LED Pin at the start
+ 
+  
+// Bluetooth Serial Communication
+  EEBlue.begin(9600);                                              // Begin bluetooth communication at 9600
+  EEBlue.println("Bluetooth Serial Communication Established");    // Confirm bluetooth connection established 
+  EEBlue.println(" ");
+
+// IMU Sensor Setup
+  EEBlue.println("IMU Setup Begin");
+  DarwinIMU.begin();              // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
+  delay(1000);                    // waiting 1 second to give it time to power on and make its connection before sending another command
+/* int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU
+ * are dependant on tempature. So we need to measure the tempature of the IMU first.
+ * So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
+  int8_t temp = DarwinIMU.getTemp();
+  EEBlue.print("IMU Tempature: ");        // Printing for debugging
+  EEblue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
+  EEBlue.println("IMU Setup Complete");   // Printing for debugging
+  EEBlue.println(" ");                    // Printing for debugging
+
+//TOF Sensor Setup
+  EEBlue.println("TOF Setup Begin");      // Printing for debugging
+  DarwinTOF.begin();                      // Establish connection with TOF sensor
+  EEBlue.println("TOF Setup Complete");   // Printing for debugging
+  EEBlue.println(" ");                    // Printing for debuggin
+
+//Servor (TOF) Setup
+  EEBlue.println("Servo Setup Begin");    // Printing for debugging
+  TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
+  EEBlue.print("Setting Servo to ");      // Printing for debugging
+  EEBlue.print(TOFServoPos);              // Printing for debugging
+  EEBlue.println(" degrees");             // Printing for debugging
+  TOFServo.write(TOFServoPos);            // Set servo to start position (90 degrees)sdf
+  EEBlue.println("Servo Setup Complete"); // Printing for debugging
+  EEBlue.println(" ");                    // Printing for debugging
+  
+  EEBlue.println("End of Void Setup");    // Printing for debugging
+  EEBlue.println(" ");                    // Printing for debugging
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
