@@ -6,7 +6,7 @@ Nick Woolsey
 Giovani Casillas
 */
 
-// COMPONENT SETUP
+//***BEGIN COMPONENT SETUP***
 
 
 // Bluetooth HC-05
@@ -31,8 +31,8 @@ Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_V
 // Servo (TOF up and down)
 #include <Servo.h>              // Including the servo library 
 Servo TOFServo;                 // Creating a new servo object named TOFServo
-#define TOFServoPin 10       // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
-int TOFServoPos = 90;          // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
+#define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
+int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
 
 
 // Stepper Motors
@@ -48,27 +48,27 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 
 // DC Motors
-//DC motors only require that we define their pins. No libraries or special objects required. 
+//DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right 
 #define DCmotorFrontPWMA 48     
 #define DCmotorFrontAI1 52
 #define DCmotorFrontAI2 53
+#define DCmotorFrontPWMB 49
 #define DCmotorFrontBI1 50
 #define DCmotorFrontBI2 51
-#define DCmotorFrontPWMB 49
 
 #define DCmotorMiddlePWMA 42
 #define DCmotorMiddleAI1 46
 #define DCmotorMiddleAI2 47
+#define DCmotorMiddlePWMB 43
 #define DCmotorMiddleBI1 44
 #define DCmotorMiddleBI2 54
-#define DCmotorMiddlePWMB 43
 
 #define DCmotorBackPWMA 36
 #define DCmotorBackAI1 40
 #define DCmotorBackAI2 41
+#define DCmotorBackPWMB 37
 #define DCmotorBackBI1 38
 #define DCmotorBackBI2 39
-#define DCmotorBackPWMB 37
 
 
 // LED Pins
@@ -100,7 +100,7 @@ void setup() {
  * So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
   int8_t temp = DarwinIMU.getTemp();
   EEBlue.print("IMU Tempature: ");        // Printing for debugging
-  EEblue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   EEBlue.println("IMU Setup Complete");   // Printing for debugging
   EEBlue.println(" ");                    // Printing for debugging
@@ -126,6 +126,35 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  
+ // Get position and store the direction we are facing
+
+ // Center TOF sensor 
+
+ // Get TOF Measurement and check that it is within predetermined bounds
+
+ // Move forward until TOF sensor limit is triggered 
+
+ // Look left and right to see which direction is more clear 
+
+ // Pick a side and begin turning function toward that direction
+
+    // Turning function
+    // Rotate steering arms to their turning positions
+    // measure IMU to set start position and assign target end position
+    // Rotate DC motors in approipate direction while monitoring the IMU position 
+    // Stop rotating the DC motors when the IMU target position is reached
+    // Return steering arms to drive position 
+
+    // IF LEFT TURN
+    // Drive forward while monitoring the right side of the bot to see when it clears the obstical
+    // When right side is clear, begin turn function to return to the original end goal position 
+
+    // IF RIGHT TURN
+    // same same but different 
+
+  
+    
 
 }
