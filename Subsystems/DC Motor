@@ -1,0 +1,96 @@
+//DC Motor Functions
+
+// DC Motors
+//DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right
+#define DCmotorFrontPWMA 48
+#define DCmotorFrontAI1 52
+#define DCmotorFrontAI2 53
+#define DCmotorFrontPWMB 49
+#define DCmotorFrontBI1 50
+#define DCmotorFrontBI2 51
+
+#define DCmotorMiddlePWMA 42
+#define DCmotorMiddleAI1 46
+#define DCmotorMiddleAI2 47
+#define DCmotorMiddlePWMB 43
+#define DCmotorMiddleBI1 44
+#define DCmotorMiddleBI2 54
+
+#define DCmotorBackPWMA 36
+#define DCmotorBackAI1 40
+#define DCmotorBackAI2 41
+#define DCmotorBackPWMB 37
+#define DCmotorBackBI1 38
+#define DCmotorBackBI2 39
+
+void setup()
+
+{
+  pinMode(DCmotorFrontPWMA, OUTPUT);
+  pinMode(DCmotorFrontAI1, OUTPUT);
+  pinMode(DCmotorFrontAI2, OUTPUT);
+  pinMode(DCmotorFrontBI1, OUTPUT);
+  pinMode(DCmotorFrontBI2, OUTPUT);
+  pinMode(DCmotorFrontPWMB, OUTPUT);
+}
+
+void loop() {
+}
+
+void MoveUp()
+{
+
+  digitalWrite(DCmotorFrontPWMA, HIGH);
+  digitalWrite(DCmotorFrontPWMB, HIGH);
+  digitalWrite(DCmotorMiddlePWMA, HIGH);
+  digitalWrite(DCmotorMiddlePWMB, HIGH);
+  digitalWrite(DCmotorBackPWMA, HIGH);
+  digitalWrite(DCmotorBackPWMB, HIGH);
+  // All motors A move forward
+
+  digitalWrite(DCmotorFrontAI1, HIGH);
+  digitalWrite(DCmotorFrontAI2, LOW);
+  digitalWrite(DCmotorMiddleAI1, HIGH);
+  digitalWrite(DCmotorMiddleAI2, LOW);
+  digitalWrite(DCmotorBackAI1, HIGH);
+  digitalWrite(DCmotorBackAI2, LOW);
+
+  // All motors B move forward
+
+  digitalWrite(DCmotorFrontBI1, HIGH);
+  digitalWrite(DCmotorFrontBI2, LOW);
+  digitalWrite(DCmotorMiddleBI1, HIGH);
+  digitalWrite(DCmotorMiddleBI2, LOW);
+  digitalWrite(DCmotorBackBI1, HIGH);
+  digitalWrite(DCmotorBackBI2, LOW);
+
+}
+
+void MoveBack()
+{
+
+  digitalWrite(DCmotorFrontPWMA, HIGH);
+  digitalWrite(DCmotorFrontPWMB, HIGH);
+  digitalWrite(DCmotorMiddlePWMA, HIGH);
+  digitalWrite(DCmotorMiddlePWMB, HIGH);
+  digitalWrite(DCmotorBackPWMA, HIGH);
+  digitalWrite(DCmotorBackPWMB, HIGH);
+  // All motors A move forward
+
+  digitalWrite(DCmotorFrontAI1, LOW);
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);
+  digitalWrite(DCmotorBackAI2, HIGH);
+
+  // All motors B move forward
+
+  digitalWrite(DCmotorFrontBI1, LOW);
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);
+  digitalWrite(DCmotorBackBI2, HIGH);
+
+}
