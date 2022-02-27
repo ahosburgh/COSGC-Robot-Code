@@ -1,0 +1,84 @@
+/* Stepper Motor Driver Tutorial
+
+*** Wiring Instructions ***
+  Arduino Pin 8 --- Driver 1N1
+  Arduino Pin 9 --- Driver 1N2
+  Arduino Pin 10 --- Driver 1N3
+  Arduino Pin 11 --- Driver 1N4
+
+*/
+
+#include <Stepper.h>    // Stepper motor library (Included with Arduino IDE)
+
+#define steps 64                      // Setting the number of steps per rotation the motor takes. This is mechanically 
+#define degree 5.625                  // Setting the number of degrees the motor rotates per step
+int StepperSpeed = 600;                       //fastest speed motor will allow
+Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
+Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
+Stepper FrontRightStepper(steps, 25, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
+Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
+Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
+
+
+void setup() {
+}
+
+void loop() {
+}
+
+void Left45()
+{
+  FrontLeftStepper.setSpeed(StepperSpeed);
+  FrontLeftStepper.step(degToSteps(45));
+  FrontRightStepper.setSpeed(StepperSpeed);
+  FrontRightStepper.step(degToSteps(45));
+  BackLeftStepper.setSpeed(StepperSpeed);
+  BackLeftStepper.step(degToSteps(-45));
+  BackRightStepper.setSpeed(StepperSpeed);
+  BackRightStepper.step(degToSteps(-45));
+  delay(1000);
+}
+
+void Right45()
+{
+  FrontLeftStepper.setSpeed(StepperSpeed);
+  FrontLeftStepper.step(degToSteps(-45));
+  FrontRightStepper.setSpeed(StepperSpeed);
+  FrontRightStepper.step(degToSteps(-45));
+  BackLeftStepper.setSpeed(StepperSpeed);
+  BackLeftStepper.step(degToSteps(45));
+  BackRightStepper.setSpeed(StepperSpeed);
+  BackRightStepper.step(degToSteps(45));
+  delay(1000);
+}
+
+void Left90()
+{
+  FrontLeftStepper.setSpeed(StepperSpeed);
+  FrontLeftStepper.step(degToSteps(90));
+  FrontRightStepper.setSpeed(StepperSpeed);
+  FrontRightStepper.step(degToSteps(90));
+  BackLeftStepper.setSpeed(StepperSpeed);
+  BackLeftStepper.step(degToSteps(-90));
+  BackRightStepper.setSpeed(StepperSpeed);
+  BackRightStepper.step(degToSteps(-90));
+  delay(1000);
+}
+
+void Right90()
+{
+  FrontLeftStepper.setSpeed(StepperSpeed);
+  FrontLeftStepper.step(degToSteps(-90));
+  FrontRightStepper.setSpeed(StepperSpeed);
+  FrontRightStepper.step(degToSteps(-90));
+  BackLeftStepper.setSpeed(StepperSpeed);
+  BackLeftStepper.step(degToSteps(90));
+  BackRightStepper.setSpeed(StepperSpeed);
+  BackRightStepper.step(degToSteps(90));
+  delay(1000);
+}
+
+//functon that takes in degrees requested and return steps needed
+float degToSteps(float deg) {
+  return ((steps / degree) * deg) / 2;
+}
