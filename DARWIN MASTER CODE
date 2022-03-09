@@ -67,8 +67,8 @@ float thetaG=0;         // Pitch from Gyro
 float phiG=0;           // Roll from Gyro
 float theta;            // Overall System Pitch
 float phi;              // Overall System Roll
-float thetaRad;         // 
-float phiRad;
+float thetaRad;         // theta in radians
+float phiRad;           // phi in radians
 float Xm;               // Value coming off the x magnitometer
 float Ym;               // Value coming off the Y Magnitometer
 float psi;              // Heading angle 
@@ -125,7 +125,7 @@ void setup() {
   EEBlue.println(" ");                    // Printing for debuggin
 
 
-  //Servor (TOF) Setup
+  //Servo (TOF) Setup
   EEBlue.println("Servo Setup Begin");    // Printing for debugging
   TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
   EEBlue.print("Setting Servo to ");      // Printing for debugging
