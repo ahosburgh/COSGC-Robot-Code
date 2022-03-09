@@ -3,7 +3,7 @@ Project DARWIN
 Team Members
 Adam Hosburgh
 Nick Woolsey
-Giovani Casillas
+
 */
 
 
@@ -109,7 +109,7 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 
 
-//BEGIN VOID SETUP
+//--------------VOID SETUP ------------ VOID SETUP ------------ VOID SETUP ---------------- VOID SETUP --------------
 void setup() {
   
   // Bluetooth EEBlue Communication
@@ -143,7 +143,7 @@ void setup() {
     digitalWrite(pin, LOW);
   }
   
-  Timer(1000, previousTime);                       // Startup Light show
+  Timer(1000, previousTime);                       // Startup light show
   for (int j = 0; j <= 3; j++) {
     for (byte pin = A0; pin < A0 + 6; pin++) {
       digitalWrite(pin, LOW);
@@ -173,7 +173,7 @@ void setup() {
   millisOld=millis();                     // Grabbing the system time for dt variable
   EEBlue.println("Calling IMU Calibration Function");   // Printing for debugging
   EEBlue.println(" ");  
-  SetupIMU();
+  SetupIMU();                                   // Calling function to calibrate IMU 
   EEBlue.println("IMU Calibration Complete");   // Printing for debugging
   EEBlue.println(" ");  
 
@@ -193,7 +193,7 @@ void setup() {
 
 
 
-//MAIN PROGRAM START
+//----------VOID LOOP--------------VOID LOOP------------------VOID LOOP-----------------VOID LOOP---------------
 void loop() {
 
 TOFServo.write(TOFServoPos); 
@@ -209,7 +209,7 @@ delay(10000);
 
 
 
-// FUNCTIONS ===========================================================================================================
+//------------FUNCTIONS--------------FUNCTIONS---------------FUNCTIONS-----------FUNCTIONS----------FUNCTIONS----------------
 
 
 // LED Functions
