@@ -1,4 +1,4 @@
-/* 2021-2022 NASA COSGC FRCC
+   /* 2021-2022 NASA COSGC FRCC
 Project DARWIN 
 Team Members
 Adam Hosburgh
@@ -6,45 +6,6 @@ Nick Woolsey
 Giovani Casillas
 */
 
-//***BEGIN COMPONENT SETUP***
-
-
-// Bluetooth HC-05
-#include <SoftwareSerial.h>      // Software Serial Library for using different pins as serial busses   
-SoftwareSerial EEBlue(23, 22);   // Creating object named EEBlue, and defining pins 23, and 22 as software RX and TX respectfully 
-
-
-// IMU Sensor
-#include <Wire.h>                               // I2C comunication library (built into Arduino)
-#include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
-#include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
-#include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
-#define BN0055_SAMPLERATE_DELAY_MS (100)        // Instructing the sensor to sample every 100 ms
-Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
-
-
-// TOF Sensor
-#include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
-Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF" 
-
-
-// Servo (TOF up and down)
-#include <Servo.h>              // Including the servo library 
-Servo TOFServo;                 // Creating a new servo object named TOFServo
-#define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
-int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
-
-
-// Stepper Motors
-#include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
-#define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
-#define degree 5.625                                // Setting the number of degrees the motor rotates per step
-int StepperSpeed = 600;                             // Fastest speed motor will allow
-Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
-Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
-Stepper FrontRightStepper(steps, 25, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
-Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
-Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
 
 
 // DC Motors
@@ -73,45 +34,98 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 // LED Pins
 // Defining LED pins for the taillights
-#define LeftTailLight 10
-#define RightTailLight 11
+#define Led1 = A0;
+#define Led2 = A1;
+#define Led3 = A2;
+#define Led4 = A5;
+#define Led5 = A4;
+#define Led6 = A3;
+const unsigned long eventInterval = 2000;
+unsigned long previousTime = 0;
 
-//*****BEGIN VOID SETUP*****
+
+// Bluetooth HC-05
+#include <SoftwareSerial.h>      // Software EEBlue Library for using different pins as EEBlue busses   
+SoftwareSerial EEBlue(23, 22);   // Creating object named EEBlue, and defining pins 23, and 22 as software RX and TX respectfully 
+
+
+// IMU Sensor
+#include <Wire.h>                               // I2C comunication library (built into Arduino)///////////////////////////////////////////////////////////////////////////////////////////////////
+#include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
+#include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
+#include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
+#include <math.h>                               // Math library required for trig functions in compass
+#define BN0055_SAMPLERATE_DELAY_MS (100)        // Instructing the sensor to sample every 100 ms
+Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
+float thetaM;           // Pitch from Accelerometer
+float phiM;             // Roll from Accellerometer
+float thetaFold=0;      // Overall System Pitch Filtered (Old)
+float thetaFnew;        // Overall System Pitch Filtered (New)
+float phiFold=0;        // Overall System Roll Filtered  (Old) 
+float phiFnew;          // Overall System Roll Filtered (New)
+float thetaG=0;         // Pitch from Gyro
+float phiG=0;           // Roll from Gyro
+float theta;            // Overall System Pitch
+float phi;              // Overall System Roll
+float thetaRad;         // 
+float phiRad;
+float Xm;               // Value coming off the x magnitometer
+float Ym;               // Value coming off the Y Magnitometer
+float psi;              // Heading angle 
+float dt;
+unsigned long millisOld;
+
+
+// TOF Sensor
+#include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
+Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF" 
+
+
+// Servo (TOF up and down)
+#include <Servo.h>              // Including the servo library 
+Servo TOFServo;                 // Creating a new servo object named TOFServo
+#define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
+int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
+
+
+// Stepper Motors
+#include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
+#define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
+#define degree 5.625                                // Setting the number of degrees the motor rotates per step
+int StepperSpeed = 600;                             // Fastest speed motor will allow
+Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
+Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
+Stepper FrontRightStepper(steps, 25, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
+Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
+Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
+
+
+
+
+
+
+
+
+
+
+
+//BEGIN VOID SETUP
 void setup() {
-
-// LED Taillights
- pinMode(LeftTailLight, OUTPUT);      // Set LED Pin as Output
- pinMode(RightTailLight, OUTPUT);     // Set LED Pin as Output
- digitalWrite(LeftTailLight, LOW);    // Turn OFF the LED Pin at the start
- digitalWrite(RightTailLight, LOW);   // Turn OFF the LED Pin at the start
- 
   
-// Bluetooth Serial Communication
+  // Bluetooth EEBlue Communication
   EEBlue.begin(9600);                                              // Begin bluetooth communication at 9600
-  EEBlue.println("Bluetooth Serial Communication Established");    // Confirm bluetooth connection established 
+  EEBlue.println("Bluetooth EEBlue Communication Established");    // Confirm bluetooth connection established 
   EEBlue.println(" ");
 
-// IMU Sensor Setup
-  EEBlue.println("IMU Setup Begin");
-  DarwinIMU.begin();              // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
-  delay(1000);                    // waiting 1 second to give it time to power on and make its connection before sending another command
-/* int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU
- * are dependant on tempature. So we need to measure the tempature of the IMU first.
- * So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
-  int8_t temp = DarwinIMU.getTemp();
-  EEBlue.print("IMU Tempature: ");        // Printing for debugging
-  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
-  DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
-  EEBlue.println("IMU Setup Complete");   // Printing for debugging
-  EEBlue.println(" ");                    // Printing for debugging
 
-//TOF Sensor Setup
+  //TOF Sensor Setup
   EEBlue.println("TOF Setup Begin");      // Printing for debugging
   DarwinTOF.begin();                      // Establish connection with TOF sensor
   EEBlue.println("TOF Setup Complete");   // Printing for debugging
   EEBlue.println(" ");                    // Printing for debuggin
 
-//Servor (TOF) Setup
+
+  //Servor (TOF) Setup
   EEBlue.println("Servo Setup Begin");    // Printing for debugging
   TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
   EEBlue.print("Setting Servo to ");      // Printing for debugging
@@ -120,41 +134,370 @@ void setup() {
   TOFServo.write(TOFServoPos);            // Set servo to start position (90 degrees)sdf
   EEBlue.println("Servo Setup Complete"); // Printing for debugging
   EEBlue.println(" ");                    // Printing for debugging
+
+
+// LED Tail Lights Setup
+  unsigned long previousTime = millis();
+    for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, LOW);
+  }
+  
+  Timer(1000, previousTime);                       // Startup Light show
+  for (int j = 0; j <= 3; j++) {
+    for (byte pin = A0; pin < A0 + 6; pin++) {
+      digitalWrite(pin, LOW);
+      previousTime = millis();
+      Timer(80, previousTime);
+      digitalWrite(pin, HIGH);
+    }
+  }
+  previousTime = millis();
+  Timer(300, previousTime);
+  for (byte pin = A5; pin >= A0; pin--) {
+    digitalWrite(pin, LOW);
+    previousTime = millis();
+    Timer(100, previousTime);
+  }
+
+
+
+  // IMU Sensor Setup
+  EEBlue.println("IMU Setup Begin");
+  DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
+  delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
+  int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
+  EEBlue.print("IMU Tempature: ");        // Printing for debugging
+  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
+  millisOld=millis();                     // Grabbing the system time for dt variable
+  EEBlue.println("Calling IMU Calibration Function");   // Printing for debugging
+  EEBlue.println(" ");  
+  SetupIMU();
+  EEBlue.println("IMU Calibration Complete");   // Printing for debugging
+  EEBlue.println(" ");  
+
+    
   
   EEBlue.println("End of Void Setup");    // Printing for debugging
   EEBlue.println(" ");                    // Printing for debugging
+
 }
 
+
+
+
+
+
+
+
+
+
+//MAIN PROGRAM START
 void loop() {
 
-  
- // Get position and store the direction we are facing
+TOFServo.write(TOFServoPos); 
+TurnLeft();
 
- // Center TOF sensor 
+delay(10000);
 
- // Get TOF Measurement and check that it is within predetermined bounds
+ 
+}
 
- // Move forward until TOF sensor limit is triggered 
 
- // Look left and right to see which direction is more clear 
 
- // Pick a side and begin turning function toward that direction
 
-    // Turning function
-    // Rotate steering arms to their turning positions
-    // measure IMU to set start position and assign target end position
-    // Rotate DC motors in approipate direction while monitoring the IMU position 
-    // Stop rotating the DC motors when the IMU target position is reached
-    // Return steering arms to drive position 
 
-    // IF LEFT TURN
-    // Drive forward while monitoring the right side of the bot to see when it clears the obstical
-    // When right side is clear, begin turn function to return to the original end goal position 
 
-    // IF RIGHT TURN
-    // same same but different 
+// FUNCTIONS ===========================================================================================================
 
-  
+
+// LED Functions
+void Timer(int Time, int previousTime) {
+  unsigned long currentTime = millis();
+
+  while (currentTime - previousTime < Time) {
+    currentTime = millis();
+  }
+}
+void LeftSignal()
+{
+  for (int j = 0; j <= 3; j++) {
+    for (byte pin = A2; pin >= A0; pin--) {
+      digitalWrite(pin, HIGH);
+      previousTime = millis();
+      Timer(150, previousTime);
+    }
+    Timer(500, previousTime);
+    for (byte pin = A2; pin >= A0; pin--) {
+      digitalWrite(pin, LOW);
+      previousTime = millis();
+      Timer(150, previousTime);
+    }
+  }
+}
+
+void RightSignal()
+{
+  for (int j = 0; j <= 3; j++) {
+    for (byte pin = A3; pin <= A5; pin++) {
+      digitalWrite(pin, HIGH);
+      previousTime = millis();
+      Timer(150, previousTime);
+    }
+    Timer(500, previousTime);
+    for (byte pin = A3; pin <= A5; pin++) {
+      digitalWrite(pin, LOW);
+      previousTime = millis();
+      Timer(150, previousTime);
+    }
+  }
+}
+
+void RedLight()
+{
+  for (int j = 0; j <= 1; j++) {
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, HIGH);
+    }
+    previousTime = millis();
+    Timer(100, previousTime);
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, LOW);
+    }
+    previousTime = millis();
+    Timer(100, previousTime);
+  }
+  for (byte pin = A5; pin >= A0; pin--) {
+    digitalWrite(pin, HIGH);
+  }
+}
+
+void GreenLight()
+{
+  for (byte pin = A5; pin >= A0; pin--) {
+    digitalWrite(pin, LOW);
+  }
+}
+
+
+// IMU SETUP FUNCTION 
+// This function sets up the IMU a sets the target direction for Darwin.  
+ 
+void SetupIMU(){
+  TOFServo.write(TOFServoPos); 
+  EEBlue.println(" ");
+  EEBlue.println("SetupIMU Function Successfully Called");
+  uint8_t system, gyroCal, accelCal, magCal = 0;
+
+  while(accelCal < 3){
+    DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
+    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     
+    EEBlue.print("Accelerometer: ");
+    EEBlue.print(accel.x());
+    EEBlue.print(",");
+    EEBlue.print(accel.y());
+    EEBlue.print(",");
+    EEBlue.print(accel.z());
+    EEBlue.print(",");
+    EEBlue.print(accelCal);
+    
+    EEBlue.print("   Gyro: ");
+    EEBlue.print(gyro.x());
+    EEBlue.print(",");
+    EEBlue.print(gyro.y());
+    EEBlue.print(",");
+    EEBlue.print(gyro.z());
+    EEBlue.print(",");
+    EEBlue.print(gyroCal);
+    
+    EEBlue.print("   Magnetometer: ");
+    EEBlue.print(mag.x());
+    EEBlue.print(",");
+    EEBlue.print(mag.y());
+    EEBlue.print(",");
+    EEBlue.print(mag.z());
+    EEBlue.print(",");
+    EEBlue.print(magCal);
+    EEBlue.print(",");
+    
+    EEBlue.print(", system: ");
+    EEBlue.println(system);
 
+    previousTime = millis();
+    Timer(100, previousTime);
+  }
+
+  EEBlue.println("IMU Calibration Complete");
+  //previousTime = millis();
+  //Timer(10000, previousTime);                                 // Waiting 5 seconds to set the robot down after calibration
+}
+
+
+float IMUDirection(){ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  TOFServo.write(TOFServoPos); 
+  EEBlue.println("IMU Direction Function Successfully Called");              // Printing for debugging
+
+  //uint8_t system, gyroCal, accelCal, magCal = 0;
+  //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);        
+
+  for (int i = 0; i < 100; i++){                                          // Looping 50 times just to get a good average value
+  imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+  thetaM=-atan2(accel.x()/9.8,accel.z()/9.8)/2/3.141592654*360;         // Math to get the pitch from the accelerometer       
+  phiM=-atan2(accel.y()/9.8,accel.z()/9.8)/2/3.141592654*360;           // Math to get the roll from the accelerometer
+  
+  phiFnew=.95*phiFold+.05*phiM;                                     // Filter for accelerometer roll data
+  thetaFnew=.95*thetaFold+.05*thetaM;                               // Filter for accelerometer pitch data
+ 
+  dt=(millis()-millisOld)/1000.;                                    // Measuring the change in time since last millis measurement 
+  millisOld=millis();                                               // Setting millisOld to millis to update it for next calculation
+  theta=(theta+gyro.y()*dt)*.95+thetaM*.05;                         // Calculating Absolute Roll using fancy math (and running a filter on it)
+  phi=(phi-gyro.x()*dt)*.95+ phiM*.05;                              // Calculating Absolute Pitch using fancy math  (and running a filter on it)
+  thetaG=thetaG+gyro.y()*dt;                                        // Calculating Gyro Roll
+  phiG=phiG-gyro.x()*dt;                                            // Calculating Gyro Pitch
+   
+  phiRad=phi/360*(2*3.14);                                          // Calculating 
+  thetaRad=theta/360*(2*3.14);
+   
+  Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);       // Absolute X Direction of magnitometer after fancy math 
+  Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);                                                         // Absolute Y Direction of magnitometer after fancy math
+   
+  psi=atan2(Ym,Xm)/(2*3.14)*360;                                    // Absolute heading of the robot 
+   
+  phiFold=phiFnew;
+  thetaFold=thetaFnew;
+  }                                 // End for loop
+  return psi;
+}
+
+void TurnLeft()
+{
+  EEBlue.println(" Turn Left Function Successfully Called");
+  float currentDirection = 0;
+  float startingDirection = 0;
+  float targetDirection = 0;
+  float x = 0;
+  
+  startingDirection = IMUDirection();
+  targetDirection = startingDirection - 90;
+
+
+  EEBlue.print(" Starting Direction: ");
+  EEBlue.println(startingDirection);
+ 
+  if(targetDirection < -180){       // Calculating the target position if it goes over the -180 mark
+    x = -targetDirection - 180;
+    targetDirection = 180 - x;
+  }
+
+  EEBlue.print(" Target Direction: ");
+  EEBlue.println(targetDirection);
+
+  EEBlue.println("Begin Turning Left");
+
+  currentDirection = IMUDirection();
+  while(currentDirection > targetDirection+10 || currentDirection < targetDirection - 10){
+    //LeftSignal();
+    currentDirection = IMUDirection();
+    EEBlue.print(" Target Direction: ");
+    EEBlue.print(targetDirection);
+    EEBlue.print("   Current Direction: ");
+    EEBlue.print(currentDirection);
+  }
+
+  EEBlue.print(" Left Turn Complete ");
+  EEBlue.print(" Target Direction: ");
+  EEBlue.println(targetDirection);
+  EEBlue.print(" Current Direction: ");
+  EEBlue.println(currentDirection);
+  //RedLight();
+  
+
+}
+
+
+
+// DC MOTORS 
+void MoveForward()
+{
+
+  digitalWrite(DCmotorFrontPWMA, HIGH);
+  digitalWrite(DCmotorFrontPWMB, HIGH);
+  digitalWrite(DCmotorMiddlePWMA, HIGH);
+  digitalWrite(DCmotorMiddlePWMB, HIGH);
+  digitalWrite(DCmotorBackPWMA, HIGH);
+  digitalWrite(DCmotorBackPWMB, HIGH);
+  // All motors A move forward
+
+  digitalWrite(DCmotorFrontAI1, HIGH);
+  digitalWrite(DCmotorFrontAI2, LOW);
+  digitalWrite(DCmotorMiddleAI1, HIGH);
+  digitalWrite(DCmotorMiddleAI2, LOW);
+  digitalWrite(DCmotorBackAI1, HIGH);
+  digitalWrite(DCmotorBackAI2, LOW);
+
+  // All motors B move forward
+
+  digitalWrite(DCmotorFrontBI1, HIGH);
+  digitalWrite(DCmotorFrontBI2, LOW);
+  digitalWrite(DCmotorMiddleBI1, HIGH);
+  digitalWrite(DCmotorMiddleBI2, LOW);
+  digitalWrite(DCmotorBackBI1, HIGH);
+  digitalWrite(DCmotorBackBI2, LOW);
+
+}
+
+// DC MOTORS 
+void MoveBack()
+{
+
+  digitalWrite(DCmotorFrontPWMA, HIGH);
+  digitalWrite(DCmotorFrontPWMB, HIGH);
+  digitalWrite(DCmotorMiddlePWMA, HIGH);
+  digitalWrite(DCmotorMiddlePWMB, HIGH);
+  digitalWrite(DCmotorBackPWMA, HIGH);
+  digitalWrite(DCmotorBackPWMB, HIGH);
+  // All motors A move forward
+
+  digitalWrite(DCmotorFrontAI1, LOW);
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);
+  digitalWrite(DCmotorBackAI2, HIGH);
+
+  // All motors B move forward
+
+  digitalWrite(DCmotorFrontBI1, LOW);
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);
+  digitalWrite(DCmotorBackBI2, HIGH);
+
+}
+
+
+// Time of Flight Distance Getter
+void GetDistance(){
+  
+  VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function" 
+    
+  EEBlue.print("Reading a measurement... ");    
+  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement" 
+
+  if (measure.RangeStatus != 4)   // phase failures have incorrect data             // idk. Also required for accurate measurements though
+  {
+    EEBlue.print("Distance (mm): "); EEBlue.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
+  } 
+  else 
+  {
+    EEBlue.println(" out of range ");
+  } 
 }
