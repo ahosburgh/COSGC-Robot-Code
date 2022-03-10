@@ -5,11 +5,11 @@ Adam Hosburgh
 Nick Woolsey
 
 */
+//--------------------SETUP--------------------SETUP--------------------SETUP--------------------SETUP--------------------
 
 
-
-// DC Motors
-//DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right 
+//********************DC Motors*******************DC Motors********************DC Motors********************
+//DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
 #define DCmotorFrontPWMA 48     
 #define DCmotorFrontAI1 52
 #define DCmotorFrontAI2 53
@@ -32,7 +32,7 @@ Nick Woolsey
 #define DCmotorBackBI2 39
 
 
-// LED Pins
+//********************LED Pins*******************LED Pins********************LED Pins********************
 // Defining LED pins for the taillights
 #define Led1 = A0;
 #define Led2 = A1;
@@ -44,13 +44,13 @@ const unsigned long eventInterval = 2000;
 unsigned long previousTime = 0;
 
 
-// Bluetooth HC-05
+//********************Bluetooth HC-05*******************Bluetooth HC-05********************Bluetooth HC-05******************** 
 #include <SoftwareSerial.h>      // Software EEBlue Library for using different pins as EEBlue busses   
 SoftwareSerial EEBlue(23, 22);   // Creating object named EEBlue, and defining pins 23, and 22 as software RX and TX respectfully 
 
 
-// IMU Sensor
-#include <Wire.h>                               // I2C comunication library (built into Arduino)///////////////////////////////////////////////////////////////////////////////////////////////////
+//********************IMU Sensor*******************IMU Sensor********************IMU Sensor******************** 
+#include <Wire.h>                               // I2C comunication library (built into Arduino)
 #include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
 #include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
 #include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
@@ -67,8 +67,8 @@ float thetaG=0;         // Pitch from Gyro
 float phiG=0;           // Roll from Gyro
 float theta;            // Overall System Pitch
 float phi;              // Overall System Roll
-float thetaRad;         // theta in radians
-float phiRad;           // phi in radians
+float thetaRad;         // 
+float phiRad;
 float Xm;               // Value coming off the x magnitometer
 float Ym;               // Value coming off the Y Magnitometer
 float psi;              // Heading angle 
@@ -76,19 +76,19 @@ float dt;
 unsigned long millisOld;
 
 
-// TOF Sensor
+//********************TOF Sensor*******************TOF Sensor********************TOF Sensor******************** 
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF" 
 
 
-// Servo (TOF up and down)
+//********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO******************** 
 #include <Servo.h>              // Including the servo library 
 Servo TOFServo;                 // Creating a new servo object named TOFServo
 #define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
 
 
-// Stepper Motors
+//********************STEPPER MOTORS*******************STEPPER MOTORS********************STEPPER MOTORS******************** 
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
@@ -104,15 +104,12 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 
 
-
-
-
-
-
 //--------------VOID SETUP ------------ VOID SETUP ------------ VOID SETUP ---------------- VOID SETUP --------------
+
+
 void setup() {
   
-  // Bluetooth EEBlue Communication
+  //Bluetooth EEBlue Communication
   EEBlue.begin(9600);                                              // Begin bluetooth communication at 9600
   EEBlue.println("Bluetooth EEBlue Communication Established");    // Confirm bluetooth connection established 
   EEBlue.println(" ");
@@ -125,7 +122,7 @@ void setup() {
   EEBlue.println(" ");                    // Printing for debuggin
 
 
-  //Servo (TOF) Setup
+  //Servor (TOF) Setup
   EEBlue.println("Servo Setup Begin");    // Printing for debugging
   TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
   EEBlue.print("Setting Servo to ");      // Printing for debugging
@@ -136,7 +133,79 @@ void setup() {
   EEBlue.println(" ");                    // Printing for debugging
 
 
-// LED Tail Lights Setup
+  //LED Tail Lights Setup
+  StartUpLights();
+
+
+
+  //IMU Sensor Setup
+  EEBlue.println("IMU Setup Begin");
+  DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
+  delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
+  int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
+  EEBlue.print("IMU Tempature: ");        // Printing for debugging
+  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
+  millisOld=millis();                     // Grabbing the system time for dt variable
+  EEBlue.println("Calling IMU Calibration Function");   // Printing for debugging
+  EEBlue.println(" ");  
+  //SetupIMU();                                   // Calling function to calibrate IMU 
+  EEBlue.println("IMU Calibration Complete");   // Printing for debugging
+  EEBlue.println(" ");  
+
+  // End of Void Setup
+  EEBlue.println("End of Void Setup");    // Printing for debugging
+  EEBlue.println(" ");                    // Printing for debugging
+}
+
+
+
+
+
+//----------VOID LOOP--------------VOID LOOP------------------VOID LOOP-----------------VOID LOOP---------------
+
+
+void loop() {
+
+StartUpLights();
+delay(1000);
+LeftSignal();
+
+}
+
+
+
+
+
+//==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========
+
+
+// TIMER 
+void Timer(int Time, int previousTime)
+{
+  EEBlue.println(" ");
+  EEBlue.println("==========Timer Function Sucessfully Called==========");
+  EEBlue.print("Timer called with parameters TIME: ");
+  EEBlue.print(Time);
+  EEBlue.print(" and previousTime: ");
+  EEBlue.println(previousTime);
+  
+  unsigned long currentTime = millis();
+
+  while (currentTime - previousTime < Time) {
+    currentTime = millis();
+  }
+  EEBlue.println("----------Timer Function Complete----------");
+  EEBlue.println(" ");
+}
+
+
+//--------------------LED LIGHTS--------------------LED LIGHTS--------------------LED LIGHTS--------------------
+
+
+//Start Up Lights
+void StartUpLights()
+{
   unsigned long previousTime = millis();
     for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
     pinMode(pin, OUTPUT);
@@ -159,69 +228,13 @@ void setup() {
     previousTime = millis();
     Timer(100, previousTime);
   }
-
-
-
-  // IMU Sensor Setup
-  EEBlue.println("IMU Setup Begin");
-  DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
-  delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
-  int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
-  EEBlue.print("IMU Tempature: ");        // Printing for debugging
-  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
-  DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
-  millisOld=millis();                     // Grabbing the system time for dt variable
-  EEBlue.println("Calling IMU Calibration Function");   // Printing for debugging
-  EEBlue.println(" ");  
-  SetupIMU();                                   // Calling function to calibrate IMU 
-  EEBlue.println("IMU Calibration Complete");   // Printing for debugging
-  EEBlue.println(" ");  
-
-    
-  
-  EEBlue.println("End of Void Setup");    // Printing for debugging
-  EEBlue.println(" ");                    // Printing for debugging
-
 }
 
-
-
-
-
-
-
-
-
-
-//----------VOID LOOP--------------VOID LOOP------------------VOID LOOP-----------------VOID LOOP---------------
-void loop() {
-
-TOFServo.write(TOFServoPos); 
-TurnLeft();
-
-delay(10000);
-
- 
-}
-
-
-
-
-
-
-//------------FUNCTIONS--------------FUNCTIONS---------------FUNCTIONS-----------FUNCTIONS----------FUNCTIONS----------------
-
-
-// LED Functions
-void Timer(int Time, int previousTime) {
-  unsigned long currentTime = millis();
-
-  while (currentTime - previousTime < Time) {
-    currentTime = millis();
-  }
-}
+//LEFT TURN ANIMATION
 void LeftSignal()
 {
+  EEBlue.println(" ");
+  EEBlue.println("==========LeftSignal Function Successfully Called==========");
   for (int j = 0; j <= 3; j++) {
     for (byte pin = A2; pin >= A0; pin--) {
       digitalWrite(pin, HIGH);
@@ -235,10 +248,16 @@ void LeftSignal()
       Timer(150, previousTime);
     }
   }
+  EEBlue.println("----------LeftSignal Function Complete----------");
+  EEBlue.println(" ");
 }
 
+
+//RIGHT TURN ANIMATION
 void RightSignal()
 {
+  EEBlue.println(" ");
+  EEBlue.println("==========RightSignal Function Successfully Called==========");
   for (int j = 0; j <= 3; j++) {
     for (byte pin = A3; pin <= A5; pin++) {
       digitalWrite(pin, HIGH);
@@ -252,10 +271,15 @@ void RightSignal()
       Timer(150, previousTime);
     }
   }
+  EEBlue.println("----------RightSignal Function Complete----------");
+  EEBlue.println(" ");
 }
 
+//BREAK ANIMATION (ALL LIGHTS ON)
 void RedLight()
 {
+  EEBlue.println(" ");
+  EEBlue.println("==========RedLight Function Successfully Called==========");
   for (int j = 0; j <= 1; j++) {
     for (byte pin = A5; pin >= A0; pin--) {
       digitalWrite(pin, HIGH);
@@ -271,23 +295,32 @@ void RedLight()
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, HIGH);
   }
+   EEBlue.println("----------RedLight Function Complete----------");
+   EEBlue.println(" ");
 }
 
+
+//MOVE FORWARD ANIMATION (ALL LIGHTS OFF) 
 void GreenLight()
 {
+  EEBlue.println(" ");
+  EEBlue.println("==========GreenLight Function Successfully Called==========");
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, LOW);
   }
+  EEBlue.println("----------GreenLight Function Complete----------");
+  EEBlue.println(" ");
 }
 
 
+//--------------------IMU SENSOR--------------------IMU SENSOR--------------------IMU SENSOR--------------------
+
 // IMU SETUP FUNCTION 
-// This function sets up the IMU a sets the target direction for Darwin.  
- 
-void SetupIMU(){
-  TOFServo.write(TOFServoPos); 
+// This function sets up the IMU and calibrates the sensor  
+void SetupIMU()
+{
   EEBlue.println(" ");
-  EEBlue.println("SetupIMU Function Successfully Called");
+  EEBlue.println("==========SetupIMU Function Successfully Called==========");
   uint8_t system, gyroCal, accelCal, magCal = 0;
 
   while(accelCal < 3){
@@ -327,24 +360,26 @@ void SetupIMU(){
     EEBlue.print(", system: ");
     EEBlue.println(system);
 
-    previousTime = millis();
-    Timer(100, previousTime);
+    delay(50);    // Delay 50 miliseconds to slow the rate of data sent to the serial monitor  
   }
 
   EEBlue.println("IMU Calibration Complete");
-  //previousTime = millis();
-  //Timer(10000, previousTime);                                 // Waiting 5 seconds to set the robot down after calibration
+  EEBlue.println("----------IMU Setup Function Complete----------");
+  EEBlue.println(" ");
+  delay(5000);                                 // Waiting 5 seconds to set the robot down after calibration
 }
 
-
-float IMUDirection(){ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  TOFServo.write(TOFServoPos); 
-  EEBlue.println("IMU Direction Function Successfully Called");              // Printing for debugging
+// IMU Direction function
+// This function gets the current direction from the IMU
+float IMUDirection()
+{
+  EEBlue.println(" ");
+  EEBlue.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
 
   //uint8_t system, gyroCal, accelCal, magCal = 0;
   //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);        
 
-  for (int i = 0; i < 100; i++){                                          // Looping 50 times just to get a good average value
+  for (int i = 0; i < 20; i++){                                          // Looping 20 times just to get a good average value
   imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
   imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -373,12 +408,18 @@ float IMUDirection(){ //////////////////////////////////////////////////////////
   phiFold=phiFnew;
   thetaFold=thetaFnew;
   }                                 // End for loop
+  EEBlue.println("----------IMUDirection Function Complete----------");
+  EEBlue.println(" ");
   return psi;
 }
 
+
+//--------------------MOVEMENT--------------------MOVEMENT-------------------MOVEMENT-------------------
+//TURN LEFT 
 void TurnLeft()
 {
-  EEBlue.println(" Turn Left Function Successfully Called");
+  EEBlue.println(" ");
+  EEBlue.println("=====TurnLeft Function Successfully Called===== ");
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
@@ -403,24 +444,60 @@ void TurnLeft()
 
   currentDirection = IMUDirection();
   while(currentDirection > targetDirection+10 || currentDirection < targetDirection - 10){
-    //LeftSignal();
+    //LeftSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
     currentDirection = IMUDirection();
-    EEBlue.print(" Target Direction: ");
+    EEBlue.print("Target Direction: ");
     EEBlue.print(targetDirection);
-    EEBlue.print("   Current Direction: ");
-    EEBlue.print(currentDirection);
+    EEBlue.print("Current Direction: ");
+    EEBlue.println(currentDirection);
   }
 
-  EEBlue.print(" Left Turn Complete ");
-  EEBlue.print(" Target Direction: ");
-  EEBlue.println(targetDirection);
-  EEBlue.print(" Current Direction: ");
-  EEBlue.println(currentDirection);
-  //RedLight();
-  
-
+  EEBlue.println(" Left Turn Complete ");
+  EEBlue.println("----------LeftTurn Function Complete----------");
+  EEBlue.println(" ");
 }
 
+
+//TURN RIGHT 
+void TurnRight()
+{
+  EEBlue.println(" ");
+  EEBlue.println("=====TurnRight Function Successfully Called===== ");
+  float currentDirection = 0;
+  float startingDirection = 0;
+  float targetDirection = 0;
+  float x = 0;
+  
+  startingDirection = IMUDirection();
+  targetDirection = startingDirection + 90;
+
+  EEBlue.print(" Starting Direction: ");
+  EEBlue.println(startingDirection);
+ 
+  if(targetDirection > 180){       // Calculating the target position if it goes over the -180 mark
+    x = -targetDirection + 180;
+    targetDirection = -180 - x;
+  }
+
+  EEBlue.print("Target Direction: ");
+  EEBlue.println(targetDirection);
+
+  EEBlue.println("Begin Turning Right");
+
+  currentDirection = IMUDirection();
+  while(currentDirection > targetDirection+10 || currentDirection < targetDirection - 10){
+    //RightSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
+    currentDirection = IMUDirection();
+    EEBlue.print("Target Direction: ");
+    EEBlue.print(targetDirection);
+    EEBlue.print("Current Direction: ");
+    EEBlue.println(currentDirection);
+  }
+
+  EEBlue.println(" Right Turn Complete ");
+  EEBlue.println("----------RightTurn Function Complete----------");
+  EEBlue.println(" ");
+}
 
 
 // DC MOTORS 
