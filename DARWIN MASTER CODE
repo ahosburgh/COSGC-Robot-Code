@@ -44,11 +44,6 @@ const unsigned long eventInterval = 2000;
 unsigned long previousTime = 0;
 
 
-//********************Bluetooth HC-05*******************Bluetooth HC-05********************Bluetooth HC-05******************** 
-#include <SoftwareSerial.h>      // Software EEBlue Library for using different pins as EEBlue busses   
-SoftwareSerial EEBlue(23, 22);   // Creating object named EEBlue, and defining pins 23, and 22 as software RX and TX respectfully 
-
-
 //********************IMU Sensor*******************IMU Sensor********************IMU Sensor******************** 
 #include <Wire.h>                               // I2C comunication library (built into Arduino)
 #include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
@@ -92,10 +87,10 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
-int StepperSpeed = 600;                             // Fastest speed motor will allow
+int StepperSpeed = 800;                             // Fastest speed motor will allow
 Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
 Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
-Stepper FrontRightStepper(steps, 25, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
+Stepper FrontRightStepper(steps, 25, 27, 28, 26);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
 Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
 Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
 
@@ -109,28 +104,28 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 void setup() {
   
-  //Bluetooth EEBlue Communication
-  EEBlue.begin(9600);                                              // Begin bluetooth communication at 9600
-  EEBlue.println("Bluetooth EEBlue Communication Established");    // Confirm bluetooth connection established 
-  EEBlue.println(" ");
+  //Bluetooth Serial2 Communication
+  Serial2.begin(9600);                                              // Begin bluetooth communication at 9600
+  Serial2.println("Bluetooth Serial2 Communication Established");    // Confirm bluetooth connection established 
+  Serial2.println(" ");
 
 
   //TOF Sensor Setup
-  EEBlue.println("TOF Setup Begin");      // Printing for debugging
+  Serial2.println("TOF Setup Begin");      // Printing for debugging
   DarwinTOF.begin();                      // Establish connection with TOF sensor
-  EEBlue.println("TOF Setup Complete");   // Printing for debugging
-  EEBlue.println(" ");                    // Printing for debuggin
+  Serial2.println("TOF Setup Complete");   // Printing for debugging
+  Serial2.println(" ");                    // Printing for debuggin
 
 
   //Servor (TOF) Setup
-  EEBlue.println("Servo Setup Begin");    // Printing for debugging
+  Serial2.println("Servo Setup Begin");    // Printing for debugging
   TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
-  EEBlue.print("Setting Servo to ");      // Printing for debugging
-  EEBlue.print(TOFServoPos);              // Printing for debugging
-  EEBlue.println(" degrees");             // Printing for debugging
+  Serial2.print("Setting Servo to ");      // Printing for debugging
+  Serial2.print(TOFServoPos);              // Printing for debugging
+  Serial2.println(" degrees");             // Printing for debugging
   TOFServo.write(TOFServoPos);            // Set servo to start position (90 degrees)sdf
-  EEBlue.println("Servo Setup Complete"); // Printing for debugging
-  EEBlue.println(" ");                    // Printing for debugging
+  Serial2.println("Servo Setup Complete"); // Printing for debugging
+  Serial2.println(" ");                    // Printing for debugging
 
 
   //LED Tail Lights Setup
@@ -139,23 +134,23 @@ void setup() {
 
 
   //IMU Sensor Setup
-  EEBlue.println("IMU Setup Begin");
+  Serial2.println("IMU Setup Begin");
   DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
   int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
-  EEBlue.print("IMU Tempature: ");        // Printing for debugging
-  EEBlue.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  Serial2.print("IMU Tempature: ");        // Printing for debugging
+  Serial2.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   millisOld=millis();                     // Grabbing the system time for dt variable
-  EEBlue.println("Calling IMU Calibration Function");   // Printing for debugging
-  EEBlue.println(" ");  
-  //SetupIMU();                                   // Calling function to calibrate IMU 
-  EEBlue.println("IMU Calibration Complete");   // Printing for debugging
-  EEBlue.println(" ");  
+  Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
+  Serial2.println(" ");  
+  SetupIMU();                                   // Calling function to calibrate IMU 
+  Serial2.println("IMU Calibration Complete");   // Printing for debugging
+  Serial2.println(" ");  
 
   // End of Void Setup
-  EEBlue.println("End of Void Setup");    // Printing for debugging
-  EEBlue.println(" ");                    // Printing for debugging
+  Serial2.println("End of Void Setup");    // Printing for debugging
+  Serial2.println(" ");                    // Printing for debugging
 }
 
 
@@ -167,10 +162,8 @@ void setup() {
 
 void loop() {
 
-StartUpLights();
+LookLeft();
 delay(1000);
-LeftSignal();
-
 }
 
 
@@ -180,25 +173,6 @@ LeftSignal();
 //==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========
 
 
-// TIMER 
-void Timer(int Time, int previousTime)
-{
-  EEBlue.println(" ");
-  EEBlue.println("==========Timer Function Sucessfully Called==========");
-  EEBlue.print("Timer called with parameters TIME: ");
-  EEBlue.print(Time);
-  EEBlue.print(" and previousTime: ");
-  EEBlue.println(previousTime);
-  
-  unsigned long currentTime = millis();
-
-  while (currentTime - previousTime < Time) {
-    currentTime = millis();
-  }
-  EEBlue.println("----------Timer Function Complete----------");
-  EEBlue.println(" ");
-}
-
 
 //--------------------LED LIGHTS--------------------LED LIGHTS--------------------LED LIGHTS--------------------
 
@@ -206,80 +180,33 @@ void Timer(int Time, int previousTime)
 //Start Up Lights
 void StartUpLights()
 {
-  unsigned long previousTime = millis();
-    for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
+  for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
   }
-  
-  Timer(1000, previousTime);                       // Startup light show
+
+  // Startup light show
   for (int j = 0; j <= 3; j++) {
     for (byte pin = A0; pin < A0 + 6; pin++) {
       digitalWrite(pin, LOW);
-      previousTime = millis();
-      Timer(80, previousTime);
+      delay(80);
       digitalWrite(pin, HIGH);
     }
   }
-  previousTime = millis();
-  Timer(300, previousTime);
+  delay(300);
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, LOW);
-    previousTime = millis();
-    Timer(100, previousTime);
+    delay(100);
   }
 }
 
-//LEFT TURN ANIMATION
-void LeftSignal()
-{
-  EEBlue.println(" ");
-  EEBlue.println("==========LeftSignal Function Successfully Called==========");
-  for (int j = 0; j <= 3; j++) {
-    for (byte pin = A2; pin >= A0; pin--) {
-      digitalWrite(pin, HIGH);
-      previousTime = millis();
-      Timer(150, previousTime);
-    }
-    Timer(500, previousTime);
-    for (byte pin = A2; pin >= A0; pin--) {
-      digitalWrite(pin, LOW);
-      previousTime = millis();
-      Timer(150, previousTime);
-    }
-  }
-  EEBlue.println("----------LeftSignal Function Complete----------");
-  EEBlue.println(" ");
-}
 
-
-//RIGHT TURN ANIMATION
-void RightSignal()
-{
-  EEBlue.println(" ");
-  EEBlue.println("==========RightSignal Function Successfully Called==========");
-  for (int j = 0; j <= 3; j++) {
-    for (byte pin = A3; pin <= A5; pin++) {
-      digitalWrite(pin, HIGH);
-      previousTime = millis();
-      Timer(150, previousTime);
-    }
-    Timer(500, previousTime);
-    for (byte pin = A3; pin <= A5; pin++) {
-      digitalWrite(pin, LOW);
-      previousTime = millis();
-      Timer(150, previousTime);
-    }
-  }
-  EEBlue.println("----------RightSignal Function Complete----------");
-  EEBlue.println(" ");
-}
-
+/*
 //BREAK ANIMATION (ALL LIGHTS ON)
 void RedLight()
 {
-  EEBlue.println(" ");
-  EEBlue.println("==========RedLight Function Successfully Called==========");
+  Serial2.println(" ");
+  Serial2.println("==========RedLight Function Successfully Called==========");
   for (int j = 0; j <= 1; j++) {
     for (byte pin = A5; pin >= A0; pin--) {
       digitalWrite(pin, HIGH);
@@ -295,21 +222,21 @@ void RedLight()
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, HIGH);
   }
-   EEBlue.println("----------RedLight Function Complete----------");
-   EEBlue.println(" ");
+  Serial2.println("----------RedLight Function Complete----------");
+  Serial2.println(" ");
 }
+*/
 
-
-//MOVE FORWARD ANIMATION (ALL LIGHTS OFF) 
-void GreenLight()
+//MOVE FORWARD ANIMATION (ALL LIGHTS OFF)
+void LightsOut()
 {
-  EEBlue.println(" ");
-  EEBlue.println("==========GreenLight Function Successfully Called==========");
+  Serial2.println(" ");
+  Serial2.println("==========LightsOut Function Successfully Called==========");
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, LOW);
   }
-  EEBlue.println("----------GreenLight Function Complete----------");
-  EEBlue.println(" ");
+  Serial2.println("----------LightsOut Function Complete----------");
+  Serial2.println(" ");
 }
 
 
@@ -319,8 +246,8 @@ void GreenLight()
 // This function sets up the IMU and calibrates the sensor  
 void SetupIMU()
 {
-  EEBlue.println(" ");
-  EEBlue.println("==========SetupIMU Function Successfully Called==========");
+  Serial2.println(" ");
+  Serial2.println("==========SetupIMU Function Successfully Called==========");
   uint8_t system, gyroCal, accelCal, magCal = 0;
 
   while(accelCal < 3){
@@ -329,43 +256,43 @@ void SetupIMU()
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
     
-    EEBlue.print("Accelerometer: ");
-    EEBlue.print(accel.x());
-    EEBlue.print(",");
-    EEBlue.print(accel.y());
-    EEBlue.print(",");
-    EEBlue.print(accel.z());
-    EEBlue.print(",");
-    EEBlue.print(accelCal);
+    Serial2.print("Accelerometer: ");
+    Serial2.print(accel.x());
+    Serial2.print(",");
+    Serial2.print(accel.y());
+    Serial2.print(",");
+    Serial2.print(accel.z());
+    Serial2.print(",");
+    Serial2.print(accelCal);
     
-    EEBlue.print("   Gyro: ");
-    EEBlue.print(gyro.x());
-    EEBlue.print(",");
-    EEBlue.print(gyro.y());
-    EEBlue.print(",");
-    EEBlue.print(gyro.z());
-    EEBlue.print(",");
-    EEBlue.print(gyroCal);
+    Serial2.print("   Gyro: ");
+    Serial2.print(gyro.x());
+    Serial2.print(",");
+    Serial2.print(gyro.y());
+    Serial2.print(",");
+    Serial2.print(gyro.z());
+    Serial2.print(",");
+    Serial2.print(gyroCal);
     
-    EEBlue.print("   Magnetometer: ");
-    EEBlue.print(mag.x());
-    EEBlue.print(",");
-    EEBlue.print(mag.y());
-    EEBlue.print(",");
-    EEBlue.print(mag.z());
-    EEBlue.print(",");
-    EEBlue.print(magCal);
-    EEBlue.print(",");
+    Serial2.print("   Magnetometer: ");
+    Serial2.print(mag.x());
+    Serial2.print(",");
+    Serial2.print(mag.y());
+    Serial2.print(",");
+    Serial2.print(mag.z());
+    Serial2.print(",");
+    Serial2.print(magCal);
+    Serial2.print(",");
     
-    EEBlue.print(", system: ");
-    EEBlue.println(system);
+    Serial2.print(", system: ");
+    Serial2.println(system);
 
     delay(50);    // Delay 50 miliseconds to slow the rate of data sent to the serial monitor  
   }
 
-  EEBlue.println("IMU Calibration Complete");
-  EEBlue.println("----------IMU Setup Function Complete----------");
-  EEBlue.println(" ");
+  Serial2.println("IMU Calibration Complete");
+  Serial2.println("----------IMU Setup Function Complete----------");
+  Serial2.println(" ");
   delay(5000);                                 // Waiting 5 seconds to set the robot down after calibration
 }
 
@@ -373,8 +300,8 @@ void SetupIMU()
 // This function gets the current direction from the IMU
 float IMUDirection()
 {
-  EEBlue.println(" ");
-  EEBlue.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
+  Serial2.println(" ");
+  Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
 
   //uint8_t system, gyroCal, accelCal, magCal = 0;
   //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);        
@@ -408,95 +335,182 @@ float IMUDirection()
   phiFold=phiFnew;
   thetaFold=thetaFnew;
   }                                 // End for loop
-  EEBlue.println("----------IMUDirection Function Complete----------");
-  EEBlue.println(" ");
+  Serial2.println("----------IMUDirection Function Complete----------");
+  Serial2.println(" ");
   return psi;
 }
 
 
 //--------------------MOVEMENT--------------------MOVEMENT-------------------MOVEMENT-------------------
-//TURN LEFT 
+//TURN LEFT
 void TurnLeft()
 {
-  EEBlue.println(" ");
-  EEBlue.println("=====TurnLeft Function Successfully Called===== ");
+  unsigned long prevTime = millis();
+  int NumLed = 0;
+  Serial2.println(" ");
+  Serial2.println("=====TurnLeft Function Successfully Called===== ");
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
   float x = 0;
-  
+
   startingDirection = IMUDirection();
   targetDirection = startingDirection - 90;
 
 
-  EEBlue.print(" Starting Direction: ");
-  EEBlue.println(startingDirection);
- 
-  if(targetDirection < -180){       // Calculating the target position if it goes over the -180 mark
+  Serial2.print(" Starting Direction: ");
+  Serial2.println(startingDirection);
+
+  if (targetDirection < -180) {     // Calculating the target position if it goes over the -180 mark
     x = -targetDirection - 180;
     targetDirection = 180 - x;
   }
 
-  EEBlue.print(" Target Direction: ");
-  EEBlue.println(targetDirection);
+  Serial2.print(" Target Direction: ");
+  Serial2.println(targetDirection);
 
-  EEBlue.println("Begin Turning Left");
+  Serial2.println("Begin Turning Left");
 
   currentDirection = IMUDirection();
-  while(currentDirection > targetDirection+10 || currentDirection < targetDirection - 10){
-    //LeftSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
-    currentDirection = IMUDirection();
-    EEBlue.print("Target Direction: ");
-    EEBlue.print(targetDirection);
-    EEBlue.print("Current Direction: ");
-    EEBlue.println(currentDirection);
-  }
+  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
+    //LED Animation
+    unsigned long currentTime = millis();
+    if (currentTime - prevTime > 150) {
+      switch (NumLed) {
+        case 0:
+          digitalWrite(A2, HIGH);
+          NumLed = 1;
+          prevTime = currentTime;
+          break;
 
-  EEBlue.println(" Left Turn Complete ");
-  EEBlue.println("----------LeftTurn Function Complete----------");
-  EEBlue.println(" ");
+        case 1:
+          digitalWrite(A1, HIGH);
+          NumLed = 2;
+          prevTime = currentTime;
+          break;
+
+        case 2:
+          digitalWrite(A0, HIGH);
+          NumLed = 3;
+          prevTime = currentTime;
+          break;
+
+        case 3:
+          digitalWrite(A2, LOW);
+          NumLed = 4;
+          prevTime = currentTime;
+          break;
+
+        case 4:
+          digitalWrite(A1, LOW);
+          NumLed = 5;
+          prevTime = currentTime;
+          break;
+
+        case 5:
+          digitalWrite(A0, LOW);
+          NumLed = 0;
+          prevTime = currentTime;
+          break;
+      }// End LED Animation
+    }
+    currentDirection = IMUDirection();
+    Serial2.print("Target Direction: ");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: ");
+    Serial2.println(currentDirection);
+
+  }
+  // Turning LED's Off
+  LightsOut();
+  Serial2.println(" Left Turn Complete ");
+  Serial2.println("----------LeftTurn Function Complete----------");
+  Serial2.println(" ");
 }
 
 
-//TURN RIGHT 
+
+//TURN RIGHT
 void TurnRight()
 {
-  EEBlue.println(" ");
-  EEBlue.println("=====TurnRight Function Successfully Called===== ");
+  unsigned long prevTime = millis();
+  int NumLed = 0;
+  Serial2.println(" ");
+  Serial2.println("=====TurnRight Function Successfully Called===== ");
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
   float x = 0;
-  
+
   startingDirection = IMUDirection();
   targetDirection = startingDirection + 90;
 
-  EEBlue.print(" Starting Direction: ");
-  EEBlue.println(startingDirection);
- 
-  if(targetDirection > 180){       // Calculating the target position if it goes over the -180 mark
+  Serial2.print(" Starting Direction: ");
+  Serial2.println(startingDirection);
+
+  if (targetDirection > 180) {     // Calculating the target position if it goes over the -180 mark
     x = -targetDirection + 180;
     targetDirection = -180 - x;
   }
 
-  EEBlue.print("Target Direction: ");
-  EEBlue.println(targetDirection);
+  Serial2.print("Target Direction: ");
+  Serial2.println(targetDirection);
 
-  EEBlue.println("Begin Turning Right");
+  Serial2.println("Begin Turning Right");
 
   currentDirection = IMUDirection();
-  while(currentDirection > targetDirection+10 || currentDirection < targetDirection - 10){
-    //RightSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
-    currentDirection = IMUDirection();
-    EEBlue.print("Target Direction: ");
-    EEBlue.print(targetDirection);
-    EEBlue.print("Current Direction: ");
-    EEBlue.println(currentDirection);
-  }
+  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
 
-  EEBlue.println(" Right Turn Complete ");
-  EEBlue.println("----------RightTurn Function Complete----------");
-  EEBlue.println(" ");
+    unsigned long currentTime = millis();
+    if (currentTime - prevTime > 150) {
+      switch (NumLed) {
+        case 0:
+          digitalWrite(A3, HIGH);
+          NumLed = 1;
+          prevTime = currentTime;
+          break;
+
+        case 1:
+          digitalWrite(A4, HIGH);
+          NumLed = 2;
+          prevTime = currentTime;
+          break;
+
+        case 2:
+          digitalWrite(A5, HIGH);
+          NumLed = 3;
+          prevTime = currentTime;
+          break;
+
+        case 3:
+          digitalWrite(A3, LOW);
+          NumLed = 4;
+          prevTime = currentTime;
+          break;
+
+        case 4:
+          digitalWrite(A4, LOW);
+          NumLed = 5;
+          prevTime = currentTime;
+          break;
+
+        case 5:
+          digitalWrite(A5, LOW);
+          NumLed = 0;
+          prevTime = currentTime;
+          break;
+      }
+    }
+    currentDirection = IMUDirection();
+    Serial2.print("Target Direction: ");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: ");
+    Serial2.println(currentDirection);
+  }
+  LightsOut();
+  Serial2.println(" Right Turn Complete ");
+  Serial2.println("----------RightTurn Function Complete----------");
+  Serial2.println(" ");
 }
 
 
@@ -560,21 +574,37 @@ void MoveBack()
 
 }
 
+void LookLeft()
+{
+  TOFStepper.setSpeed(StepperSpeed);
+  TOFStepper.step(degToSteps(-90));
+  delay(1000);
+  TOFStepper.step(degToSteps(90));
+}
+
+
+
+//functon that takes in degrees requested and return steps needed
+float degToSteps(float deg) {
+  return ((steps / degree) * deg) / 2;
+}
+
+
 
 // Time of Flight Distance Getter
 void GetDistance(){
   
   VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function" 
     
-  EEBlue.print("Reading a measurement... ");    
+  Serial2.print("Reading a measurement... ");    
   DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement" 
 
   if (measure.RangeStatus != 4)   // phase failures have incorrect data             // idk. Also required for accurate measurements though
   {
-    EEBlue.print("Distance (mm): "); EEBlue.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
+    Serial2.print("Distance (mm): "); Serial2.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
   } 
   else 
   {
-    EEBlue.println(" out of range ");
+    Serial2.println(" out of range ");
   } 
 }
