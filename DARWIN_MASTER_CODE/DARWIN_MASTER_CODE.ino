@@ -75,6 +75,7 @@ unsigned long millisOld;
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
 float distance;
+// SCL - gray SDA - white
 
 
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
@@ -108,7 +109,7 @@ void setup() {
   Serial2.begin(9600);                                              // Begin bluetooth communication at 9600
   Serial2.println("Bluetooth Serial2 Communication Established");    // Confirm bluetooth connection established
   Serial2.println(" ");
-
+  // Pin TX2 and RX2 -- Yellow and Blue
 
   //TOF Sensor Setup
   Serial2.println("TOF Setup Begin");      // Printing for debugging
@@ -197,14 +198,14 @@ void setup() {
 
 void loop() {
   delay(1000);
-  //  MoveForward();
-  //  delay(3000);
-  //  DCStop();
-  //  TurnLeft();
-  //  MoveForward();
-  //  delay(3000);
-  //  DCStop();
-  //  TurnRight();
+    MoveForward();
+    delay(3000);
+    DCStop();
+    TurnLeft();
+    MoveForward();
+    delay(3000);
+    DCStop();
+    TurnRight();
   MoveBack();
   DCStop();
 
@@ -463,7 +464,7 @@ void TurnLeft()
 
   }
   DCStop();
-  stepperStraight();
+  //stepperStraight();
   LightsOut();
   Serial2.println(" Left Turn Complete ");
   Serial2.println("----------LeftTurn Function Complete----------");
@@ -574,29 +575,29 @@ void TurnRight()
     Serial2.println(currentDirection);
   }
   DCStop();
-  stepperStraight();
+  //stepperStraight();
   LightsOut();
   Serial2.println(" Right Turn Complete ");
   Serial2.println("----------RightTurn Function Complete----------");
   Serial2.println(" ");
   delay(MovementDelay);
 }
-
-void turnStepper() {
-  int deg = degToSteps(45);
-  FrontLeftStepper.step(-deg);
-  BackRightStepper.step(-deg);
-  FrontRightStepper.step(deg);
-  BackLeftStepper.step(deg);
-}
-
-void stepperStraight() {
-  int deg = degToSteps(-45);
-  FrontLeftStepper.step(-deg);
-  BackRightStepper.step(-deg);
-  FrontRightStepper.step(deg);
-  BackLeftStepper.step(deg);
-}
+//
+//void turnStepper() {
+// // int deg = degToSteps(45);
+//  FrontLeftStepper.step(-deg);
+//  BackRightStepper.step(-deg);
+//  FrontRightStepper.step(deg);
+//  BackLeftStepper.step(deg);
+//}
+//
+//void stepperStraight() {
+//  //int deg = degToSteps(-45);
+//  FrontLeftStepper.step(-deg);
+//  BackRightStepper.step(-deg);
+//  FrontRightStepper.step(deg);
+//  BackLeftStepper.step(deg);
+//}
 
 // DC MOTORS
 void MoveForward()
