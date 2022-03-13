@@ -73,6 +73,8 @@ unsigned long millisOld;
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
+int currentDistance = 0;
+int targetDistance = 0;
 
 
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
@@ -143,7 +145,7 @@ void setup() {
   millisOld = millis();                   // Grabbing the system time for dt variable
   Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
   Serial2.println(" ");
-  SetupIMU();                                   // Calling function to calibrate IMU
+  //SetupIMU();                                   // Calling function to calibrate IMU
   Serial2.println("IMU Calibration Complete");   // Printing for debugging
   Serial2.println(" ");
 
@@ -160,9 +162,23 @@ void setup() {
 
 
 void loop() {
-
+  delay(1000);
+  MoveForward();
+  delay(3000);
+  DCStop();
+  delay(3000);
   TurnLeft();
+  delay(1000);
+  MoveForward();
   delay(5000);
+  DCStop();
+  delay(3000);
+  TurnRight();
+  delay(1000);
+  MoveBack();
+  delay(1000);
+  DCStop();
+
 }
 
 
@@ -172,24 +188,6 @@ void loop() {
 //==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========
 
 
-// TIMER
-void Timer(int Time, int previousTime)
-{
-  Serial2.println(" ");
-  Serial2.println("==========Timer Function Sucessfully Called==========");
-  Serial2.print("Timer called with parameters TIME: ");
-  Serial2.print(Time);
-  Serial2.print(" and previousTime: ");
-  Serial2.println(previousTime);
-
-  unsigned long currentTime = millis();
-
-  while (currentTime - previousTime < Time) {
-    currentTime = millis();
-  }
-  Serial2.println("----------Timer Function Complete----------");
-  Serial2.println(" ");
-}
 
 
 //--------------------LED LIGHTS--------------------LED LIGHTS--------------------LED LIGHTS--------------------
@@ -198,7 +196,6 @@ void Timer(int Time, int previousTime)
 //Start Up Lights
 void StartUpLights()
 {
-  unsigned long previousTime = millis();
   for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
@@ -218,31 +215,6 @@ void StartUpLights()
     delay(100);
   }
 }
-
-//BREAK ANIMATION (ALL LIGHTS ON)
-void RedLight()
-{
-  Serial2.println(" ");
-  Serial2.println("==========RedLight Function Successfully Called==========");
-  for (int j = 0; j <= 1; j++) {
-    for (byte pin = A5; pin >= A0; pin--) {
-      digitalWrite(pin, HIGH);
-    }
-    previousTime = millis();
-    Timer(100, previousTime);
-    for (byte pin = A5; pin >= A0; pin--) {
-      digitalWrite(pin, LOW);
-    }
-    previousTime = millis();
-    Timer(100, previousTime);
-  }
-  for (byte pin = A5; pin >= A0; pin--) {
-    digitalWrite(pin, HIGH);
-  }
-  Serial2.println("----------RedLight Function Complete----------");
-  Serial2.println(" ");
-}
-
 
 //MOVE FORWARD ANIMATION (ALL LIGHTS OFF)
 void LightsOut()
@@ -531,7 +503,7 @@ void TurnRight()
 // DC MOTORS
 void MoveForward()
 {
-
+  LightsOut();
   digitalWrite(DCmotorFrontPWMA, HIGH);
   digitalWrite(DCmotorFrontPWMB, HIGH);
   digitalWrite(DCmotorMiddlePWMA, HIGH);
@@ -561,35 +533,80 @@ void MoveForward()
 // DC MOTORS
 void MoveBack()
 {
+  int NumLed = 1;
+  unsigned long prevTime = millis();
+  while (currentTime - prevTime < 3000) {
+    unsigned long currentTime = millis();
+    switch (NumLed) {
+      case 0:
+        for (byte pin = A5; pin >= A0; pin--) {
+          digitalWrite(pin, HIGH);
+        }
+        NumLed = 1;
+        break;
 
-  digitalWrite(DCmotorFrontPWMA, HIGH);
-  digitalWrite(DCmotorFrontPWMB, HIGH);
-  digitalWrite(DCmotorMiddlePWMA, HIGH);
-  digitalWrite(DCmotorMiddlePWMB, HIGH);
-  digitalWrite(DCmotorBackPWMA, HIGH);
-  digitalWrite(DCmotorBackPWMB, HIGH);
-  // All motors A move forward
+      case 1:
+        for (byte pin = A5; pin >= A0; pin--) {
+          digitalWrite(pin, LOW);
+        }
+        NumLed = 0;
+        break;
 
-  digitalWrite(DCmotorFrontAI1, LOW);
-  digitalWrite(DCmotorFrontAI2, HIGH);
-  digitalWrite(DCmotorMiddleAI1, LOW);
-  digitalWrite(DCmotorMiddleAI2, HIGH);
-  digitalWrite(DCmotorBackAI1, LOW);
-  digitalWrite(DCmotorBackAI2, HIGH);
+    }
 
-  // All motors B move forward
+    digitalWrite(DCmotorFrontPWMA, HIGH);
+    digitalWrite(DCmotorFrontPWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, HIGH);
+    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorBackPWMA, HIGH);
+    digitalWrite(DCmotorBackPWMB, HIGH);
+    // All motors A move back
 
-  digitalWrite(DCmotorFrontBI1, LOW);
-  digitalWrite(DCmotorFrontBI2, HIGH);
-  digitalWrite(DCmotorMiddleBI1, LOW);
-  digitalWrite(DCmotorMiddleBI2, HIGH);
-  digitalWrite(DCmotorBackBI1, LOW);
-  digitalWrite(DCmotorBackBI2, HIGH);
+    digitalWrite(DCmotorFrontAI1, LOW);
+    digitalWrite(DCmotorFrontAI2, HIGH);
+    digitalWrite(DCmotorMiddleAI1, LOW);
+    digitalWrite(DCmotorMiddleAI2, HIGH);
+    digitalWrite(DCmotorBackAI1, LOW);
+    digitalWrite(DCmotorBackAI2, HIGH);
 
+    // All motors B move back
+
+    digitalWrite(DCmotorFrontBI1, LOW);
+    digitalWrite(DCmotorFrontBI2, HIGH);
+    digitalWrite(DCmotorMiddleBI1, LOW);
+    digitalWrite(DCmotorMiddleBI2, HIGH);
+    digitalWrite(DCmotorBackBI1, LOW);
+    digitalWrite(DCmotorBackBI2, HIGH);
+    //prevTime = currentTime;
+  }
+}
+
+void DCStop()
+{
+  digitalWrite(DCmotorFrontPWMA, LOW);
+  digitalWrite(DCmotorFrontPWMB, LOW);
+  digitalWrite(DCmotorMiddlePWMA, LOW);
+  digitalWrite(DCmotorMiddlePWMB, LOW);
+  digitalWrite(DCmotorBackPWMA, LOW);
+  digitalWrite(DCmotorBackPWMB, LOW);
+
+  for (int j = 0; j <= 1; j++) {
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, HIGH);
+    }
+    delay(100);
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, LOW);
+    }
+    delay(100);
+  }
+  for (byte pin = A5; pin >= A0; pin--) {
+    digitalWrite(pin, HIGH);
+  }
 }
 
 
-// Time of Flight Distance Getter
+// Time of Flight Distance Retrieval
 void GetDistance() {
 
   VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function"
