@@ -1,8 +1,8 @@
-   /* 2021-2022 NASA COSGC FRCC
-Project DARWIN 
-Team Members
-Adam Hosburgh
-Nick Woolsey
+/* 2021-2022 NASA COSGC FRCC
+  Project DARWIN
+  Team Members
+  Adam Hosburgh
+  Nick Woolsey
 
 */
 //--------------------SETUP--------------------SETUP--------------------SETUP--------------------SETUP--------------------
@@ -10,7 +10,8 @@ Nick Woolsey
 
 //********************DC Motors*******************DC Motors********************DC Motors********************
 //DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
-#define DCmotorFrontPWMA 48     
+int MovementDelay = 1000;
+#define DCmotorFrontPWMA 48
 #define DCmotorFrontAI1 52
 #define DCmotorFrontAI2 53
 #define DCmotorFrontPWMB 49
@@ -22,7 +23,7 @@ Nick Woolsey
 #define DCmotorMiddleAI2 47
 #define DCmotorMiddlePWMB 43
 #define DCmotorMiddleBI1 44
-#define DCmotorMiddleBI2 54
+#define DCmotorMiddleBI2 45
 
 #define DCmotorBackPWMA 36
 #define DCmotorBackAI1 40
@@ -34,17 +35,16 @@ Nick Woolsey
 
 //********************LED Pins*******************LED Pins********************LED Pins********************
 // Defining LED pins for the taillights
-#define Led1 = A0;
-#define Led2 = A1;
-#define Led3 = A2;
-#define Led4 = A5;
-#define Led5 = A4;
-#define Led6 = A3;
+#define Led1 A0
+#define Led2 A1
+#define Led3 A2
+#define Led4 A5
+#define Led5 A4
+#define Led6 A3
 const unsigned long eventInterval = 2000;
 unsigned long previousTime = 0;
 
-
-//********************IMU Sensor*******************IMU Sensor********************IMU Sensor******************** 
+//********************IMU Sensor*******************IMU Sensor********************IMU Sensor********************
 #include <Wire.h>                               // I2C comunication library (built into Arduino)
 #include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
 #include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
@@ -54,46 +54,47 @@ unsigned long previousTime = 0;
 Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
 float thetaM;           // Pitch from Accelerometer
 float phiM;             // Roll from Accellerometer
-float thetaFold=0;      // Overall System Pitch Filtered (Old)
+float thetaFold = 0;    // Overall System Pitch Filtered (Old)
 float thetaFnew;        // Overall System Pitch Filtered (New)
-float phiFold=0;        // Overall System Roll Filtered  (Old) 
+float phiFold = 0;      // Overall System Roll Filtered  (Old)
 float phiFnew;          // Overall System Roll Filtered (New)
-float thetaG=0;         // Pitch from Gyro
-float phiG=0;           // Roll from Gyro
+float thetaG = 0;       // Pitch from Gyro
+float phiG = 0;         // Roll from Gyro
 float theta;            // Overall System Pitch
 float phi;              // Overall System Roll
-float thetaRad;         // 
+float thetaRad;         //
 float phiRad;
 float Xm;               // Value coming off the x magnitometer
 float Ym;               // Value coming off the Y Magnitometer
-float psi;              // Heading angle 
+float psi;              // Heading angle
 float dt;
 unsigned long millisOld;
 
 
-//********************TOF Sensor*******************TOF Sensor********************TOF Sensor******************** 
+//********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
-Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF" 
+Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
+int currentDistance = 0;
+int targetDistance = 0;
 
 
-//********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO******************** 
+//********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
 #include <Servo.h>              // Including the servo library 
 Servo TOFServo;                 // Creating a new servo object named TOFServo
 #define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
 
 
-//********************STEPPER MOTORS*******************STEPPER MOTORS********************STEPPER MOTORS******************** 
+//********************STEPPER MOTORS*******************STEPPER MOTORS********************STEPPER MOTORS********************
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
-int StepperSpeed = 800;                             // Fastest speed motor will allow
+int StepperSpeed = 200;                             // Speed of motor
 Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
 Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
-Stepper FrontRightStepper(steps, 25, 27, 28, 26);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
+Stepper FrontRightStepper(steps, 24, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
 Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
 Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
-
 
 
 
@@ -103,10 +104,10 @@ Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object n
 
 
 void setup() {
-  
+
   //Bluetooth Serial2 Communication
   Serial2.begin(9600);                                              // Begin bluetooth communication at 9600
-  Serial2.println("Bluetooth Serial2 Communication Established");    // Confirm bluetooth connection established 
+  Serial2.println("Bluetooth Serial2 Communication Established");    // Confirm bluetooth connection established
   Serial2.println(" ");
 
 
@@ -117,7 +118,7 @@ void setup() {
   Serial2.println(" ");                    // Printing for debuggin
 
 
-  //Servor (TOF) Setup
+  //Servo (TOF) Setup
   Serial2.println("Servo Setup Begin");    // Printing for debugging
   TOFServo.attach(TOFServoPin);           // Attaches the servo to the signalPin of the Arduino
   Serial2.print("Setting Servo to ");      // Printing for debugging
@@ -128,7 +129,36 @@ void setup() {
   Serial2.println(" ");                    // Printing for debugging
 
 
+  // Motor Setup
+  pinMode(DCmotorFrontPWMA, OUTPUT);
+  pinMode(DCmotorFrontAI1, OUTPUT);
+  pinMode(DCmotorFrontAI2, OUTPUT);
+  pinMode(DCmotorFrontPWMB, OUTPUT);
+  pinMode(DCmotorFrontBI1, OUTPUT);
+  pinMode(DCmotorFrontBI2, OUTPUT);
+
+  pinMode(DCmotorMiddlePWMA, OUTPUT);
+  pinMode(DCmotorMiddleAI1, OUTPUT);
+  pinMode(DCmotorMiddleAI2, OUTPUT);
+  pinMode(DCmotorMiddlePWMB, OUTPUT);
+  pinMode(DCmotorMiddleBI1, OUTPUT);
+  pinMode(DCmotorMiddleBI2, OUTPUT);
+
+  pinMode(DCmotorBackPWMA, OUTPUT);
+  pinMode(DCmotorBackAI1, OUTPUT);
+  pinMode(DCmotorBackAI2, OUTPUT);
+  pinMode(DCmotorBackPWMB, OUTPUT);
+  pinMode(DCmotorBackBI1, OUTPUT);
+  pinMode(DCmotorBackBI2, OUTPUT);
+
+
   //LED Tail Lights Setup
+  pinMode(Led1, OUTPUT);
+  pinMode(Led2, OUTPUT);
+  pinMode(Led3, OUTPUT);
+  pinMode(Led4, OUTPUT);
+  pinMode(Led5, OUTPUT);
+  pinMode(Led6, OUTPUT);
   StartUpLights();
 
 
@@ -139,18 +169,24 @@ void setup() {
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
   int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
   Serial2.print("IMU Tempature: ");        // Printing for debugging
-  Serial2.println(temp);                   // Printing the measured tempature to the screen for sanity check. 
+  Serial2.println(temp);                   // Printing the measured tempature to the screen for sanity check.
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
-  millisOld=millis();                     // Grabbing the system time for dt variable
+  millisOld = millis();                   // Grabbing the system time for dt variable
   Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
-  Serial2.println(" ");  
-  SetupIMU();                                   // Calling function to calibrate IMU 
+  Serial2.println(" ");
+  //SetupIMU();                                   // Calling function to calibrate IMU
   Serial2.println("IMU Calibration Complete");   // Printing for debugging
-  Serial2.println(" ");  
+  Serial2.println(" ");
 
   // End of Void Setup
   Serial2.println("End of Void Setup");    // Printing for debugging
   Serial2.println(" ");                    // Printing for debugging
+
+  FrontLeftStepper.setSpeed(StepperSpeed);
+  BackRightStepper.setSpeed(StepperSpeed);
+  FrontRightStepper.setSpeed(StepperSpeed);
+  BackLeftStepper.setSpeed(StepperSpeed);
+
 }
 
 
@@ -161,9 +197,18 @@ void setup() {
 
 
 void loop() {
+  delay(1000);
+  //  MoveForward();
+  //  delay(3000);
+  //  DCStop();
+  //  TurnLeft();
+  //  MoveForward();
+  //  delay(3000);
+  //  DCStop();
+  //  TurnRight();
+  MoveBack();
+  DCStop();
 
-LookLeft();
-delay(1000);
 }
 
 
@@ -171,6 +216,7 @@ delay(1000);
 
 
 //==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========FUNCTIONS==========
+
 
 
 
@@ -200,33 +246,6 @@ void StartUpLights()
   }
 }
 
-
-/*
-//BREAK ANIMATION (ALL LIGHTS ON)
-void RedLight()
-{
-  Serial2.println(" ");
-  Serial2.println("==========RedLight Function Successfully Called==========");
-  for (int j = 0; j <= 1; j++) {
-    for (byte pin = A5; pin >= A0; pin--) {
-      digitalWrite(pin, HIGH);
-    }
-    previousTime = millis();
-    Timer(100, previousTime);
-    for (byte pin = A5; pin >= A0; pin--) {
-      digitalWrite(pin, LOW);
-    }
-    previousTime = millis();
-    Timer(100, previousTime);
-  }
-  for (byte pin = A5; pin >= A0; pin--) {
-    digitalWrite(pin, HIGH);
-  }
-  Serial2.println("----------RedLight Function Complete----------");
-  Serial2.println(" ");
-}
-*/
-
 //MOVE FORWARD ANIMATION (ALL LIGHTS OFF)
 void LightsOut()
 {
@@ -242,20 +261,20 @@ void LightsOut()
 
 //--------------------IMU SENSOR--------------------IMU SENSOR--------------------IMU SENSOR--------------------
 
-// IMU SETUP FUNCTION 
-// This function sets up the IMU and calibrates the sensor  
+// IMU SETUP FUNCTION
+// This function sets up the IMU and calibrates the sensor
 void SetupIMU()
 {
   Serial2.println(" ");
   Serial2.println("==========SetupIMU Function Successfully Called==========");
   uint8_t system, gyroCal, accelCal, magCal = 0;
 
-  while(accelCal < 3){
+  while (accelCal < 3) {
     DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-    
+
     Serial2.print("Accelerometer: ");
     Serial2.print(accel.x());
     Serial2.print(",");
@@ -264,7 +283,7 @@ void SetupIMU()
     Serial2.print(accel.z());
     Serial2.print(",");
     Serial2.print(accelCal);
-    
+
     Serial2.print("   Gyro: ");
     Serial2.print(gyro.x());
     Serial2.print(",");
@@ -273,7 +292,7 @@ void SetupIMU()
     Serial2.print(gyro.z());
     Serial2.print(",");
     Serial2.print(gyroCal);
-    
+
     Serial2.print("   Magnetometer: ");
     Serial2.print(mag.x());
     Serial2.print(",");
@@ -283,11 +302,11 @@ void SetupIMU()
     Serial2.print(",");
     Serial2.print(magCal);
     Serial2.print(",");
-    
+
     Serial2.print(", system: ");
     Serial2.println(system);
 
-    delay(50);    // Delay 50 miliseconds to slow the rate of data sent to the serial monitor  
+    delay(50);    // Delay 50 miliseconds to slow the rate of data sent to the serial monitor
   }
 
   Serial2.println("IMU Calibration Complete");
@@ -304,36 +323,36 @@ float IMUDirection()
   Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
 
   //uint8_t system, gyroCal, accelCal, magCal = 0;
-  //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);        
+  //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
 
-  for (int i = 0; i < 20; i++){                                          // Looping 20 times just to get a good average value
-  imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-  imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-  imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
-  thetaM=-atan2(accel.x()/9.8,accel.z()/9.8)/2/3.141592654*360;         // Math to get the pitch from the accelerometer       
-  phiM=-atan2(accel.y()/9.8,accel.z()/9.8)/2/3.141592654*360;           // Math to get the roll from the accelerometer
-  
-  phiFnew=.95*phiFold+.05*phiM;                                     // Filter for accelerometer roll data
-  thetaFnew=.95*thetaFold+.05*thetaM;                               // Filter for accelerometer pitch data
- 
-  dt=(millis()-millisOld)/1000.;                                    // Measuring the change in time since last millis measurement 
-  millisOld=millis();                                               // Setting millisOld to millis to update it for next calculation
-  theta=(theta+gyro.y()*dt)*.95+thetaM*.05;                         // Calculating Absolute Roll using fancy math (and running a filter on it)
-  phi=(phi-gyro.x()*dt)*.95+ phiM*.05;                              // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-  thetaG=thetaG+gyro.y()*dt;                                        // Calculating Gyro Roll
-  phiG=phiG-gyro.x()*dt;                                            // Calculating Gyro Pitch
-   
-  phiRad=phi/360*(2*3.14);                                          // Calculating 
-  thetaRad=theta/360*(2*3.14);
-   
-  Xm=mag.x()*cos(thetaRad)-mag.y()*sin(phiRad)*sin(thetaRad)+mag.z()*cos(phiRad)*sin(thetaRad);       // Absolute X Direction of magnitometer after fancy math 
-  Ym=mag.y()*cos(phiRad)+mag.z()*sin(phiRad);                                                         // Absolute Y Direction of magnitometer after fancy math
-   
-  psi=atan2(Ym,Xm)/(2*3.14)*360;                                    // Absolute heading of the robot 
-   
-  phiFold=phiFnew;
-  thetaFold=thetaFnew;
+    thetaM = -atan2(accel.x() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360; // Math to get the pitch from the accelerometer
+    phiM = -atan2(accel.y() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360; // Math to get the roll from the accelerometer
+
+    phiFnew = .95 * phiFold + .05 * phiM;                             // Filter for accelerometer roll data
+    thetaFnew = .95 * thetaFold + .05 * thetaM;                       // Filter for accelerometer pitch data
+
+    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
+    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
+    theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
+    phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
+    thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
+    phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
+
+    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
+    thetaRad = theta / 360 * (2 * 3.14);
+
+    Xm = mag.x() * cos(thetaRad) - mag.y() * sin(phiRad) * sin(thetaRad) + mag.z() * cos(phiRad) * sin(thetaRad); // Absolute X Direction of magnitometer after fancy math
+    Ym = mag.y() * cos(phiRad) + mag.z() * sin(phiRad);                                                 // Absolute Y Direction of magnitometer after fancy math
+
+    psi = atan2(Ym, Xm) / (2 * 3.14) * 360;                           // Absolute heading of the robot
+
+    phiFold = phiFnew;
+    thetaFold = thetaFnew;
   }                                 // End for loop
   Serial2.println("----------IMUDirection Function Complete----------");
   Serial2.println(" ");
@@ -370,10 +389,9 @@ void TurnLeft()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Left");
-
+  //turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
-    //LED Animation
     unsigned long currentTime = millis();
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
@@ -412,8 +430,32 @@ void TurnLeft()
           NumLed = 0;
           prevTime = currentTime;
           break;
-      }// End LED Animation
+      }
     }
+    digitalWrite(DCmotorFrontPWMA, HIGH);
+    digitalWrite(DCmotorFrontPWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, HIGH);
+    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorBackPWMA, HIGH);
+    digitalWrite(DCmotorBackPWMB, HIGH);
+    // All motors A move back
+
+    digitalWrite(DCmotorFrontAI1, LOW);
+    digitalWrite(DCmotorFrontAI2, HIGH);
+    digitalWrite(DCmotorMiddleAI1, LOW);
+    digitalWrite(DCmotorMiddleAI2, HIGH);
+    digitalWrite(DCmotorBackAI1, LOW);
+    digitalWrite(DCmotorBackAI2, HIGH);
+
+    // All motors B move Forward
+
+    digitalWrite(DCmotorFrontBI1, HIGH);
+    digitalWrite(DCmotorFrontBI2, LOW);
+    digitalWrite(DCmotorMiddleBI1, HIGH);
+    digitalWrite(DCmotorMiddleBI2, LOW);
+    digitalWrite(DCmotorBackBI1, HIGH);
+    digitalWrite(DCmotorBackBI2, LOW);
+
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
     Serial2.print(targetDirection);
@@ -421,13 +463,14 @@ void TurnLeft()
     Serial2.println(currentDirection);
 
   }
-  // Turning LED's Off
+  DCStop();
+  stepperStraight();
   LightsOut();
   Serial2.println(" Left Turn Complete ");
   Serial2.println("----------LeftTurn Function Complete----------");
   Serial2.println(" ");
+  delay(MovementDelay);
 }
-
 
 
 //TURN RIGHT
@@ -457,10 +500,10 @@ void TurnRight()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Right");
-
+  //turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
-
+    //RightSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
     unsigned long currentTime = millis();
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
@@ -501,23 +544,66 @@ void TurnRight()
           break;
       }
     }
+    digitalWrite(DCmotorFrontPWMA, HIGH);
+    digitalWrite(DCmotorFrontPWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, HIGH);
+    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorBackPWMA, HIGH);
+    digitalWrite(DCmotorBackPWMB, HIGH);
+    // All motors A move forward
+
+    digitalWrite(DCmotorFrontAI1, HIGH);
+    digitalWrite(DCmotorFrontAI2, LOW);
+    digitalWrite(DCmotorMiddleAI1, HIGH);
+    digitalWrite(DCmotorMiddleAI2, LOW);
+    digitalWrite(DCmotorBackAI1, HIGH);
+    digitalWrite(DCmotorBackAI2, LOW);
+
+    // All motors B move back
+
+    digitalWrite(DCmotorFrontBI1, LOW);
+    digitalWrite(DCmotorFrontBI2, HIGH);
+    digitalWrite(DCmotorMiddleBI1, LOW);
+    digitalWrite(DCmotorMiddleBI2, HIGH);
+    digitalWrite(DCmotorBackBI1, LOW);
+    digitalWrite(DCmotorBackBI2, HIGH);
+
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
     Serial2.print(targetDirection);
     Serial2.print("Current Direction: ");
     Serial2.println(currentDirection);
   }
+  DCStop();
+  stepperStraight();
   LightsOut();
   Serial2.println(" Right Turn Complete ");
   Serial2.println("----------RightTurn Function Complete----------");
   Serial2.println(" ");
+  delay(MovementDelay);
 }
 
+void turnStepper() {
+  int deg = degToSteps(45);
+  FrontLeftStepper.step(-deg);
+  BackRightStepper.step(-deg);
+  FrontRightStepper.step(deg);
+  BackLeftStepper.step(deg);
+}
 
-// DC MOTORS 
+void stepperStraight() {
+  int deg = degToSteps(-45);
+  FrontLeftStepper.step(-deg);
+  BackRightStepper.step(-deg);
+  FrontRightStepper.step(deg);
+  BackLeftStepper.step(deg);
+}
+
+// DC MOTORS
 void MoveForward()
 {
-
+  Serial2.println("Moving forward");
+  LightsOut();
   digitalWrite(DCmotorFrontPWMA, HIGH);
   digitalWrite(DCmotorFrontPWMB, HIGH);
   digitalWrite(DCmotorMiddlePWMA, HIGH);
@@ -544,67 +630,103 @@ void MoveForward()
 
 }
 
-// DC MOTORS 
+// DC MOTORS
 void MoveBack()
 {
+  int NumLed = 1;
+  unsigned long prevTime = millis();
+  unsigned long currentTime = millis();
+  while (currentTime - prevTime < 3000) {
+    currentTime = millis();
+    if (currentTime - prevTime > 150) {
+      switch (NumLed) {
+        case 0:
+          for (byte pin = A5; pin >= A0; pin--) {
+            digitalWrite(pin, HIGH);
+          }
+          NumLed = 1;
+          break;
 
-  digitalWrite(DCmotorFrontPWMA, HIGH);
-  digitalWrite(DCmotorFrontPWMB, HIGH);
-  digitalWrite(DCmotorMiddlePWMA, HIGH);
-  digitalWrite(DCmotorMiddlePWMB, HIGH);
-  digitalWrite(DCmotorBackPWMA, HIGH);
-  digitalWrite(DCmotorBackPWMB, HIGH);
-  // All motors A move forward
+        case 1:
+          for (byte pin = A5; pin >= A0; pin--) {
+            digitalWrite(pin, LOW);
+          }
+          NumLed = 0;
+          break;
 
-  digitalWrite(DCmotorFrontAI1, LOW);
-  digitalWrite(DCmotorFrontAI2, HIGH);
-  digitalWrite(DCmotorMiddleAI1, LOW);
-  digitalWrite(DCmotorMiddleAI2, HIGH);
-  digitalWrite(DCmotorBackAI1, LOW);
-  digitalWrite(DCmotorBackAI2, HIGH);
+      }
+    }
 
-  // All motors B move forward
+    digitalWrite(DCmotorFrontPWMA, HIGH);
+    digitalWrite(DCmotorFrontPWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, HIGH);
+    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorBackPWMA, HIGH);
+    digitalWrite(DCmotorBackPWMB, HIGH);
+    // All motors A move back
 
-  digitalWrite(DCmotorFrontBI1, LOW);
-  digitalWrite(DCmotorFrontBI2, HIGH);
-  digitalWrite(DCmotorMiddleBI1, LOW);
-  digitalWrite(DCmotorMiddleBI2, HIGH);
-  digitalWrite(DCmotorBackBI1, LOW);
-  digitalWrite(DCmotorBackBI2, HIGH);
+    digitalWrite(DCmotorFrontAI1, LOW);
+    digitalWrite(DCmotorFrontAI2, HIGH);
+    digitalWrite(DCmotorMiddleAI1, LOW);
+    digitalWrite(DCmotorMiddleAI2, HIGH);
+    digitalWrite(DCmotorBackAI1, LOW);
+    digitalWrite(DCmotorBackAI2, HIGH);
 
+    // All motors B move back
+
+    digitalWrite(DCmotorFrontBI1, LOW);
+    digitalWrite(DCmotorFrontBI2, HIGH);
+    digitalWrite(DCmotorMiddleBI1, LOW);
+    digitalWrite(DCmotorMiddleBI2, HIGH);
+    digitalWrite(DCmotorBackBI1, LOW);
+    digitalWrite(DCmotorBackBI2, HIGH);
+  }
 }
 
-void LookLeft()
+void DCStop()
 {
-  TOFStepper.setSpeed(StepperSpeed);
-  TOFStepper.step(degToSteps(-90));
-  delay(1000);
-  TOFStepper.step(degToSteps(90));
+  digitalWrite(DCmotorFrontPWMA, LOW);
+  digitalWrite(DCmotorFrontPWMB, LOW);
+  digitalWrite(DCmotorMiddlePWMA, LOW);
+  digitalWrite(DCmotorMiddlePWMB, LOW);
+  digitalWrite(DCmotorBackPWMA, LOW);
+  digitalWrite(DCmotorBackPWMB, LOW);
+
+  for (int j = 0; j <= 1; j++) {
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, HIGH);
+    }
+    delay(100);
+    for (byte pin = A5; pin >= A0; pin--) {
+      digitalWrite(pin, LOW);
+    }
+    delay(100);
+  }
+  for (byte pin = A5; pin >= A0; pin--) {
+    digitalWrite(pin, HIGH);
+  }
 }
 
 
+// Time of Flight Distance Retrieval
+void GetDistance() {
 
-//functon that takes in degrees requested and return steps needed
-float degToSteps(float deg) {
-  return ((steps / degree) * deg) / 2;
-}
+  VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function"
 
-
-
-// Time of Flight Distance Getter
-void GetDistance(){
-  
-  VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function" 
-    
-  Serial2.print("Reading a measurement... ");    
-  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement" 
+  Serial2.print("Reading a measurement... ");
+  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement"
 
   if (measure.RangeStatus != 4)   // phase failures have incorrect data             // idk. Also required for accurate measurements though
   {
     Serial2.print("Distance (mm): "); Serial2.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
-  } 
-  else 
+  }
+  else
   {
     Serial2.println(" out of range ");
-  } 
+  }
+}
+
+//functon that takes in degrees requested and return steps needed
+float degToSteps(float deg) {
+  return ((steps / degree) * deg) / 2;
 }
