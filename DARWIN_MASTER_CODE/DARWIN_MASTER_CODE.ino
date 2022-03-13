@@ -633,11 +633,12 @@ void MoveForward()
 void MoveBack()
 {
   int NumLed = 1;
-  unsigned long prevTime = millis();
+  unsigned long targetTime = millis();
   unsigned long currentTime = millis();
-  while (currentTime - prevTime < 3000) {
+  unsigned long prevTime = millis();
+  while (currentTime - targetTime < 3000) {
     currentTime = millis();
-    if (currentTime - prevTime > 150) {
+    if (currentTime - prevTime > 200) {
       switch (NumLed) {
         case 0:
           for (byte pin = A5; pin >= A0; pin--) {
@@ -654,6 +655,7 @@ void MoveBack()
           break;
 
       }
+      prevTime = currentTime;
     }
 
     digitalWrite(DCmotorFrontPWMA, HIGH);
