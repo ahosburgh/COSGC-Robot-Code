@@ -80,7 +80,7 @@ float distance;
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
 #include <Servo.h>              // Including the servo library 
 Servo TOFServo;                 // Creating a new servo object named TOFServo
-#define TOFServoPin 10          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
+#define TOFServoPin 2          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
 
 
@@ -92,7 +92,7 @@ int StepperSpeed = 200;                             // Speed of motor
 Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
 Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
 Stepper FrontRightStepper(steps, 24, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
-Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins
+Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins // CHANGED SERVO TO 2. 
 Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
 
 
