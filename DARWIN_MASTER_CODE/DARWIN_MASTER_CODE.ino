@@ -74,8 +74,7 @@ unsigned long millisOld;
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
-int currentDistance = 0;
-int targetDistance = 0;
+float distance;
 
 
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
@@ -710,25 +709,27 @@ void DCStop()
 }
 
 
-// Time of Flight Distance Retrieval
-void GetDistance() {
+// Time of Flight Distance Getter
+float GetDistance(){
+  float OldDistance = distance;
+  VL53L0X_RangingMeasurementData_t measure;                                         // create TOF variable named measure
+    
+  Serial2.println("GetDistance Function Successfully Called");    
+  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
 
-  VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function"
-
-  Serial2.print("Reading a measurement... ");
-  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement"
-
-  if (measure.RangeStatus != 4)   // phase failures have incorrect data             // idk. Also required for accurate measurements though
+  if (measure.RangeMilliMeter < 8190)   // 8190 is the value returned when the TOF sensor measurements are out of range
   {
-    Serial2.print("Distance (mm): "); Serial2.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
-  }
-  else
+    distance = measure.RangeMilliMeter;
+    Serial2.print("Distance (mm): "); Serial2.println(distance);       // measure.RangeMilliMeter is the actual variable we will need
+    
+  } 
+  else 
   {
-    Serial2.println(" out of range ");
-  }
-}
-
-//functon that takes in degrees requested and return steps needed
-float degToSteps(float deg) {
-  return ((steps / degree) * deg) / 2;
+    distance = OldDistance;
+    Serial2.print(" Out of Range: using OldDistance value : ");
+    Serial2.println(distance);
+    
+  } 
+  
+  return distance;
 }
