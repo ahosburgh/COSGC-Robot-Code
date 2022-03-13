@@ -50,7 +50,7 @@ unsigned long previousTime = 0;
 #include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
 #include <math.h>                               // Math library required for trig functions in compass
 #define BN0055_SAMPLERATE_DELAY_MS (100)        // Instructing the sensor to sample every 100 ms
-Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
+Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU"    55 is its id and 0x28 is its address)=
 float thetaM;           // Pitch from Accelerometer
 float phiM;             // Roll from Accellerometer
 float thetaFold = 0;    // Overall System Pitch Filtered (Old)
@@ -73,9 +73,7 @@ unsigned long millisOld;
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
-int currentDistance = 0;
-int targetDistance = 0;
-
+float distance;
 
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
 #include <Servo.h>              // Including the servo library 
@@ -141,11 +139,11 @@ void setup() {
   int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
   Serial2.print("IMU Tempature: ");        // Printing for debugging
   Serial2.println(temp);                   // Printing the measured tempature to the screen for sanity check.
+  Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
+  Serial2.println(" ")
+  //SetupIMU();                                   // Calling function to calibrate IMU
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   millisOld = millis();                   // Grabbing the system time for dt variable
-  Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
-  Serial2.println(" ");
-  //SetupIMU();                                   // Calling function to calibrate IMU
   Serial2.println("IMU Calibration Complete");   // Printing for debugging
   Serial2.println(" ");
 
@@ -606,20 +604,28 @@ void DCStop()
 }
 
 
-// Time of Flight Distance Retrieval
-void GetDistance() {
 
-  VL53L0X_RangingMeasurementData_t measure;                                         // idk. I assume "begin measurement function"
+// Time of Flight Distance Getter
+float GetDistance(){
+  float OldDistance = distance;
+  VL53L0X_RangingMeasurementData_t measure;                                         // create TOF variable named measure
+    
+  Serial2.println("GetDistance Function Successfully Called");    
+  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
 
-  Serial2.print("Reading a measurement... ");
-  DarwinTOF.rangingTest(&measure, false); // pass in 'true' to get debug data printout!   // idk. I assume "take measurement"
-
-  if (measure.RangeStatus != 4)   // phase failures have incorrect data             // idk. Also required for accurate measurements though
+  if (measure.RangeMilliMeter < 8190)   // 8190 is the value returned when the TOF sensor measurements are out of range
   {
-    Serial2.print("Distance (mm): "); Serial2.println(measure.RangeMilliMeter);       // measure.RangeMilliMeter is the actual variable we will need
-  }
-  else
+    distance = measure.RangeMilliMeter;
+    Serial2.print("Distance (mm): "); Serial2.println(distance);       // measure.RangeMilliMeter is the actual variable we will need
+    
+  } 
+  else 
   {
-    Serial2.println(" out of range ");
-  }
+    distance = OldDistance;
+    Serial2.print(" Out of Range: using OldDistance value : ");
+    Serial2.println(distance);
+    
+  } 
+  
+  return distance;
 }
