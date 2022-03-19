@@ -197,17 +197,10 @@ void setup() {
 
 
 void loop() {
-  delay(1000);
-    MoveForward();
-    delay(3000);
-    DCStop();
-    TurnLeft();
-    MoveForward();
-    delay(3000);
-    DCStop();
-    TurnRight();
-  MoveBack();
-  DCStop();
+turnStepper();
+delay(1000);
+stepperStraight();
+delay(1000);
 
 }
 
@@ -389,7 +382,7 @@ void TurnLeft()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Left");
-  //turnStepper(); //Turns stepper motors for 0 degree turns
+  turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
     unsigned long currentTime = millis();
@@ -464,7 +457,7 @@ void TurnLeft()
 
   }
   DCStop();
-  //stepperStraight();
+  stepperStraight();
   LightsOut();
   Serial2.println(" Left Turn Complete ");
   Serial2.println("----------LeftTurn Function Complete----------");
@@ -500,10 +493,9 @@ void TurnRight()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Right");
-  //turnStepper(); //Turns stepper motors for 0 degree turns
+  turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
-    //RightSignal(); +++++++++++++++++++++++++++++++++++++++++++++++++ Not working +++++++++++++++++++++++++++++++++++++++++++++++++++
     unsigned long currentTime = millis();
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
@@ -575,31 +567,31 @@ void TurnRight()
     Serial2.println(currentDirection);
   }
   DCStop();
-  //stepperStraight();
+  stepperStraight();
   LightsOut();
   Serial2.println(" Right Turn Complete ");
   Serial2.println("----------RightTurn Function Complete----------");
   Serial2.println(" ");
   delay(MovementDelay);
 }
-//
-//void turnStepper() {
-// // int deg = degToSteps(45);
-//  FrontLeftStepper.step(-deg);
-//  BackRightStepper.step(-deg);
-//  FrontRightStepper.step(deg);
-//  BackLeftStepper.step(deg);
-//}
-//
-//void stepperStraight() {
-//  //int deg = degToSteps(-45);
-//  FrontLeftStepper.step(-deg);
-//  BackRightStepper.step(-deg);
-//  FrontRightStepper.step(deg);
-//  BackLeftStepper.step(deg);
-//}
+  
+void turnStepper() {
+  int deg = degToSteps(45);
+  FrontLeftStepper.step(-deg);
+  BackRightStepper.step(-deg);
+  FrontRightStepper.step(deg);
+  BackLeftStepper.step(deg);
+}
 
-// DC MOTORS
+void stepperStraight() {
+  int deg = degToSteps(-45);
+  FrontLeftStepper.step(-deg);
+  BackRightStepper.step(-deg);
+  FrontRightStepper.step(deg);
+  BackLeftStepper.step(deg);
+}
+
+//DC MOTORS
 void MoveForward()
 {
   Serial2.println("Moving forward");
