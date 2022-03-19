@@ -11,26 +11,26 @@
 //********************DC Motors*******************DC Motors********************DC Motors********************
 //DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
 int MovementDelay = 1000;
-#define DCmotorFrontPWMA 48
-#define DCmotorFrontAI1 52
-#define DCmotorFrontAI2 53
-#define DCmotorFrontPWMB 49
-#define DCmotorFrontBI1 50
-#define DCmotorFrontBI2 51
+#define DCmotorFrontPWMA 46
+#define DCmotorFrontAI1 50
+#define DCmotorFrontAI2 48
+#define DCmotorFrontPWMB 51
+#define DCmotorFrontBI1 47
+#define DCmotorFrontBI2 49
 
-#define DCmotorMiddlePWMA 42
-#define DCmotorMiddleAI1 46
-#define DCmotorMiddleAI2 47
+#define DCmotorMiddlePWMA 38
+#define DCmotorMiddleAI1 42
+#define DCmotorMiddleAI2 40
 #define DCmotorMiddlePWMB 43
-#define DCmotorMiddleBI1 44
-#define DCmotorMiddleBI2 45
+#define DCmotorMiddleBI1 39
+#define DCmotorMiddleBI2 41
 
-#define DCmotorBackPWMA 36
-#define DCmotorBackAI1 40
-#define DCmotorBackAI2 41
-#define DCmotorBackPWMB 37
-#define DCmotorBackBI1 38
-#define DCmotorBackBI2 39
+#define DCmotorBackPWMA 30
+#define DCmotorBackAI1 34
+#define DCmotorBackAI2 32
+#define DCmotorBackPWMB 35
+#define DCmotorBackBI1 31
+#define DCmotorBackBI2 33
 
 
 //********************LED Pins*******************LED Pins********************LED Pins********************
@@ -90,14 +90,7 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
 int StepperSpeed = 200;                             // Speed of motor
-Stepper TOFStepper(steps, 32, 34, 33, 35);          // Creating Stepper object named TOFStepper and defining the steppers pins
-Stepper FrontLeftStepper(steps, 28, 30, 29, 31);    // Creating Stepper object named FrontLeftStepper and defining the steppers pins
-Stepper FrontRightStepper(steps, 24, 26, 25, 27);   // Creating Stepper object named FrontRightStepper and defining the steppers pins
-Stepper BackLeftStepper(steps, 2, 4, 3, 5);         // Creating Stepper object named BackLeftStepper and defining the steppers pins // CHANGED SERVO TO 2. 
-Stepper BackRightStepper(steps, 6, 8, 7, 9);        // Creating Stepper object named BackRightStepper and defining the steppers pins
-
-
-
+Stepper TOFStepper(steps, A8, A10, A9, A11);          // Creating Stepper object named TOFStepper and defining the steppers pins
 
 
 //--------------VOID SETUP ------------ VOID SETUP ------------ VOID SETUP ---------------- VOID SETUP --------------
@@ -182,11 +175,7 @@ void setup() {
   Serial2.println("End of Void Setup");    // Printing for debugging
   Serial2.println(" ");                    // Printing for debugging
 
-  FrontLeftStepper.setSpeed(StepperSpeed);
-  BackRightStepper.setSpeed(StepperSpeed);
-  FrontRightStepper.setSpeed(StepperSpeed);
-  BackLeftStepper.setSpeed(StepperSpeed);
-
+  TOFStepper.setSpeed(StepperSpeed);      // Setting TOF Stepper Motor speed
 }
 
 
@@ -197,10 +186,7 @@ void setup() {
 
 
 void loop() {
-turnStepper();
-delay(1000);
-stepperStraight();
-delay(1000);
+
 
 }
 
@@ -315,9 +301,6 @@ float IMUDirection()
   Serial2.println(" ");
   Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
 
-  //uint8_t system, gyroCal, accelCal, magCal = 0;
-  //DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-
   for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
@@ -357,10 +340,12 @@ float IMUDirection()
 //TURN LEFT
 void TurnLeft()
 {
-  unsigned long prevTime = millis();
-  int NumLed = 0;
+
   Serial2.println(" ");
   Serial2.println("=====TurnLeft Function Successfully Called===== ");
+  
+  unsigned long prevTime = millis();
+  int NumLed = 0;
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
@@ -382,7 +367,6 @@ void TurnLeft()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Left");
-  turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
     unsigned long currentTime = millis();
@@ -457,7 +441,6 @@ void TurnLeft()
 
   }
   DCStop();
-  stepperStraight();
   LightsOut();
   Serial2.println(" Left Turn Complete ");
   Serial2.println("----------LeftTurn Function Complete----------");
@@ -469,10 +452,11 @@ void TurnLeft()
 //TURN RIGHT
 void TurnRight()
 {
-  unsigned long prevTime = millis();
-  int NumLed = 0;
   Serial2.println(" ");
   Serial2.println("=====TurnRight Function Successfully Called===== ");
+  
+  unsigned long prevTime = millis();
+  int NumLed = 0;
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
@@ -493,7 +477,6 @@ void TurnRight()
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Right");
-  turnStepper(); //Turns stepper motors for 0 degree turns
   currentDirection = IMUDirection();
   while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
     unsigned long currentTime = millis();
@@ -567,7 +550,6 @@ void TurnRight()
     Serial2.println(currentDirection);
   }
   DCStop();
-  stepperStraight();
   LightsOut();
   Serial2.println(" Right Turn Complete ");
   Serial2.println("----------RightTurn Function Complete----------");
@@ -575,27 +557,13 @@ void TurnRight()
   delay(MovementDelay);
 }
   
-void turnStepper() {
-  int deg = degToSteps(45);
-  FrontLeftStepper.step(-deg);
-  BackRightStepper.step(-deg);
-  FrontRightStepper.step(deg);
-  BackLeftStepper.step(deg);
-}
-
-void stepperStraight() {
-  int deg = degToSteps(-45);
-  FrontLeftStepper.step(-deg);
-  BackRightStepper.step(-deg);
-  FrontRightStepper.step(deg);
-  BackLeftStepper.step(deg);
-}
 
 //DC MOTORS
 void MoveForward()
 {
   Serial2.println("Moving forward");
   LightsOut();
+  
   digitalWrite(DCmotorFrontPWMA, HIGH);
   digitalWrite(DCmotorFrontPWMB, HIGH);
   digitalWrite(DCmotorMiddlePWMA, HIGH);
