@@ -187,6 +187,18 @@ void setup() {
 
 void loop() {
 
+MoveForward();
+delay (1000);
+DCStop();
+delay (1000);
+TurnLeft(90);
+delay (1000);
+DCStop();
+delay(1000);
+TurnRight(180);
+delay (1000);
+MoveBack();
+delay (1000);
 
 }
 
@@ -473,12 +485,12 @@ void TurnLeft(int deg)
 
     // All motors B move Forward
 
-    digitalWrite(DCmotorFrontBI1, HIGH);
-    digitalWrite(DCmotorFrontBI2, LOW);
-    digitalWrite(DCmotorMiddleBI1, HIGH);
-    digitalWrite(DCmotorMiddleBI2, LOW);
-    digitalWrite(DCmotorBackBI1, HIGH);
-    digitalWrite(DCmotorBackBI2, LOW);
+    digitalWrite(DCmotorFrontBI1, LOW);
+    digitalWrite(DCmotorFrontBI2, HIGH);
+    digitalWrite(DCmotorMiddleBI1, LOW);
+    digitalWrite(DCmotorMiddleBI2, HIGH);
+    digitalWrite(DCmotorBackBI1, LOW);
+    digitalWrite(DCmotorBackBI2, HIGH);
 
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
@@ -497,7 +509,7 @@ void TurnLeft(int deg)
 
 
 //TURN RIGHT
-void TurnRight()
+void TurnRight(int deg)
 {
   Serial2.println(" ");
   Serial2.println("=====TurnRight Function Successfully Called===== ");
@@ -507,7 +519,7 @@ void TurnRight()
   float currentDirection = 0;
   float startingDirection = 0;
   float targetDirection = 0;
-  float x = 0;
+  
 
   startingDirection = IMUDirection();
   targetDirection = startingDirection + 90;
@@ -516,8 +528,8 @@ void TurnRight()
   Serial2.println(startingDirection);
 
   if (targetDirection > 180) {     // Calculating the target position if it goes over the -180 mark
-    x = -targetDirection + 180;
-    targetDirection = -180 - x;
+    deg = -targetDirection + 180;
+    targetDirection = -180 - deg;
   }
 
   Serial2.print("Target Direction: ");
@@ -583,12 +595,12 @@ void TurnRight()
 
     // All motors B move back
 
-    digitalWrite(DCmotorFrontBI1, LOW);
-    digitalWrite(DCmotorFrontBI2, HIGH);
-    digitalWrite(DCmotorMiddleBI1, LOW);
-    digitalWrite(DCmotorMiddleBI2, HIGH);
-    digitalWrite(DCmotorBackBI1, LOW);
-    digitalWrite(DCmotorBackBI2, HIGH);
+    digitalWrite(DCmotorFrontBI1, HIGH);
+    digitalWrite(DCmotorFrontBI2, LOW);
+    digitalWrite(DCmotorMiddleBI1, HIGH);
+    digitalWrite(DCmotorMiddleBI2, LOW);
+    digitalWrite(DCmotorBackBI1, HIGH);
+    digitalWrite(DCmotorBackBI2, LOW);
 
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
@@ -619,12 +631,12 @@ void MoveForward()
   digitalWrite(DCmotorBackPWMB, HIGH);
   // All motors A move forward
 
-  digitalWrite(DCmotorFrontAI1, HIGH);
-  digitalWrite(DCmotorFrontAI2, LOW);
-  digitalWrite(DCmotorMiddleAI1, HIGH);
-  digitalWrite(DCmotorMiddleAI2, LOW);
-  digitalWrite(DCmotorBackAI1, HIGH);
-  digitalWrite(DCmotorBackAI2, LOW);
+  digitalWrite(DCmotorFrontAI1, LOW);
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);
+  digitalWrite(DCmotorBackAI2, HIGH);
 
   // All motors B move forward
 
@@ -674,12 +686,12 @@ void MoveBack()
     digitalWrite(DCmotorBackPWMB, HIGH);
     // All motors A move back
 
-    digitalWrite(DCmotorFrontAI1, LOW);
-    digitalWrite(DCmotorFrontAI2, HIGH);
-    digitalWrite(DCmotorMiddleAI1, LOW);
-    digitalWrite(DCmotorMiddleAI2, HIGH);
-    digitalWrite(DCmotorBackAI1, LOW);
-    digitalWrite(DCmotorBackAI2, HIGH);
+    digitalWrite(DCmotorFrontAI1, HIGH);
+    digitalWrite(DCmotorFrontAI2, LOW);
+    digitalWrite(DCmotorMiddleAI1, HIGH);
+    digitalWrite(DCmotorMiddleAI2, LOW);
+    digitalWrite(DCmotorBackAI1, HIGH);
+    digitalWrite(DCmotorBackAI2, LOW);
 
     // All motors B move back
 
