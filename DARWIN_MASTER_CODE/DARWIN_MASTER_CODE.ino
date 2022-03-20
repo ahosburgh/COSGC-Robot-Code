@@ -58,8 +58,8 @@ float thetaFold = 0;    // Overall System Pitch Filtered (Old)
 float thetaFnew;        // Overall System Pitch Filtered (New)
 float phiFold = 0;      // Overall System Roll Filtered  (Old)
 float phiFnew;          // Overall System Roll Filtered (New)
-float thetaG = 0;       // Pitch from Gyro
-float phiG = 0;         // Roll from Gyro
+//float thetaG = 0;       // Pitch from Gyro
+//float phiG = 0;         // Roll from Gyro
 float theta;            // Overall System Pitch
 float phi;              // Overall System Roll
 float thetaRad;         //
@@ -294,6 +294,8 @@ void SetupIMU()
   delay(5000);                                 // Waiting 5 seconds to set the robot down after calibration
 }
 
+
+
 // IMU Direction function
 // This function gets the current direction from the IMU
 float IMUDirection()
@@ -316,8 +318,9 @@ float IMUDirection()
     millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
     theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
     phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-    thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
-    phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
+   
+    //thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
+    //phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
 
     phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
     thetaRad = theta / 360 * (2 * 3.14);
@@ -336,40 +339,84 @@ float IMUDirection()
 }
 
 
+
+// IMU Pitch function
+// This function gets the current pitch angle from the IMU
+float IMUPitch()
+{
+  Serial2.println(" ");
+  Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
+
+  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+    thetaM = -atan2(accel.x() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360; // Math to get the pitch from the accelerometer
+    phiM = -atan2(accel.y() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360; // Math to get the roll from the accelerometer
+
+    phiFnew = .95 * phiFold + .05 * phiM;                             // Filter for accelerometer roll data
+    thetaFnew = .95 * thetaFold + .05 * thetaM;                       // Filter for accelerometer pitch data
+
+    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
+    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
+    theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
+    phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
+    
+    //thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
+    //phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
+
+    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
+    thetaRad = theta / 360 * (2 * 3.14);
+
+    Xm = mag.x() * cos(thetaRad) - mag.y() * sin(phiRad) * sin(thetaRad) + mag.z() * cos(phiRad) * sin(thetaRad); // Absolute X Direction of magnitometer after fancy math
+    Ym = mag.y() * cos(phiRad) + mag.z() * sin(phiRad);                                                 // Absolute Y Direction of magnitometer after fancy math
+
+    psi = atan2(Ym, Xm) / (2 * 3.14) * 360;                           // Absolute heading of the robot
+
+    phiFold = phiFnew;
+    thetaFold = thetaFnew;
+  }                                 // End for loop
+  Serial2.println("----------IMUDirection Function Complete----------");
+  Serial2.println(" ");
+  return phi;
+}
+
+
 //--------------------MOVEMENT--------------------MOVEMENT-------------------MOVEMENT-------------------
 //TURN LEFT
-void TurnLeft()
+void TurnLeft(int deg)
 {
 
   Serial2.println(" ");
-  Serial2.println("=====TurnLeft Function Successfully Called===== ");
+  Serial2.println("=====TurnLeft Function Successfully Called===== ");        // Printing for testing
   
-  unsigned long prevTime = millis();
-  int NumLed = 0;
-  float currentDirection = 0;
-  float startingDirection = 0;
-  float targetDirection = 0;
-  float x = 0;
+  unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds 
+  int NumLed = 0;                         // Initalizing NumLed and setting it to 0 for blinker functions
+  float currentDirection = 0;             // Creating local variable named currentDirection and setting it to 0
+  float startingDirection = 0;            // Creating local variable named startingDirection and setting it to 0
+  float targetDirection = 0;              // Creating local variable named targetDirection and setting it to 0
+  float tempValue = 0;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
 
-  startingDirection = IMUDirection();
-  targetDirection = startingDirection - 90;
+  startingDirection = IMUDirection();         // setting startingDirection to the current value returned from the function IMUDirection()
+  targetDirection = startingDirection - deg;  // setting targetDirction = to the startingDirection - the deg value we passed to this function 
 
 
-  Serial2.print(" Starting Direction: ");
+  Serial2.print(" Starting Direction: ");     // Printing for testing
   Serial2.println(startingDirection);
 
-  if (targetDirection < -180) {     // Calculating the target position if it goes over the -180 mark
-    x = -targetDirection - 180;
-    targetDirection = 180 - x;
+  if (targetDirection < -180) {               // Calculating the target position if it goes over the -180 mark
+    tempValue = -targetDirection - 180;
+    targetDirection = 180 - tempValue;
   }
 
-  Serial2.print(" Target Direction: ");
+  Serial2.print(" Target Direction: ");       // Printing for testing
   Serial2.println(targetDirection);
 
   Serial2.println("Begin Turning Left");
-  currentDirection = IMUDirection();
-  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
-    unsigned long currentTime = millis();
+  currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function 
+  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {    // This while loop repeates untill the curentDirection has reached the target direction
+    unsigned long currentTime = millis(); 
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
         case 0:
