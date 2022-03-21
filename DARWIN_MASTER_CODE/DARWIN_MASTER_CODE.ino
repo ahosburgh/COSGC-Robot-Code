@@ -470,8 +470,8 @@ void TurnLeft(int deg)
     }
     digitalWrite(DCmotorFrontPWMA, HIGH);
     digitalWrite(DCmotorFrontPWMB, HIGH);
-    digitalWrite(DCmotorMiddlePWMA, HIGH);
-    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, LOW);
+    digitalWrite(DCmotorMiddlePWMB, LOW);
     digitalWrite(DCmotorBackPWMA, HIGH);
     digitalWrite(DCmotorBackPWMB, HIGH);
     // All motors A move back
@@ -580,8 +580,8 @@ void TurnRight(int deg)
     }
     digitalWrite(DCmotorFrontPWMA, HIGH);
     digitalWrite(DCmotorFrontPWMB, HIGH);
-    digitalWrite(DCmotorMiddlePWMA, HIGH);
-    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorMiddlePWMA, LOW);
+    digitalWrite(DCmotorMiddlePWMB, LOW);
     digitalWrite(DCmotorBackPWMA, HIGH);
     digitalWrite(DCmotorBackPWMB, HIGH);
     // All motors A move forward
