@@ -200,6 +200,7 @@ delay (1000);
 MoveBack();
 delay (1000);
 DCStop();
+delay(1000);
 
 }
 
@@ -472,8 +473,8 @@ void TurnLeft(int deg)
     digitalWrite(DCmotorFrontPWMA, HIGH);
     digitalWrite(DCmotorFrontPWMB, HIGH);
     digitalWrite(DCmotorMiddlePWMA, HIGH);
-    digitalWrite(DCmotorMiddlePWMB, LOW);
-    digitalWrite(DCmotorBackPWMA, LOW);
+    digitalWrite(DCmotorMiddlePWMB, HIGH);
+    digitalWrite(DCmotorBackPWMA, HIGH);
     digitalWrite(DCmotorBackPWMB, HIGH);
     // All motors A move back
 
@@ -581,10 +582,10 @@ void TurnRight(int deg)
     }
     digitalWrite(DCmotorFrontPWMA, HIGH);
     digitalWrite(DCmotorFrontPWMB, HIGH);
-    digitalWrite(DCmotorMiddlePWMA, LOW);
+    digitalWrite(DCmotorMiddlePWMA, HIGH);
     digitalWrite(DCmotorMiddlePWMB, HIGH);
     digitalWrite(DCmotorBackPWMA, HIGH);
-    digitalWrite(DCmotorBackPWMB, LOW);
+    digitalWrite(DCmotorBackPWMB, HIGH);
     // All motors A move forward
 
     digitalWrite(DCmotorFrontAI1, HIGH);
