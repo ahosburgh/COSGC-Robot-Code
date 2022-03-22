@@ -50,8 +50,9 @@ unsigned long previousTime = 0;
 #include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
 #include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
 #include <math.h>                               // Math library required for trig functions in compass
-#define BN0055_SAMPLERATE_DELAY_MS (100)        // Instructing the sensor to sample every 100 ms
-Adafruit_BNO055 DarwinIMU = Adafruit_BNO055();  // Using adafruit library to create IMU object named "DarwinIMU"
+#include <EEPROM.h>                             // EEprom library required save/load data from arduinos long term memory
+#define BNO055_SAMPLERATE_DELAY_MS 100        // Instructing the sensor to sample every 100 ms
+Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU", giving it the id 55 and address 0x28
 float thetaM;           // Pitch from Accelerometer
 float phiM;             // Roll from Accellerometer
 float thetaFold = 0;    // Overall System Pitch Filtered (Old)
@@ -160,10 +161,59 @@ void setup() {
   Serial2.println("IMU Setup Begin");
   DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
-  int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
-  Serial2.print("IMU Tempature: ");        // Printing for debugging
-  Serial2.println(temp);                   // Printing the measured tempature to the screen for sanity check.
+  int eeAddress = 0;
+  long bnoID;
+  bool foundCalib = false;
+
+  EEPROM.get(eeAddress, bnoID);
+
+  adafruit_bno055_offsets_t calibrationData;
+  sensor_t sensor;
+  
+  DarwinIMU.getSensor(&sensor);
+
+  if (bnoID != sensor.sensor_id)
+    {
+        Serial2.println("\nNo Calibration Data for this sensor exists in EEPROM");
+        delay(500);
+    }
+    else
+    {
+        Serial2.println("\nFound Calibration for this sensor in EEPROM.");
+        eeAddress += sizeof(long);
+        EEPROM.get(eeAddress, calibrationData);
+
+        
+
+        Serial2.println("\n\nRestoring Calibration data to the BNO055...");
+        DarwinIMU.setSensorOffsets(calibrationData);
+
+        Serial2.println("\n\nCalibration data loaded into BNO055");
+        foundCalib = true;
+    }
+  
+  
+  //int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
+  
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
+  sensors_event_t event;
+  DarwinIMU.getEvent(&event);
+ 
+  /*Serial2.println("Move sensor slightly to calibrate magnetometers");
+    while (!DarwinIMU.isFullyCalibrated())
+        {
+            DarwinIMU.getEvent(&event);
+            delay(BNO055_SAMPLERATE_DELAY_MS);
+        }
+
+*/
+    Serial2.println("\nFully calibrated!");
+    Serial2.println("--------------------------------");
+    Serial2.println("Calibration Results: ");
+    adafruit_bno055_offsets_t newCalib;
+    DarwinIMU.getSensorOffsets(newCalib);
+    
+    
   millisOld = millis();                   // Grabbing the system time for dt variable
   Serial2.println("Calling IMU Calibration Function");   // Printing for debugging
   Serial2.println(" ");
@@ -187,20 +237,11 @@ void setup() {
 
 void loop() {
 
-MoveForward();
-delay (1000);
-DCStop();
-delay (1000);
-TurnLeft(90);
-delay (1000);
-DCStop();
-delay(1000);
-TurnRight(90);
-delay (1000);
-MoveBack();
-delay (1000);
-DCStop();
-delay(1000);
+
+
+TurnLeft(45);
+TurnRight(180);
+
 
 }
 
@@ -359,7 +400,7 @@ float IMUDirection()
 float IMUPitch()
 {
   Serial2.println(" ");
-  Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
+  Serial2.println("==========IMUPitch Function Successfully Called==========");           // Printing for debugging
 
   for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
@@ -429,7 +470,7 @@ void TurnLeft(int deg)
 
   Serial2.println("Begin Turning Left");
   currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function 
-  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {    // This while loop repeates untill the curentDirection has reached the target direction
+  while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis(); 
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
@@ -524,7 +565,7 @@ void TurnRight(int deg)
   
 
   startingDirection = IMUDirection();
-  targetDirection = startingDirection + 90;
+  targetDirection = startingDirection + deg;
 
   Serial2.print(" Starting Direction: ");
   Serial2.println(startingDirection);
@@ -539,7 +580,7 @@ void TurnRight(int deg)
 
   Serial2.println("Begin Turning Right");
   currentDirection = IMUDirection();
-  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
+  while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {
     unsigned long currentTime = millis();
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
