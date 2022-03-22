@@ -178,7 +178,7 @@ void setup(void)
     *  This isn't foolproof, but it's better than nothing.
     */
     bno.getSensor(&sensor);
-    if (bnoID != sensor.sensor_id)
+    /*if (bnoID != sensor.sensor_id)
     {
         Serial.println("\nNo Calibration Data for this sensor exists in EEPROM");
         delay(500);
@@ -196,7 +196,7 @@ void setup(void)
 
         Serial.println("\n\nCalibration data loaded into BNO055");
         foundCalib = true;
-    }
+    }*/
 
     delay(1000);
 
@@ -212,7 +212,7 @@ void setup(void)
     sensors_event_t event;
     bno.getEvent(&event);
     /* always recal the mag as It goes out of calibration very often */
-    if (foundCalib){
+    /*if (foundCalib){
         Serial.println("Move sensor slightly to calibrate magnetometers");
         while (!bno.isFullyCalibrated())
         {
@@ -222,6 +222,7 @@ void setup(void)
     }
     else
     {
+    */
         Serial.println("Please Calibrate Sensor: ");
         while (!bno.isFullyCalibrated())
         {
@@ -243,7 +244,7 @@ void setup(void)
             /* Wait the specified delay before requesting new data */
             delay(BNO055_SAMPLERATE_DELAY_MS);
         }
-    }
+    //}
 
     Serial.println("\nFully calibrated!");
     Serial.println("--------------------------------");
