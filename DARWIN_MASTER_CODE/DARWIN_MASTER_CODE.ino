@@ -11,26 +11,30 @@
 //********************DC Motors*******************DC Motors********************DC Motors********************
 //DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
 int MovementDelay = 1000;
-#define DCmotorFrontPWMA 46
+int slow = 130; // Speed of slow motors 
+#define DCmotorFrontPWMA 6    // Front Right
 #define DCmotorFrontAI1 50
 #define DCmotorFrontAI2 48
-#define DCmotorFrontPWMB 51
-#define DCmotorFrontBI1 47
+
+#define DCmotorFrontPWMB 7    // Front Left
+#define DCmotorFrontBI1 51
 #define DCmotorFrontBI2 49
 
-#define DCmotorMiddlePWMA 38
-#define DCmotorMiddleAI1 42
-#define DCmotorMiddleAI2 40
-#define DCmotorMiddlePWMB 43
-#define DCmotorMiddleBI1 39
-#define DCmotorMiddleBI2 41
+#define DCmotorMiddlePWMA 3   // Middle Right
+#define DCmotorMiddleAI1 44
+#define DCmotorMiddleAI2 42
 
-#define DCmotorBackPWMA 30
-#define DCmotorBackAI1 34
-#define DCmotorBackAI2 32
-#define DCmotorBackPWMB 35
-#define DCmotorBackBI1 31
-#define DCmotorBackBI2 33
+#define DCmotorMiddlePWMB 4   // Middle Left
+#define DCmotorMiddleBI1 45
+#define DCmotorMiddleBI2 43
+
+#define DCmotorBackPWMA 10    // Back Right
+#define DCmotorBackAI1 38
+#define DCmotorBackAI2 36
+  
+#define DCmotorBackPWMB 11    // Back LEft
+#define DCmotorBackBI1 39
+#define DCmotorBackBI2 37
 
 
 //********************LED Pins*******************LED Pins********************LED Pins********************
@@ -82,7 +86,7 @@ float distance;
 //********************FRONT SERVO*******************FRONT SERVO********************FRONT SERVO********************
 #include <Servo.h>              // Including the servo library 
 Servo TOFServo;                 // Creating a new servo object named TOFServo
-#define TOFServoPin 2          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
+#define TOFServoPin 8          // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
 
 
@@ -238,10 +242,14 @@ void setup() {
 void loop() {
 
 
+MoveForward();
 delay (3000);
+DCStop();
+MoveBack();
+delay (3000);
+DCStop();
 TurnLeft(90);
-
-
+TurnRight(90);
 
 }
 
@@ -283,80 +291,19 @@ void StartUpLights()
 //MOVE FORWARD ANIMATION (ALL LIGHTS OFF)
 void LightsOut()
 {
-  Serial2.println(" ");
-  Serial2.println("==========LightsOut Function Successfully Called==========");
   for (byte pin = A5; pin >= A0; pin--) {
     digitalWrite(pin, LOW);
   }
-  Serial2.println("----------LightsOut Function Complete----------");
-  Serial2.println(" ");
 }
 
 
 //--------------------IMU SENSOR--------------------IMU SENSOR--------------------IMU SENSOR--------------------
-
-// IMU SETUP FUNCTION
-// This function sets up the IMU and calibrates the sensor
-void SetupIMU()
-{
-  Serial2.println(" ");
-  Serial2.println("==========SetupIMU Function Successfully Called==========");
-  uint8_t system, gyroCal, accelCal, magCal = 0;
-
-  while (accelCal < 3) {
-    DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-    Serial2.print("Accelerometer: ");
-    Serial2.print(accel.x());
-    Serial2.print(",");
-    Serial2.print(accel.y());
-    Serial2.print(",");
-    Serial2.print(accel.z());
-    Serial2.print(",");
-    Serial2.print(accelCal);
-
-    Serial2.print("   Gyro: ");
-    Serial2.print(gyro.x());
-    Serial2.print(",");
-    Serial2.print(gyro.y());
-    Serial2.print(",");
-    Serial2.print(gyro.z());
-    Serial2.print(",");
-    Serial2.print(gyroCal);
-
-    Serial2.print("   Magnetometer: ");
-    Serial2.print(mag.x());
-    Serial2.print(",");
-    Serial2.print(mag.y());
-    Serial2.print(",");
-    Serial2.print(mag.z());
-    Serial2.print(",");
-    Serial2.print(magCal);
-    Serial2.print(",");
-
-    Serial2.print(", system: ");
-    Serial2.println(system);
-
-    delay(50);    // Delay 50 miliseconds to slow the rate of data sent to the serial monitor
-  }
-
-  Serial2.println("IMU Calibration Complete");
-  Serial2.println("----------IMU Setup Function Complete----------");
-  Serial2.println(" ");
-  delay(5000);                                 // Waiting 5 seconds to set the robot down after calibration
-}
-
 
 
 // IMU Direction function
 // This function gets the current direction from the IMU
 float IMUDirection()
 {
-  Serial2.println(" ");
-  Serial2.println("==========IMUDirection Function Successfully Called==========");           // Printing for debugging
 
   for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
@@ -374,9 +321,6 @@ float IMUDirection()
     theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
     phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
    
-    //thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
-    //phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
-
     phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
     thetaRad = theta / 360 * (2 * 3.14);
 
@@ -387,10 +331,8 @@ float IMUDirection()
 
     phiFold = phiFnew;
     thetaFold = thetaFnew;
-  }                                 // End for loop
-  Serial2.println("----------IMUDirection Function Complete----------");
-  Serial2.println(" ");
-  return psi;
+  }                                 // End of for loop
+  return psi;     // Return the absolute heading 
 }
 
 
@@ -399,9 +341,6 @@ float IMUDirection()
 // This function gets the current pitch angle from the IMU
 float IMUPitch()
 {
-  Serial2.println(" ");
-  Serial2.println("==========IMUPitch Function Successfully Called==========");           // Printing for debugging
-
   for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
@@ -418,23 +357,10 @@ float IMUPitch()
     theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
     phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
     
-    //thetaG = thetaG + gyro.y() * dt;                                  // Calculating Gyro Roll
-    //phiG = phiG - gyro.x() * dt;                                      // Calculating Gyro Pitch
-
-    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
-    thetaRad = theta / 360 * (2 * 3.14);
-
-    Xm = mag.x() * cos(thetaRad) - mag.y() * sin(phiRad) * sin(thetaRad) + mag.z() * cos(phiRad) * sin(thetaRad); // Absolute X Direction of magnitometer after fancy math
-    Ym = mag.y() * cos(phiRad) + mag.z() * sin(phiRad);                                                 // Absolute Y Direction of magnitometer after fancy math
-
-    psi = atan2(Ym, Xm) / (2 * 3.14) * 360;                           // Absolute heading of the robot
-
     phiFold = phiFnew;
     thetaFold = thetaFnew;
-  }                                 // End for loop
-  Serial2.println("----------IMUDirection Function Complete----------");
-  Serial2.println(" ");
-  return phi;
+  }                                 // End of for loop
+  return phi;     // Return the absolute pitch 
 }
 
 
@@ -470,6 +396,31 @@ void TurnLeft(int deg)
 
   Serial2.println("Begin Turning Left");
   currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function 
+  
+    // Set speed of motors. Some are faster than others to stop turning malfunctions
+  analogWrite(DCmotorFrontPWMA, 255);   // Front Right
+  analogWrite(DCmotorFrontPWMB, 255);   // Front Left
+  analogWrite(DCmotorMiddlePWMA, 255);  // Middle Right
+  analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
+  analogWrite(DCmotorBackPWMA, slow);    // Back Right
+  analogWrite(DCmotorBackPWMB, 255);    // Back Left
+
+  // All Right Motors Move Forward
+  digitalWrite(DCmotorFrontAI1, LOW);   // Front Right Forwards
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);  // Middle Right Forwards
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);    // Back Right Forwards
+  digitalWrite(DCmotorBackAI2, HIGH);
+
+  // All Left Motors Move Backwards
+  digitalWrite(DCmotorFrontBI1, HIGH);       // Front Left Backwards
+  digitalWrite(DCmotorFrontBI2, LOW);
+  digitalWrite(DCmotorMiddleBI1, HIGH);      // Middle Left Backwards
+  digitalWrite(DCmotorMiddleBI2, LOW);
+  digitalWrite(DCmotorBackBI1, HIGH);        // Back Left Backwards
+  digitalWrite(DCmotorBackBI2, LOW);
+
   while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis(); 
     if (currentTime - prevTime > 150) {
@@ -511,35 +462,12 @@ void TurnLeft(int deg)
           break;
       }
     }
-    analogWrite(DCmotorFrontPWMA, 80);
-    analogWrite(DCmotorFrontPWMB, 80);
-    analogWrite(DCmotorMiddlePWMA, 80);
-    analogWrite(DCmotorMiddlePWMB, 80);
-    analogWrite(DCmotorBackPWMA, 80);
-    analogWrite(DCmotorBackPWMB, 80);
-    // All motors A move back
 
-    digitalWrite(DCmotorFrontAI1, LOW);
-    digitalWrite(DCmotorFrontAI2, HIGH);
-    digitalWrite(DCmotorMiddleAI1, LOW);
-    digitalWrite(DCmotorMiddleAI2, HIGH);
-    digitalWrite(DCmotorBackAI1, LOW);
-    digitalWrite(DCmotorBackAI2, HIGH);
-
-    // All motors B move Forward
-
-    digitalWrite(DCmotorFrontBI1, LOW);
-    digitalWrite(DCmotorFrontBI2, HIGH);
-    digitalWrite(DCmotorMiddleBI1, LOW);
-    digitalWrite(DCmotorMiddleBI2, HIGH);
-    digitalWrite(DCmotorBackBI1, LOW);
-    digitalWrite(DCmotorBackBI2, HIGH);
-
-    currentDirection = IMUDirection();
-    Serial2.print("Target Direction: ");
-    Serial2.print(targetDirection);
-    Serial2.print("Current Direction: ");
-    Serial2.println(currentDirection);
+  currentDirection = IMUDirection();
+  Serial2.print("Target Direction: ");
+  Serial2.print(targetDirection);
+  Serial2.print("Current Direction: ");
+  Serial2.println(currentDirection);
 
   }
   DCStop();
@@ -580,6 +508,31 @@ void TurnRight(int deg)
 
   Serial2.println("Begin Turning Right");
   currentDirection = IMUDirection();
+
+  // Set speed of motors. Some are faster than others to stop turning malfunctions
+  analogWrite(DCmotorFrontPWMA, 255);   // Front Right
+  analogWrite(DCmotorFrontPWMB, 255);   // Front Left
+  analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
+  analogWrite(DCmotorMiddlePWMB, 255);  // Middle Left
+  analogWrite(DCmotorBackPWMA, 255);    // Back Right
+  analogWrite(DCmotorBackPWMB, slow);    // Back Left
+
+  // All Right Motors Move Backwards
+  digitalWrite(DCmotorFrontAI1, HIGH);   // Front Right Backwards
+  digitalWrite(DCmotorFrontAI2, LOW);
+  digitalWrite(DCmotorMiddleAI1, HIGH);  // Middle Right Backwards
+  digitalWrite(DCmotorMiddleAI2, LOW);
+  digitalWrite(DCmotorBackAI1, HIGH);    // Back Right Backwards
+  digitalWrite(DCmotorBackAI2, LOW);
+
+  // All Left Motors Move Forward
+  digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
+  digitalWrite(DCmotorBackBI2, HIGH);
+
   while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {
     unsigned long currentTime = millis();
     if (currentTime - prevTime > 150) {
@@ -621,29 +574,7 @@ void TurnRight(int deg)
           break;
       }
     }
-    digitalWrite(DCmotorFrontPWMA, HIGH);
-    digitalWrite(DCmotorFrontPWMB, HIGH);
-    digitalWrite(DCmotorMiddlePWMA, HIGH);
-    digitalWrite(DCmotorMiddlePWMB, HIGH);
-    digitalWrite(DCmotorBackPWMA, HIGH);
-    digitalWrite(DCmotorBackPWMB, HIGH);
-    // All motors A move forward
 
-    digitalWrite(DCmotorFrontAI1, HIGH);
-    digitalWrite(DCmotorFrontAI2, LOW);
-    digitalWrite(DCmotorMiddleAI1, HIGH);
-    digitalWrite(DCmotorMiddleAI2, LOW);
-    digitalWrite(DCmotorBackAI1, HIGH);
-    digitalWrite(DCmotorBackAI2, LOW);
-
-    // All motors B move back
-
-    digitalWrite(DCmotorFrontBI1, HIGH);
-    digitalWrite(DCmotorFrontBI2, LOW);
-    digitalWrite(DCmotorMiddleBI1, HIGH);
-    digitalWrite(DCmotorMiddleBI2, LOW);
-    digitalWrite(DCmotorBackBI1, HIGH);
-    digitalWrite(DCmotorBackBI2, LOW);
 
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
@@ -665,30 +596,30 @@ void MoveForward()
 {
   Serial2.println("Moving forward");
   LightsOut();
-  
-  digitalWrite(DCmotorFrontPWMA, HIGH);
-  digitalWrite(DCmotorFrontPWMB, HIGH);
-  digitalWrite(DCmotorMiddlePWMA, HIGH);
-  digitalWrite(DCmotorMiddlePWMB, HIGH);
-  digitalWrite(DCmotorBackPWMA, HIGH);
-  digitalWrite(DCmotorBackPWMB, HIGH);
-  // All motors A move forward
 
-  digitalWrite(DCmotorFrontAI1, LOW);
-  digitalWrite(DCmotorFrontAI2, HIGH);
-  digitalWrite(DCmotorMiddleAI1, LOW);
+  // Set speed of all motors to 100%
+  digitalWrite(DCmotorFrontPWMA, HIGH);     // Front Right Motor
+  digitalWrite(DCmotorFrontPWMB, HIGH);     // Front Left Motor
+  digitalWrite(DCmotorMiddlePWMA, HIGH);    // Middle Right Motor
+  digitalWrite(DCmotorMiddlePWMB, HIGH);    // Middle Left Motor
+  digitalWrite(DCmotorBackPWMA, HIGH);      // Back Right Motor
+  digitalWrite(DCmotorBackPWMB, HIGH);      // Back Left Motor
+
+  // All Right Motors move forward
+  digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward
+  digitalWrite(DCmotorFrontAI2, HIGH);      
+  digitalWrite(DCmotorMiddleAI1, LOW);      // Middle Right Forward
   digitalWrite(DCmotorMiddleAI2, HIGH);
-  digitalWrite(DCmotorBackAI1, LOW);
+  digitalWrite(DCmotorBackAI1, LOW);        // Back Right Forward
   digitalWrite(DCmotorBackAI2, HIGH);
 
-  // All motors B move forward
-
-  digitalWrite(DCmotorFrontBI1, HIGH);
-  digitalWrite(DCmotorFrontBI2, LOW);
-  digitalWrite(DCmotorMiddleBI1, HIGH);
-  digitalWrite(DCmotorMiddleBI2, LOW);
-  digitalWrite(DCmotorBackBI1, HIGH);
-  digitalWrite(DCmotorBackBI2, LOW);
+  // All Left Motors move forward
+  digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
+  digitalWrite(DCmotorBackBI2, HIGH);
 
 }
 
@@ -721,34 +652,35 @@ void MoveBack()
       prevTime = currentTime;
     }
 
-    digitalWrite(DCmotorFrontPWMA, HIGH);
-    digitalWrite(DCmotorFrontPWMB, HIGH);
-    digitalWrite(DCmotorMiddlePWMA, HIGH);
-    digitalWrite(DCmotorMiddlePWMB, HIGH);
-    digitalWrite(DCmotorBackPWMA, HIGH);
-    digitalWrite(DCmotorBackPWMB, HIGH);
-    // All motors A move back
+  // Set speed of all motors to 100%
+  digitalWrite(DCmotorFrontPWMA, HIGH);     // Front Right Motor
+  digitalWrite(DCmotorFrontPWMB, HIGH);     // Front Left Motor
+  digitalWrite(DCmotorMiddlePWMA, HIGH);    // Middle Right Motor
+  digitalWrite(DCmotorMiddlePWMB, HIGH);    // Middle Left Motor
+  digitalWrite(DCmotorBackPWMA, HIGH);      // Back Right Motor
+  digitalWrite(DCmotorBackPWMB, HIGH);      // Back Left Motor
 
-    digitalWrite(DCmotorFrontAI1, HIGH);
-    digitalWrite(DCmotorFrontAI2, LOW);
-    digitalWrite(DCmotorMiddleAI1, HIGH);
-    digitalWrite(DCmotorMiddleAI2, LOW);
-    digitalWrite(DCmotorBackAI1, HIGH);
-    digitalWrite(DCmotorBackAI2, LOW);
+  // Move All Right Motors Backwards 
+  digitalWrite(DCmotorFrontAI1, HIGH);      // Front Right Backwards
+  digitalWrite(DCmotorFrontAI2, LOW);
+  digitalWrite(DCmotorMiddleAI1, HIGH);     // Middle Right Backwards
+  digitalWrite(DCmotorMiddleAI2, LOW);
+  digitalWrite(DCmotorBackAI1, HIGH);       // Back Right Backwards
+  digitalWrite(DCmotorBackAI2, LOW);
 
-    // All motors B move back
-
-    digitalWrite(DCmotorFrontBI1, LOW);
-    digitalWrite(DCmotorFrontBI2, HIGH);
-    digitalWrite(DCmotorMiddleBI1, LOW);
-    digitalWrite(DCmotorMiddleBI2, HIGH);
-    digitalWrite(DCmotorBackBI1, LOW);
-    digitalWrite(DCmotorBackBI2, HIGH);
+  // Move All Left Motors Backwards
+  digitalWrite(DCmotorFrontBI1, HIGH);      // Front Left Backwards
+  digitalWrite(DCmotorFrontBI2, LOW);
+  digitalWrite(DCmotorMiddleBI1, HIGH);     // Middle Left Backwards
+  digitalWrite(DCmotorMiddleBI2, LOW);
+  digitalWrite(DCmotorBackBI1, HIGH);       // Back Left Backwards
+  digitalWrite(DCmotorBackBI2, LOW);
   }
 }
 
 void DCStop()
 {
+  // Set speed of all motors to 0% 
   digitalWrite(DCmotorFrontPWMA, LOW);
   digitalWrite(DCmotorFrontPWMB, LOW);
   digitalWrite(DCmotorMiddlePWMA, LOW);
