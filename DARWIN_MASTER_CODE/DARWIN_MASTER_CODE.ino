@@ -11,7 +11,7 @@
 //********************DC Motors*******************DC Motors********************DC Motors********************
 //DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
 int MovementDelay = 1000;
-int slow = 130; // Speed of slow motors 
+int slow = 80; // Speed of slow motors 
 #define DCmotorFrontPWMA 6    // Front Right
 #define DCmotorFrontAI1 50
 #define DCmotorFrontAI2 48
@@ -246,7 +246,7 @@ MoveForward();
 delay (3000);
 DCStop();
 MoveBack();
-delay (3000);
+delay (1000);
 DCStop();
 TurnLeft(90);
 TurnRight(90);
@@ -397,29 +397,6 @@ void TurnLeft(int deg)
   Serial2.println("Begin Turning Left");
   currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function 
   
-    // Set speed of motors. Some are faster than others to stop turning malfunctions
-  analogWrite(DCmotorFrontPWMA, 255);   // Front Right
-  analogWrite(DCmotorFrontPWMB, 255);   // Front Left
-  analogWrite(DCmotorMiddlePWMA, 255);  // Middle Right
-  analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
-  analogWrite(DCmotorBackPWMA, slow);    // Back Right
-  analogWrite(DCmotorBackPWMB, 255);    // Back Left
-
-  // All Right Motors Move Forward
-  digitalWrite(DCmotorFrontAI1, LOW);   // Front Right Forwards
-  digitalWrite(DCmotorFrontAI2, HIGH);
-  digitalWrite(DCmotorMiddleAI1, LOW);  // Middle Right Forwards
-  digitalWrite(DCmotorMiddleAI2, HIGH);
-  digitalWrite(DCmotorBackAI1, LOW);    // Back Right Forwards
-  digitalWrite(DCmotorBackAI2, HIGH);
-
-  // All Left Motors Move Backwards
-  digitalWrite(DCmotorFrontBI1, HIGH);       // Front Left Backwards
-  digitalWrite(DCmotorFrontBI2, LOW);
-  digitalWrite(DCmotorMiddleBI1, HIGH);      // Middle Left Backwards
-  digitalWrite(DCmotorMiddleBI2, LOW);
-  digitalWrite(DCmotorBackBI1, HIGH);        // Back Left Backwards
-  digitalWrite(DCmotorBackBI2, LOW);
 
   while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis(); 
@@ -462,6 +439,30 @@ void TurnLeft(int deg)
           break;
       }
     }
+
+      // Set speed of motors. Some are faster than others to stop turning malfunctions
+  analogWrite(DCmotorFrontPWMA, 255);   // Front Right
+  analogWrite(DCmotorFrontPWMB, 255);   // Front Left
+  analogWrite(DCmotorMiddlePWMA, 255);  // Middle Right
+  analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
+  analogWrite(DCmotorBackPWMA, slow);    // Back Right
+  analogWrite(DCmotorBackPWMB, 255);    // Back Left
+
+  // All Right Motors Move Forward
+  digitalWrite(DCmotorFrontAI1, LOW);   // Front Right Forwards
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);  // Middle Right Forwards
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);    // Back Right Forwards
+  digitalWrite(DCmotorBackAI2, HIGH);
+
+  // All Left Motors Move Backwards
+  digitalWrite(DCmotorFrontBI1, HIGH);       // Front Left Backwards
+  digitalWrite(DCmotorFrontBI2, LOW);
+  digitalWrite(DCmotorMiddleBI1, HIGH);      // Middle Left Backwards
+  digitalWrite(DCmotorMiddleBI2, LOW);
+  digitalWrite(DCmotorBackBI1, HIGH);        // Back Left Backwards
+  digitalWrite(DCmotorBackBI2, LOW);
 
   currentDirection = IMUDirection();
   Serial2.print("Target Direction: ");
@@ -509,29 +510,7 @@ void TurnRight(int deg)
   Serial2.println("Begin Turning Right");
   currentDirection = IMUDirection();
 
-  // Set speed of motors. Some are faster than others to stop turning malfunctions
-  analogWrite(DCmotorFrontPWMA, 255);   // Front Right
-  analogWrite(DCmotorFrontPWMB, 255);   // Front Left
-  analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
-  analogWrite(DCmotorMiddlePWMB, 255);  // Middle Left
-  analogWrite(DCmotorBackPWMA, 255);    // Back Right
-  analogWrite(DCmotorBackPWMB, slow);    // Back Left
-
-  // All Right Motors Move Backwards
-  digitalWrite(DCmotorFrontAI1, HIGH);   // Front Right Backwards
-  digitalWrite(DCmotorFrontAI2, LOW);
-  digitalWrite(DCmotorMiddleAI1, HIGH);  // Middle Right Backwards
-  digitalWrite(DCmotorMiddleAI2, LOW);
-  digitalWrite(DCmotorBackAI1, HIGH);    // Back Right Backwards
-  digitalWrite(DCmotorBackAI2, LOW);
-
-  // All Left Motors Move Forward
-  digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
-  digitalWrite(DCmotorFrontBI2, HIGH);
-  digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
-  digitalWrite(DCmotorMiddleBI2, HIGH);
-  digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
-  digitalWrite(DCmotorBackBI2, HIGH);
+ 
 
   while (currentDirection > targetDirection + 9 || currentDirection < targetDirection - 9) {
     unsigned long currentTime = millis();
@@ -574,7 +553,29 @@ void TurnRight(int deg)
           break;
       }
     }
-
+     // Set speed of motors. Some are faster than others to stop turning malfunctions
+    analogWrite(DCmotorFrontPWMA, 255);   // Front Right
+    analogWrite(DCmotorFrontPWMB, 255);   // Front Left
+    analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
+    analogWrite(DCmotorMiddlePWMB, 255);  // Middle Left
+    analogWrite(DCmotorBackPWMA, 255);    // Back Right
+    analogWrite(DCmotorBackPWMB, slow);    // Back Left
+    
+    // All Right Motors Move Backwards
+    digitalWrite(DCmotorFrontAI1, HIGH);   // Front Right Backwards
+    digitalWrite(DCmotorFrontAI2, LOW);
+    digitalWrite(DCmotorMiddleAI1, HIGH);  // Middle Right Backwards
+    digitalWrite(DCmotorMiddleAI2, LOW);
+    digitalWrite(DCmotorBackAI1, HIGH);    // Back Right Backwards
+    digitalWrite(DCmotorBackAI2, LOW);
+    
+    // All Left Motors Move Forward
+    digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
+    digitalWrite(DCmotorFrontBI2, HIGH);
+    digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
+    digitalWrite(DCmotorMiddleBI2, HIGH);
+    digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
+    digitalWrite(DCmotorBackBI2, HIGH);
 
     currentDirection = IMUDirection();
     Serial2.print("Target Direction: ");
