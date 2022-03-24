@@ -11,7 +11,7 @@
 //********************DC Motors*******************DC Motors********************DC Motors********************
 //DC motors only require that we define their pins. No libraries or special objects required. A = Left, B = Right, PWM = power(0-255)
 int MovementDelay = 1000;
-int slow = 80; // Speed of slow motors 
+int slow = 80; // Speed of slow motors
 int med = 150;
 int fast = 255;
 #define DCmotorFrontPWMA 6    // Front Right
@@ -33,7 +33,7 @@ int fast = 255;
 #define DCmotorBackPWMA 10    // Back Right
 #define DCmotorBackAI1 38
 #define DCmotorBackAI2 36
-  
+
 #define DCmotorBackPWMB 11    // Back LEft
 #define DCmotorBackBI1 39
 #define DCmotorBackBI2 37
@@ -68,7 +68,7 @@ float phiFnew;          // Overall System Roll Filtered (New)
 float theta;            // Overall System Pitch
 float phi;              // Overall System Roll
 float thetaRad;         // Pitch in radians
-float phiRad;           // Roll in radians 
+float phiRad;           // Roll in radians
 float Xm;               // Value coming off the x magnitometer
 float Ym;               // Value coming off the Y Magnitometer
 float psi;              // Heading angle
@@ -89,7 +89,7 @@ float distance;
 Servo TOFServo;                 // Creating a new servo object named TOFServo
 #define TOFServoPin 8           // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
-// RANGE 0 - 170 for safety 
+// RANGE 0 - 170 for safety
 
 //********************STEPPER MOTORS*******************STEPPER MOTORS********************STEPPER MOTORS********************
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)

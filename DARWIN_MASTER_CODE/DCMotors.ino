@@ -3,8 +3,8 @@ void DCDrift()
   int CurrentDirection = IMUDirection;
   Serial.println("Tokyo drift");
   LightsOut(); //Turns all lights off
-  if (CurrentDirection < GoldenDirection){ //Change target direction to golden direction
-  while (CurrentDirection != GoldenDirection) {
+  if (CurrentDirection < GoldenDirection) { //Change target direction to golden direction
+    while (CurrentDirection != GoldenDirection) {
       // Set speed of motors. Some are faster than others to stop turning malfunctions
       analogWrite(DCmotorFrontPWMA, fast);   // Front Right
       analogWrite(DCmotorFrontPWMB, slow);   // Front Left
