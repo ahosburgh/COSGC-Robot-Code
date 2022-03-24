@@ -71,32 +71,6 @@ void TurnLeft(int deg)
       }
     }
 
-  /*
-  // Set speed of motors. Some are faster than others to stop turning malfunctions
-  analogWrite(DCmotorFrontPWMA, med);   // Front Right
-  analogWrite(DCmotorFrontPWMB, med);   // Front Left
-  analogWrite(DCmotorMiddlePWMA, med);  // Middle Right
-  analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
-  analogWrite(DCmotorBackPWMA, slow);    // Back Right
-  analogWrite(DCmotorBackPWMB, med);    // Back Left
-
-  // All Right Motors Move Forward
-  digitalWrite(DCmotorFrontAI1, LOW);   // Front Right Forwards
-  digitalWrite(DCmotorFrontAI2, HIGH);
-  digitalWrite(DCmotorMiddleAI1, LOW);  // Middle Right Forwards
-  digitalWrite(DCmotorMiddleAI2, HIGH);
-  digitalWrite(DCmotorBackAI1, LOW);    // Back Right Forwards
-  digitalWrite(DCmotorBackAI2, HIGH);
-
-  // All Left Motors Move Backwards
-  digitalWrite(DCmotorFrontBI1, HIGH);       // Front Left Backwards
-  digitalWrite(DCmotorFrontBI2, LOW);
-  digitalWrite(DCmotorMiddleBI1, HIGH);      // Middle Left Backwards
-  digitalWrite(DCmotorMiddleBI2, LOW);
-  digitalWrite(DCmotorBackBI1, HIGH);        // Back Left Backwards
-  digitalWrite(DCmotorBackBI2, LOW);
-  */
-
   currentDirection = IMUDirection();
   Serial.print("Target Direction: ");
   Serial.print(targetDirection);
@@ -191,31 +165,6 @@ void TurnRight(int deg)
           break;
       }
     }
-    /*
-    // Set speed of motors. Some are faster than others to stop turning malfunctions
-    analogWrite(DCmotorFrontPWMA, med);   // Front Right
-    analogWrite(DCmotorFrontPWMB, med);   // Front Left
-    analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
-    analogWrite(DCmotorMiddlePWMB, med);  // Middle Left
-    analogWrite(DCmotorBackPWMA, med);    // Back Right
-    analogWrite(DCmotorBackPWMB, slow);    // Back Left
-    
-    // All Right Motors Move Backwards
-    digitalWrite(DCmotorFrontAI1, HIGH);   // Front Right Backwards
-    digitalWrite(DCmotorFrontAI2, LOW);
-    digitalWrite(DCmotorMiddleAI1, HIGH);  // Middle Right Backwards
-    digitalWrite(DCmotorMiddleAI2, LOW);
-    digitalWrite(DCmotorBackAI1, HIGH);    // Back Right Backwards
-    digitalWrite(DCmotorBackAI2, LOW);
-    
-    // All Left Motors Move Forward
-    digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
-    digitalWrite(DCmotorFrontBI2, HIGH);
-    digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
-    digitalWrite(DCmotorMiddleBI2, HIGH);
-    digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
-    digitalWrite(DCmotorBackBI2, HIGH);
-    */
 
     currentDirection = IMUDirection();
     Serial.print("Target Direction: ");
