@@ -3,7 +3,7 @@
 float IMUDirection()
 {
 
-  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+  for (int i = 0; i < 10; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -39,7 +39,7 @@ float IMUDirection()
 // This function gets the current pitch angle from the IMU
 float IMUPitch()
 {
-  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+  for (int i = 0; i < 10; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
