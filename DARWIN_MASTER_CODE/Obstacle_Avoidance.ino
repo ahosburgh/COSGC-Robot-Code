@@ -1,3 +1,3 @@
-while(obstacle != detected){
-  DCForward();
-}
+//while(obstacle != detected){
+//  DCForward();
+//}
