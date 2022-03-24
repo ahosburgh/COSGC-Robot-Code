@@ -197,14 +197,14 @@ void setup() {
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   sensors_event_t event;
   DarwinIMU.getEvent(&event);
- 
+ /*
   Serial.println("Move sensor slightly to calibrate magnetometers");
     while (!DarwinIMU.isFullyCalibrated())
         {
             DarwinIMU.getEvent(&event);
             delay(BNO055_SAMPLERATE_DELAY_MS);
         }
-
+*/
 
   Serial.println("\nFully calibrated!");
   Serial.println("--------------------------------");
@@ -231,7 +231,6 @@ void setup() {
 void loop() {
 
 TurnLeft(90);
-
 
 }
 
@@ -287,7 +286,7 @@ void LightsOut()
 float IMUDirection()
 {
 
-  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+  for (int i = 0; i < 10; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -323,7 +322,7 @@ float IMUDirection()
 // This function gets the current pitch angle from the IMU
 float IMUPitch()
 {
-  for (int i = 0; i < 20; i++) {                                         // Looping 20 times just to get a good average value
+  for (int i = 0; i < 10; i++) {                                         // Looping 20 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -342,7 +341,7 @@ float IMUPitch()
     phiFold = phiFnew;
     thetaFold = thetaFnew;
   }                                 // End of for loop
-  return phi;     // Return the absolute pitch 
+  return theta;     // Return the absolute pitch 
 }
 
 
@@ -447,12 +446,18 @@ void TurnLeft(int deg)
   */
 
   currentDirection = IMUDirection();
-  Serial.print("Target Direction: ");
+  Serial.print("Target Direction: \t");
   Serial.print(targetDirection);
-  Serial.print("Current Direction: ");
+  Serial.print("\t Current Direction: \t");
   Serial.println(currentDirection);
 
+    if (currentDirection < targetDirection - 10 || currentDirection > targetDirection - 30){
+      Serial.println("---- Correction Needed ----");
+      int correction = targetDirection - currentDirection;
+      TurnRight(correction);
+    }
   }
+  
   DCStop();
   LightsOut();
   Serial.println(" Left Turn Complete ");
@@ -560,20 +565,20 @@ void TurnRight(int deg)
     digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
     digitalWrite(DCmotorBackBI2, HIGH);
     */
-
+/*
     currentDirection = IMUDirection();
     Serial.print("Target Direction: ");
     Serial.print(targetDirection);
     Serial.print("Current Direction: ");
     Serial.println(currentDirection);
-    
+   /* 
     if(currentDirection > targetDirection + 10){
-       float correction = currentDirection - targetDirecion;
-      if ( > 180) {     // Calculating the correction position if it goes over the -180 mark
+       float correction = currentDirection - targetDirection;
+      //if ( > 180) {     // Calculating the correction position if it goes over the -180 mark
     correction = -targetDirection + 180;
     targetDirection = -180 - deg;
   }
-      
+      *//*
     }
   }
   DCStop();
@@ -583,7 +588,7 @@ void TurnRight(int deg)
   Serial.println(" ");
   delay(MovementDelay);
 }
-  
+*/
 
 //DC MOTORS
 void MoveForward()
