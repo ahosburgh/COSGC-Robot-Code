@@ -18,7 +18,7 @@ float IMUDirection()
     millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
     theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
     phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-   
+
     phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
     thetaRad = theta / 360 * (2 * 3.14);
 
@@ -30,7 +30,7 @@ float IMUDirection()
     phiFold = phiFnew;
     thetaFold = thetaFnew;
   }                                 // End of for loop
-  return psi;     // Return the absolute heading 
+  return psi;     // Return the absolute heading
 }
 
 
@@ -54,9 +54,9 @@ float IMUPitch()
     millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
     theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
     phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-    
+
     phiFold = phiFnew;
     thetaFold = thetaFnew;
   }                                 // End of for loop
-  return phi;     // Return the absolute pitch 
+  return phi;     // Return the absolute pitch
 }

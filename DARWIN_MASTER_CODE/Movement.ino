@@ -92,7 +92,7 @@ void TurnLeft(int deg)
     }
   }
   DCStop(); //Stops all DC motors
-  LightsOut(); //Turns all lights off  
+  LightsOut(); //Turns all lights off
   Serial.println(" Left Turn Complete ");
   Serial.println("----------LeftTurn Function Complete----------");
   Serial.println(" ");

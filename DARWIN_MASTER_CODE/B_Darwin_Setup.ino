@@ -12,7 +12,7 @@ void setup() {
 
   //TOF Stepper Setup
   TOFStepper.setSpeed(StepperSpeed);        // Setting TOF Stepper Motor speed
-  
+
   //Servo (TOF) Setup
   Serial.println("Servo Setup Begin");      // Printing for debugging
   TOFServo.attach(TOFServoPin);             // Attaches the servo to the signalPin of the Arduino
@@ -69,28 +69,28 @@ void setup() {
 
   adafruit_bno055_offsets_t calibrationData;
   sensor_t sensor;
-  
+
   DarwinIMU.getSensor(&sensor);
 
   if (bnoID != sensor.sensor_id)
-    {
-        Serial.println("\nNo Calibration Data for this sensor exists in EEPROM");
-        delay(500);
-    }
-    else
-    {
-        Serial.println("\nFound Calibration for this sensor in EEPROM.");
-        eeAddress += sizeof(long);
-        EEPROM.get(eeAddress, calibrationData);
+  {
+    Serial.println("\nNo Calibration Data for this sensor exists in EEPROM");
+    delay(500);
+  }
+  else
+  {
+    Serial.println("\nFound Calibration for this sensor in EEPROM.");
+    eeAddress += sizeof(long);
+    EEPROM.get(eeAddress, calibrationData);
 
 
-        Serial.println("\n\nRestoring Calibration data to the BNO055...");
-        DarwinIMU.setSensorOffsets(calibrationData);
+    Serial.println("\n\nRestoring Calibration data to the BNO055...");
+    DarwinIMU.setSensorOffsets(calibrationData);
 
-        Serial.println("\n\nCalibration data loaded into BNO055");
-        foundCalib = true;
-    }
-  
+    Serial.println("\n\nCalibration data loaded into BNO055");
+    foundCalib = true;
+  }
+
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   sensors_event_t event;
   DarwinIMU.getEvent(&event);
@@ -100,8 +100,8 @@ void setup() {
   Serial.println("Calibration Results: ");
   adafruit_bno055_offsets_t newCalib;
   DarwinIMU.getSensorOffsets(newCalib);
-    
-    
+
+
   millisOld = millis();                         // Grabbing the system time for dt variable
   Serial.println("IMU Calibration Complete");   // Printing for debugging
 
@@ -109,6 +109,6 @@ void setup() {
   Serial.println("End of Void Setup");          // Printing for debugging
   Serial.println(" ");                          // Printing for debugging
 
-  GoldenDirection = IMUDirection(); //Set heading for goal
+  GoldenDirection = 90//IMUDirection(); //Set heading for goal
 
 }
