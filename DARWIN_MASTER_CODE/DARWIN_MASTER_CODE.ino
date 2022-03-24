@@ -74,6 +74,7 @@ float Ym;               // Value coming off the Y Magnitometer
 float psi;              // Heading angle
 float dt;
 unsigned long millisOld;
+float GoldenDirection;
 
 
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************

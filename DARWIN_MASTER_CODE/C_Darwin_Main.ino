@@ -1,7 +1,12 @@
 void loop() {
 
-//TurnLeft(90);
-LightsOut();
-IMUDirection();
-GetDistance();
+  DCForward();
+  if (detect obstacle) {
+    TurnLeft(45);
+    if (detect obstacle) {
+      TurnRight(90);
+    }
+  }
+  DCForward();
+  DCDrift();
 }

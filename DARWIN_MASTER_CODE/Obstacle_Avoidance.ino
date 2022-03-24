@@ -1,0 +1,3 @@
+while(obstacle != detected){
+  DCForward();
+}
