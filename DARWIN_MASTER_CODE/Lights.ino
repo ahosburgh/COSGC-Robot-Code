@@ -1,6 +1,3 @@
-#include "Lights.h"
-
-//Start Up Lights
 void StartUpLights()
 {
   for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
