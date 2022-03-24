@@ -49,6 +49,7 @@ int fast = 255;
 #define Led6 A3
 const unsigned long eventInterval = 2000;
 unsigned long previousTime = 0;
+#include "Lights.h"
 
 //********************IMU Sensor*******************IMU Sensor********************IMU Sensor********************
 #include <Wire.h>                               // I2C comunication library (built into Arduino)
@@ -243,42 +244,6 @@ TurnLeft(90);
 
 
 
-
-//--------------------LED LIGHTS--------------------LED LIGHTS--------------------LED LIGHTS--------------------
-
-
-//Start Up Lights
-void StartUpLights()
-{
-  for (byte pin = A0; pin < A0 + 6; pin++) {      // Setting all pin modes to output via for loop
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, LOW);
-  }
-
-  // Startup light show
-  for (int j = 0; j <= 3; j++) {
-    for (byte pin = A0; pin < A0 + 6; pin++) {
-      digitalWrite(pin, LOW);
-      delay(80);
-      digitalWrite(pin, HIGH);
-    }
-  }
-  delay(300);
-  for (byte pin = A5; pin >= A0; pin--) {
-    digitalWrite(pin, LOW);
-    delay(100);
-  }
-}
-
-//MOVE FORWARD ANIMATION (ALL LIGHTS OFF)
-void LightsOut()
-{
-  for (byte pin = A5; pin >= A0; pin--) {
-    digitalWrite(pin, LOW);
-  }
-}
-
-
 //--------------------IMU SENSOR--------------------IMU SENSOR--------------------IMU SENSOR--------------------
 
 
@@ -453,6 +418,7 @@ void TurnLeft(int deg)
   Serial.println(currentDirection);
 
   }
+  
   DCStop();
   LightsOut();
   Serial.println(" Left Turn Complete ");
@@ -461,7 +427,7 @@ void TurnLeft(int deg)
   delay(MovementDelay);
 }
 
-
+/*
 //TURN RIGHT
 void TurnRight(int deg)
 {
@@ -560,20 +526,20 @@ void TurnRight(int deg)
     digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
     digitalWrite(DCmotorBackBI2, HIGH);
     */
-
+/*
     currentDirection = IMUDirection();
     Serial.print("Target Direction: ");
     Serial.print(targetDirection);
     Serial.print("Current Direction: ");
     Serial.println(currentDirection);
     
-    if(currentDirection > targetDirection + 10){
-       float correction = currentDirection - targetDirecion;
-      if ( > 180) {     // Calculating the correction position if it goes over the -180 mark
-    correction = -targetDirection + 180;
-    targetDirection = -180 - deg;
-  }
-      
+//    if(currentDirection > targetDirection + 10){
+//       float correction = currentDirection - targetDirection;
+//      if ( > 180) {     // Calculating the correction position if it goes over the -180 mark
+//    correction = -targetDirection + 180;
+//    targetDirection = -180 - deg;
+//  }*/
+  /*    
     }
   }
   DCStop();
@@ -583,7 +549,7 @@ void TurnRight(int deg)
   Serial.println(" ");
   delay(MovementDelay);
 }
-  
+  */
 
 //DC MOTORS
 void MoveForward()
