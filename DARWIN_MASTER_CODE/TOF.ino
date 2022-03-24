@@ -21,3 +21,12 @@ float GetDistance(){
   
   return distance;
 }
+
+
+//Convert servos position value to degrees above ground level 
+int ServoToDeg(int servoPos){
+  float deg;
+  deg = -0.4875 * servoPos + 133.875;
+
+  return deg
+}
