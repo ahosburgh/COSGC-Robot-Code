@@ -88,7 +88,7 @@ float distance;
 Servo TOFServo;                 // Creating a new servo object named TOFServo
 #define TOFServoPin 8           // This is the pin that the signal wire is connect to the arduino through. Can be any digital out pin.
 int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it to 90. This will be the starting position in degrees our servo turns to, and hold the value of any position we want to set the servo to later.
-
+// RANGE 0 - 170 for safety 
 
 //********************STEPPER MOTORS*******************STEPPER MOTORS********************STEPPER MOTORS********************
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
