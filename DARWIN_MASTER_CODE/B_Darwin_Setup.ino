@@ -94,14 +94,6 @@ void setup() {
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   sensors_event_t event;
   DarwinIMU.getEvent(&event);
- 
-  Serial.println("Move sensor slightly to calibrate magnetometers");
-    while (!DarwinIMU.isFullyCalibrated())
-        {
-            DarwinIMU.getEvent(&event);
-            delay(BNO055_SAMPLERATE_DELAY_MS);
-        }
-
 
   Serial.println("\nFully calibrated!");
   Serial.println("--------------------------------");
