@@ -80,7 +80,6 @@ float GoldenDirection;
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
-float distance;
 // SCL - gray SDA - white
 
 

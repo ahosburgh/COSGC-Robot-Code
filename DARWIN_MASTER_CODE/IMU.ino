@@ -60,3 +60,10 @@ float IMUPitch()
   }                                 // End of for loop
   return phi;     // Return the absolute pitch
 }
+
+
+float Navigation(){
+
+  
+
+}

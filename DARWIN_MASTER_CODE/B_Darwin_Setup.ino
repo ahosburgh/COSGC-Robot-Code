@@ -109,6 +109,6 @@ void setup() {
   Serial.println("End of Void Setup");          // Printing for debugging
   Serial.println(" ");                          // Printing for debugging
 
-  GoldenDirection = 90//IMUDirection(); //Set heading for goal
+  GoldenDirection = 90;//IMUDirection(); //Set heading for goal
 
 }

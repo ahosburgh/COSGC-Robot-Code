@@ -1,3 +1,14 @@
+void MoveForward(){
+  
+  while(ObjectDetection() == false && Navigation() == true){
+    DCForward();
+    ObjectDetection();
+    Navigation(); 
+  }
+}
+
+
+
 //TURN LEFT
 void TurnLeft(int deg)
 {
