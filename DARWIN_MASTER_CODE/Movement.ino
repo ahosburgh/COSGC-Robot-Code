@@ -1,5 +1,12 @@
 void MoveForward(){
- 
+
+//  ObjectDetection();
+//  Navigation();
+//  while(ObjectDetection == false && Navigation() == true){
+//    DCForward();
+//    ObjectDetection();
+//    Navigation();
+//  }
  
 }
 
@@ -8,31 +15,31 @@ void MoveForward(){
 //TURN LEFT
 void TurnLeft(int deg)
 {
-  Serial.println("\n=====TurnLeft Function Successfully Called===== ");        // Printing for testing
+  Serial2.println("\n=====TurnLeft Function Successfully Called===== ");        // Printing for testing
 
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   int NumLed = 0;                         // Initalizing NumLed and setting it to 0 for blinker functions
-  float currentDirection = 0;             // Creating local variable named currentDirection and setting it to 0
-  float startingDirection = 0;            // Creating local variable named startingDirection and setting it to 0
-  float targetDirection = 0;              // Creating local variable named targetDirection and setting it to 0
-  float tempValue = 0;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
+  float currentDirection;             // Creating local variable named currentDirection and setting it to 0
+  float startingDirection;            // Creating local variable named startingDirection and setting it to 0
+  float targetDirection;              // Creating local variable named targetDirection and setting it to 0
+  float tempValue;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
 
   startingDirection = IMUDirection();         // setting startingDirection to the current value returned from the function IMUDirection()
   targetDirection = startingDirection - deg;  // setting targetDirction = to the startingDirection - the deg value we passed to this function
 
 
-  Serial.print("\n Starting Direction: ");     // Printing for testing
-  Serial.println(startingDirection);
+  Serial2.print("\n Starting Direction: ");     // Printing for testing
+  Serial2.println(startingDirection);
 
   if (targetDirection < -180) {               // Calculating the target position if it goes over the -180 mark
     tempValue = -targetDirection - 180;
     targetDirection = 180 - tempValue;
   }
 
-  Serial.print(" Target Direction: ");       // Printing for testing
-  Serial.println(targetDirection);
+  Serial2.print(" Target Direction: ");       // Printing for testing
+  Serial2.println(targetDirection);
 
-  Serial.println("Begin Turning Left");
+  Serial2.println("Begin Turning Left");
   currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function
 
 
@@ -80,10 +87,10 @@ void TurnLeft(int deg)
     }
     DCLeft(); //Sets all DC motors to turn left
     currentDirection = IMUDirection();
-    Serial.print("Target Direction: ");
-    Serial.print(targetDirection);
-    Serial.print("Current Direction: ");
-    Serial.println(currentDirection);
+    Serial2.print("Target Direction: ");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: ");
+    Serial2.println(currentDirection);
 
     if (currentTime - prevTime > 8000) { // To get out if stuck
       DCRight();
@@ -93,16 +100,16 @@ void TurnLeft(int deg)
     }
 
     if (currentDirection < targetDirection - 10 || currentDirection < targetDirection - 30) {  // Correction if the robot overshoots
-      Serial.print("\n---Correction Needed---\n");
+      Serial2.print("\n---Correction Needed---\n");
       int correction = targetDirection - currentDirection;
       TurnRight(correction);
     }
   }
   DCStop(); //Stops all DC motors
   LightsOut(); //Turns all lights off
-  Serial.println(" Left Turn Complete ");
-  Serial.println("----------LeftTurn Function Complete----------");
-  Serial.println(" ");
+  Serial2.println(" Left Turn Complete ");
+  Serial2.println("----------LeftTurn Function Complete----------");
+  Serial2.println(" ");
   delay(MovementDelay); //Delay for set movement delay
 }
 
@@ -110,8 +117,8 @@ void TurnLeft(int deg)
 //TURN RIGHT
 void TurnRight(int deg)
 {
-  Serial.println(" ");
-  Serial.println("=====TurnRight Function Successfully Called===== ");
+  Serial2.println(" ");
+  Serial2.println("=====TurnRight Function Successfully Called===== ");
 
   unsigned long prevTime = millis();
   int NumLed = 0;
@@ -123,18 +130,18 @@ void TurnRight(int deg)
   startingDirection = IMUDirection();
   targetDirection = startingDirection + deg;
 
-  Serial.print(" Starting Direction: ");
-  Serial.println(startingDirection);
+  Serial2.print(" Starting Direction: ");
+  Serial2.println(startingDirection);
 
   if (targetDirection > 180) {     // Calculating the target position if it goes over the -180 mark
     deg = -targetDirection + 180;
     targetDirection = -180 - deg;
   }
 
-  Serial.print("Target Direction: ");
-  Serial.println(targetDirection);
+  Serial2.print("Target Direction: ");
+  Serial2.println(targetDirection);
 
-  Serial.println("Begin Turning Right");
+  Serial2.println("Begin Turning Right");
   currentDirection = IMUDirection();
 
 
@@ -183,10 +190,10 @@ void TurnRight(int deg)
     }
     DCRight(); //Sets all DC motors to turn right
     currentDirection = IMUDirection();
-    Serial.print("Target Direction: ");
-    Serial.print(targetDirection);
-    Serial.print("Current Direction: ");
-    Serial.println(currentDirection);
+    Serial2.print("Target Direction: ");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: ");
+    Serial2.println(currentDirection);
 
     if (currentTime - prevTime > 8000) { // To get out if stuck
       DCLeft();
@@ -196,15 +203,15 @@ void TurnRight(int deg)
     }
 
     if (currentDirection > targetDirection - 10 || currentDirection > targetDirection - 30) {  // Correction if the robot overshoots
-      Serial.print("\n---Correction Needed---\n");
+      Serial2.print("\n---Correction Needed---\n");
       int correction = targetDirection - currentDirection;
       TurnLeft(correction);
     } // End of if correction
   }   // End of While
   DCStop(); //Stops all DC Motors
   LightsOut(); //Turns all lights off
-  Serial.println(" Right Turn Complete ");
-  Serial.println("----------RightTurn Function Complete----------");
-  Serial.println(" ");
+  Serial2.println(" Right Turn Complete ");
+  Serial2.println("----------RightTurn Function Complete----------");
+  Serial2.println(" ");
   delay(MovementDelay); //Delay for set movement delay
 }

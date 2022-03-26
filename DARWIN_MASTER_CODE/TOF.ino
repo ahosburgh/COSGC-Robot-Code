@@ -5,16 +5,16 @@ bool ObjectDetection(){
   
   distance = GetDistance();
     if (distance > minDistance){
-      Serial.print("Path Clear: \t"); 
-      Serial.print(distance);
-      Serial.println("\t");
+      Serial2.print("Path Clear: \t");
+      Serial2.print(distance);
+      Serial2.println("\t");
       return false;
     }
     else
     {
-      Serial.print("OBJECT DETECTED: \t");
-      Serial.print(distance);
-      Serial.println("\t");
+      Serial2.print("OBJECT DETECTED: \t");
+      Serial2.print(distance);
+      Serial2.println("\t");
       return true;
     }
 }
@@ -29,20 +29,19 @@ int GetDistance() {
   DarwinTOF.rangingTest(&measure, false);                         // Running the built in ranging function to get a measurement pass in 'true' to get debug data printout!
 
   distance = measure.RangeMilliMeter;
-//  if (measure.RangeMilliMeter < 8190)                             // IF the measurement is under the max value 
-//  {                                                               //(8190 is the value returned when the TOF sensor measurements are out of range) 
-//    distance = measure.RangeMilliMeter;                           // Set distance = the the measurement returned from the measurement function
-//  }                                                               // End of IF 
-//  else                                                            // ELSE
-//  {
-//    distance = measure.RangeMilliMeter;                           // Set distance = to the out of range value
-//  }                                                               // End of ELSE 
+  
   return distance;                                                // Return the value stored in distance
 }                                                                 // End of GetDistance()
 
 
 float ServoPos(int deg){
   TOFServo.write(DegToServo(deg));
+}
+
+void LevelTOF(){
+ int deg;
+ deg = DegToServo(IMUPitch() + 90); 
+ TOFServo.write(deg);
 }
 
 
@@ -52,7 +51,6 @@ float ServoToDeg(int servoPos){                                   // Send this f
   deg = -0.4875 * servoPos + 133.875;                             // y = mx+b math to calculate the real value in degrees the servo is set to. 
   return deg;                                                     // Return the value of degrees as a float 
 }                                                                 // End of ServoToDeg()
-
 
 
 // Convers a degree above ground level to a real value to set the servo to 

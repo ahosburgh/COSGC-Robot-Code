@@ -1,4 +1,12 @@
-
+bool Navigation(float dir){
+  if(IMUDirection() > dir - 10  && IMUDirection() < dir + 10){
+    return true;  
+  }
+  else
+  {
+    return false;
+  }
+}
 
 
 
@@ -62,12 +70,12 @@ float IMUPitch()
     phiFold = phiFnew;
     thetaFold = thetaFnew;
   }                                 // End of for loop
-  return phi;     // Return the absolute pitch
+  return theta;     // Return the absolute pitch
 }
 
 void CalibrateIMU(){
-  Serial.println(" ");
-  Serial.println("==========SetupIMU Function Successfully Called==========");
+  Serial2.println(" ");
+  Serial2.println("==========SetupIMU Function Successfully Called==========");
   uint8_t system, gyroCal, accelCal, magCal = 0;
 
   while (accelCal < 3) {
@@ -76,41 +84,22 @@ void CalibrateIMU(){
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
-    Serial.print("Accelerometer: \t");
-    Serial.print(accel.x());
-    Serial.print(",");
-    Serial.print(accel.y());
-    Serial.print(",");
-    Serial.print(accel.z());
-    Serial.print(",");
-    Serial.print(accelCal);
+    Serial2.print("Accelerometer: \t");
+    Serial2.print(accelCal);
 
-    Serial.print("\t   Gyro: \t");
-    Serial.print(gyro.x());
-    Serial.print(",");
-    Serial.print(gyro.y());
-    Serial.print(",");
-    Serial.print(gyro.z());
-    Serial.print(",");
-    Serial.print(gyroCal);
+    Serial2.print("\t   Gyro: \t");
+    Serial2.print(gyroCal);
 
-    Serial.print("\t   Magnetometer: \t");
-    Serial.print(mag.x());
-    Serial.print(",");
-    Serial.print(mag.y());
-    Serial.print(",");
-    Serial.print(mag.z());
-    Serial.print(",");
-    Serial.print(magCal);
-    Serial.print(",");
-
-    Serial.print(", system: ");
-    Serial.println(system);
+    Serial2.print("\t   Magnetometer: \t");
+    Serial2.print(magCal);
+    
+    Serial2.print("\tsystem: \t");
+    Serial2.println(system);
   }
 
-  Serial.println("IMU Calibration Complete");
-  Serial.println("----------IMU Setup Function Complete----------");
-  Serial.println(" ");
+  Serial2.println("IMU Calibration Complete");
+  Serial2.println("----------IMU Setup Function Complete----------");
+  Serial2.println(" ");
 }
 
 
@@ -122,11 +111,11 @@ float GetGoldenDirection(){
   float z;
   float avg;
 
-  Serial.println("Place Robot on the ground and prepare for run");
-  Serial.println("Taking Golden direction in: ");
+  Serial2.println("Place Robot on the ground and prepare for run");
+  Serial2.println("Taking Golden direction in: ");
   
   for(int i = 30; i > 0; i--){
-    Serial.println(i);
+    Serial2.println(i);
     delay(1000);      
     }
 
@@ -140,6 +129,6 @@ float GetGoldenDirection(){
   avg = (x + y + z)/3;
   
   GoldenDirection = avg; 
-  Serial.print("Golden Direction set to: ");
-  Serial.println(GoldenDirection); 
+  Serial2.print("Golden Direction set to: ");
+  Serial2.println(GoldenDirection); 
 }
