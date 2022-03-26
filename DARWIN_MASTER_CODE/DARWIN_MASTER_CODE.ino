@@ -1,4 +1,4 @@
-/* 2021-2022 NASA COSGC FRCC
+ /* 2021-2022 NASA COSGC FRCC
   Project DARWIN
   Team Members
   Adam Hosburgh
@@ -57,7 +57,7 @@ unsigned long previousTime = 0;
 #include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
 #include <math.h>                               // Math library required for trig functions in compass
 #include <EEPROM.h>                             // EEprom library required save/load data from arduinos long term memory
-#define BNO055_SAMPLERATE_DELAY_MS 100        // Instructing the sensor to sample every 100 ms
+#define BNO055_SAMPLERATE_DELAY_MS 100          // Instructing the sensor to sample every 100 ms
 Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU", giving it the id 55 and address 0x28
 float thetaM;           // Pitch from Accelerometer
 float phiM;             // Roll from Accellerometer
@@ -72,9 +72,9 @@ float phiRad;           // Roll in radians
 float Xm;               // Value coming off the x magnitometer
 float Ym;               // Value coming off the Y Magnitometer
 float psi;              // Heading angle
-float dt;
-unsigned long millisOld;
-float GoldenDirection;
+float dt;               // Delta time
+unsigned long millisOld;// Old value of time in milliseconds
+float GoldenDirection;  // The direction if the final goal
 
 
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
@@ -95,4 +95,5 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
 int StepperSpeed = 600;                             // Speed of motor
-Stepper TOFStepper(steps, A8, A10, A9, A11);          // Creating Stepper object named TOFStepper and defining the steppers pins
+int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
+Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins

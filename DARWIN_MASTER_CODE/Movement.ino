@@ -1,15 +1,64 @@
-void MoveForward(){
+void MoveForward(int dir){
 
-//  ObjectDetection();
-//  Navigation();
-//  while(ObjectDetection == false && Navigation() == true){
-//    DCForward();
-//    ObjectDetection();
-//    Navigation();
-//  }
- 
+  bool i = false;
+  bool j = false;
+
+  ObjectDetection();
+  Navigation(dir);
+  while(ObjectDetection() == false && Navigation(dir) == true){
+    
+    if(i == false){
+    DCForward();
+    i = true;
+    }
+  
+    if(j == false){
+      if(stepperAngle < 70){  
+      stepperAngle = stepperAngle + 1;
+      StepperLeft(1);           
+      }
+      else
+      {
+      j = true;
+      }
+    }
+    else
+    {
+      if(stepperAngle > -70){
+      stepperAngle = stepperAngle - 1;
+      StepperRight(1);
+      }
+      else
+      {
+       j = false;
+      }
+    }
+    ObjectDetection();
+    Navigation(dir);
+  }
+
+  i = false;
+  while(ObjectDetection() == false && Navigation(dir) == false){
+
+    if(i == false){
+      Drift(dir);
+      i == true;
+    }
+    ObjectDetection();
+    Navigation(dir);
+  }
+  
 }
 
+void Drift(int dir){
+
+  if(IMUDirection() > dir){
+    DCDriftRight();
+  }
+  if(IMUDirection() < dir){
+    DCDriftLeft();
+  }
+}
 
 
 //TURN LEFT

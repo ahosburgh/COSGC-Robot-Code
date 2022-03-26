@@ -74,8 +74,7 @@ float IMUPitch()
 }
 
 void CalibrateIMU(){
-  Serial2.println(" ");
-  Serial2.println("==========SetupIMU Function Successfully Called==========");
+  Serial2.println("\n==========CalibrateIMU Function Successfully Called==========\n");
   uint8_t system, gyroCal, accelCal, magCal = 0;
 
   while (accelCal < 3) {
@@ -87,48 +86,46 @@ void CalibrateIMU(){
     Serial2.print("Accelerometer: \t");
     Serial2.print(accelCal);
 
-    Serial2.print("\t   Gyro: \t");
+    Serial2.print("\tGyro: \t");
     Serial2.print(gyroCal);
 
-    Serial2.print("\t   Magnetometer: \t");
+    Serial2.print("\tMagnetometer: \t");
     Serial2.print(magCal);
     
     Serial2.print("\tsystem: \t");
     Serial2.println(system);
   }
-
+  while(IMUDirection() == 0.00){
+    Serial2.print("Calibration Failed -- Restart -- \t");
+    Serial2.println(IMUDirection());
+  }
   Serial2.println("IMU Calibration Complete");
-  Serial2.println("----------IMU Setup Function Complete----------");
-  Serial2.println(" ");
 }
 
 
 
 float GetGoldenDirection(){
 
-  float x;
-  float y;
-  float z;
-  float avg;
+  float sample1;
+  float sample2;
+  float sample3;
 
-  Serial2.println("Place Robot on the ground and prepare for run");
+  Serial2.println("Place Darwin on the ground and prepare for run");
   Serial2.println("Taking Golden direction in: ");
   
   for(int i = 30; i > 0; i--){
     Serial2.println(i);
     delay(1000);      
     }
-
   
-  x = IMUDirection();
+  sample1 = IMUDirection();
   delay(1000);
-  y = IMUDirection();
+  sample2 = IMUDirection();
   delay(1000);
-  z = IMUDirection();
-
-  avg = (x + y + z)/3;
+  sample3 = IMUDirection();
   
-  GoldenDirection = avg; 
+  GoldenDirection = (sample1 + sample2 + sample3)/3;
+  
   Serial2.print("Golden Direction set to: ");
   Serial2.println(GoldenDirection); 
 }
