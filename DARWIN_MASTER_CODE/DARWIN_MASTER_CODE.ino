@@ -94,5 +94,5 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #include <Stepper.h>                                // Stepper motor library (Included with Arduino IDE)
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
-int StepperSpeed = 200;                             // Speed of motor
+int StepperSpeed = 600;                             // Speed of motor
 Stepper TOFStepper(steps, A8, A10, A9, A11);          // Creating Stepper object named TOFStepper and defining the steppers pins

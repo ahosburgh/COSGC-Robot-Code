@@ -41,6 +41,10 @@ int GetDistance() {
 }                                                                 // End of GetDistance()
 
 
+float ServoPos(int deg){
+  TOFServo.write(DegToServo(deg));
+}
+
 
 // Convert servos position value to degrees above ground level 
 float ServoToDeg(int servoPos){                                   // Send this function the servos coded position
