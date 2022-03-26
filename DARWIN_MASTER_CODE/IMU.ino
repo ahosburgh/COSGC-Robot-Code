@@ -1,3 +1,7 @@
+
+
+
+
 // IMU Direction function
 // This function gets the current direction from the IMU
 float IMUDirection()
@@ -61,9 +65,81 @@ float IMUPitch()
   return phi;     // Return the absolute pitch
 }
 
+void CalibrateIMU(){
+  Serial.println(" ");
+  Serial.println("==========SetupIMU Function Successfully Called==========");
+  uint8_t system, gyroCal, accelCal, magCal = 0;
 
-float Navigation(){
+  while (accelCal < 3) {
+    DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
+    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+    Serial.print("Accelerometer: \t");
+    Serial.print(accel.x());
+    Serial.print(",");
+    Serial.print(accel.y());
+    Serial.print(",");
+    Serial.print(accel.z());
+    Serial.print(",");
+    Serial.print(accelCal);
+
+    Serial.print("\t   Gyro: \t");
+    Serial.print(gyro.x());
+    Serial.print(",");
+    Serial.print(gyro.y());
+    Serial.print(",");
+    Serial.print(gyro.z());
+    Serial.print(",");
+    Serial.print(gyroCal);
+
+    Serial.print("\t   Magnetometer: \t");
+    Serial.print(mag.x());
+    Serial.print(",");
+    Serial.print(mag.y());
+    Serial.print(",");
+    Serial.print(mag.z());
+    Serial.print(",");
+    Serial.print(magCal);
+    Serial.print(",");
+
+    Serial.print(", system: ");
+    Serial.println(system);
+  }
+
+  Serial.println("IMU Calibration Complete");
+  Serial.println("----------IMU Setup Function Complete----------");
+  Serial.println(" ");
+}
+
+
+
+float GetGoldenDirection(){
+
+  float x;
+  float y;
+  float z;
+  float avg;
+
+  Serial.println("Place Robot on the ground and prepare for run");
+  Serial.println("Taking Golden direction in: ");
+  
+  for(int i = 30; i > 0; i--){
+    Serial.println(i);
+    delay(1000);      
+    }
 
   
+  x = IMUDirection();
+  delay(1000);
+  y = IMUDirection();
+  delay(1000);
+  z = IMUDirection();
 
+  avg = (x + y + z)/3;
+  
+  GoldenDirection = avg; 
+  Serial.print("Golden Direction set to: ");
+  Serial.println(GoldenDirection); 
 }

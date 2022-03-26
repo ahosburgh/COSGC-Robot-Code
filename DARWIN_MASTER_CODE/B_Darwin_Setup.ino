@@ -61,54 +61,21 @@ void setup() {
   Serial.println("IMU Setup Begin");
   DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
-  int eeAddress = 0;
-  long bnoID;
-  bool foundCalib = false;
-
-  EEPROM.get(eeAddress, bnoID);
-
-  adafruit_bno055_offsets_t calibrationData;
-  sensor_t sensor;
-
-  DarwinIMU.getSensor(&sensor);
-
-  if (bnoID != sensor.sensor_id)
-  {
-    Serial.println("\nNo Calibration Data for this sensor exists in EEPROM");
-    delay(500);
-  }
-  else
-  {
-    Serial.println("\nFound Calibration for this sensor in EEPROM.");
-    eeAddress += sizeof(long);
-    EEPROM.get(eeAddress, calibrationData);
-
-
-    Serial.println("\n\nRestoring Calibration data to the BNO055...");
-    DarwinIMU.setSensorOffsets(calibrationData);
-
-    Serial.println("\n\nCalibration data loaded into BNO055");
-    foundCalib = true;
-  }
-
+  int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
+  Serial.print("IMU Tempature: ");        // Printing for debugging
+  Serial.println(temp);                   // Printing the measured tempature to the screen for sanity check.
+  CalibrateIMU();
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
-  sensors_event_t event;
-  DarwinIMU.getEvent(&event);
-
-  Serial.println("\nFully calibrated!");
-  Serial.println("--------------------------------");
-  Serial.println("Calibration Results: ");
-  adafruit_bno055_offsets_t newCalib;
-  DarwinIMU.getSensorOffsets(newCalib);
-
-
-  millisOld = millis();                         // Grabbing the system time for dt variable
+  millisOld = millis();                   // Grabbing the system time for dt variable
+  Serial.println("Calling IMU Calibration Function");   // Printing for debugging
+  Serial.println(" ");
   Serial.println("IMU Calibration Complete");   // Printing for debugging
+  Serial.println(" ");
 
+  GetGoldenDirection();
+  
   // End of Void Setup
   Serial.println("End of Void Setup");          // Printing for debugging
   Serial.println(" ");                          // Printing for debugging
-
-  GoldenDirection = 90;//IMUDirection(); //Set heading for goal
 
 }
