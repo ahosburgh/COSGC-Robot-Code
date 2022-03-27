@@ -1,77 +1,115 @@
-void MoveForward(int dir){
-
-  bool i = false;
-  bool j = false;
-
-  ObjectDetection();
-  Navigation(dir);
-  while(ObjectDetection() == false && Navigation(dir) == true){
-    
-    if(i == false){
+void MoveForward(int dir) {
+  while (ObjectDetection() == false && Navigation(dir) == true) {
     DCForward();
-    i = true;
-    }
-  
-    if(j == false){
-      if(stepperAngle < 70){  
-      stepperAngle = stepperAngle + 1;
-      StepperLeft(1);           
+    Serial2.println("Driving Forward");
+    /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
+    if (x == true) {
+      if (stepperAngle < 60) {
+        stepperAngle = stepperAngle + 60;
+        StepperLeft(60);
       }
-      else
-      {
-      j = true;
+      else {
+        x = false;
       }
     }
     else
     {
-      if(stepperAngle > -70){
-      stepperAngle = stepperAngle - 1;
-      StepperRight(1);
+      if (stepperAngle > -60) {
+        stepperAngle = stepperAngle - 60;
+        StepperRight(60);
       }
-      else
-      {
-       j = false;
+      else {
+        x = true;
       }
     }
-    ObjectDetection();
-    Navigation(dir);
+    //////////////////////////////////////////////////////////////// end big chunk
+    LevelTOF();
   }
-
-  i = false;
-  while(ObjectDetection() == false && Navigation(dir) == false){
-
-    if(i == false){
-      Drift(dir);
-      i == true;
+  while (ObjectDetection() == false && Navigation(dir) == false) {
+    /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
+    if (x == true) {
+      if (stepperAngle < 60) {
+        stepperAngle = stepperAngle + 60;
+        StepperLeft(60);
+      }
+      else {
+        x = false;
+      }
     }
-    ObjectDetection();
-    Navigation(dir);
+    else
+    {
+      if (stepperAngle > -60) {
+        stepperAngle = stepperAngle - 60;
+        StepperRight(60);
+      }
+      else {
+        x = true;
+      }
+    }
+    //////////////////////////////////////////////////////////////// end big chunk
+    LevelTOF();
+    Drift(dir);
   }
-  
 }
 
-void Drift(int dir){
 
-  if(IMUDirection() > dir){
-    DCDriftRight();
+
+void Drift(int dir) {
+  int tempValue = 0;
+  if (dir < -170) {
+    tempValue = dir + 350;
+    if (IMUDirection() > dir + 10)
+    {
+      DCDriftRight();
+      Serial2.println("DCDriftRight");
+    }
+    else if (IMUDirection() < tempValue)
+    {
+      DCDriftLeft();
+      Serial2.println("DCDriftLeft");
+    }
   }
-  if(IMUDirection() < dir){
-    DCDriftLeft();
+  else if (dir > 170) {
+    tempValue = dir - 350;
+    if (IMUDirection() < dir - 10)
+    {
+      DCDriftRight();
+      Serial2.println("DCDriftRight");
+    }
+    else if (IMUDirection() > tempValue)
+    {
+      DCDriftLeft();
+      Serial2.println("DCDriftLeft");
+    }
+  }
+  else
+  {
+    if (IMUDirection() < dir - 10)
+    {
+      DCDriftRight();
+      Serial2.println("DCDriftRight");
+    }
+    else (IMUDirection() > dir + 10);
+    {
+      DCDriftLeft();
+      Serial2.println("DCDriftLeft");
+    }
   }
 }
+
 
 
 //TURN LEFT
 void TurnLeft(int deg)
 {
-  Serial2.println("\n=====TurnLeft Function Successfully Called===== ");        // Printing for testing
+  Serial2.println("\n == == = TurnLeft Function Successfully Called == == = ");        // Printing for testing
 
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   int NumLed = 0;                         // Initalizing NumLed and setting it to 0 for blinker functions
-  float currentDirection;             // Creating local variable named currentDirection and setting it to 0
-  float startingDirection;            // Creating local variable named startingDirection and setting it to 0
-  float targetDirection;              // Creating local variable named targetDirection and setting it to 0
-  float tempValue;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
+  float currentDirection = 0;             // Creating local variable named currentDirection and setting it to 0
+  float startingDirection = 0;            // Creating local variable named startingDirection and setting it to 0
+  float targetDirection = 0;              // Creating local variable named targetDirection and setting it to 0
+  float tempValue = 0;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
 
   startingDirection = IMUDirection();         // setting startingDirection to the current value returned from the function IMUDirection()
   targetDirection = startingDirection - deg;  // setting targetDirction = to the startingDirection - the deg value we passed to this function
@@ -149,7 +187,7 @@ void TurnLeft(int deg)
     }
 
     if (currentDirection < targetDirection - 10 || currentDirection < targetDirection - 30) {  // Correction if the robot overshoots
-      Serial2.print("\n---Correction Needed---\n");
+      Serial2.print("\n-- -Correction Needed-- -\n");
       int correction = targetDirection - currentDirection;
       TurnRight(correction);
     }
@@ -167,7 +205,7 @@ void TurnLeft(int deg)
 void TurnRight(int deg)
 {
   Serial2.println(" ");
-  Serial2.println("=====TurnRight Function Successfully Called===== ");
+  Serial2.println(" == == = TurnRight Function Successfully Called == == = ");
 
   unsigned long prevTime = millis();
   int NumLed = 0;
@@ -252,7 +290,7 @@ void TurnRight(int deg)
     }
 
     if (currentDirection > targetDirection - 10 || currentDirection > targetDirection - 30) {  // Correction if the robot overshoots
-      Serial2.print("\n---Correction Needed---\n");
+      Serial2.print("\n-- -Correction Needed-- -\n");
       int correction = targetDirection - currentDirection;
       TurnLeft(correction);
     } // End of if correction

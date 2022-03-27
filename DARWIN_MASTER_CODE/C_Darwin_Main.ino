@@ -1,4 +1,7 @@
 void loop() {
+  
+    MoveForward(GoldenDirection);
+}
 
 // go towards the golden direction
 
@@ -15,4 +18,3 @@ void loop() {
 // go towards the golden direction
 
   
-}

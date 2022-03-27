@@ -59,22 +59,22 @@ unsigned long previousTime = 0;
 #include <EEPROM.h>                             // EEprom library required save/load data from arduinos long term memory
 #define BNO055_SAMPLERATE_DELAY_MS 100          // Instructing the sensor to sample every 100 ms
 Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU", giving it the id 55 and address 0x28
-float thetaM;           // Pitch from Accelerometer
-float phiM;             // Roll from Accellerometer
+float thetaM = 0;           // Pitch from Accelerometer
+float phiM = 0;             // Roll from Accellerometer
 float thetaFold = 0;    // Overall System Pitch Filtered (Old)
-float thetaFnew;        // Overall System Pitch Filtered (New)
+float thetaFnew = 0;        // Overall System Pitch Filtered (New)
 float phiFold = 0;      // Overall System Roll Filtered  (Old)
-float phiFnew;          // Overall System Roll Filtered (New)
-float theta;            // Overall System Pitch
-float phi;              // Overall System Roll
-float thetaRad;         // Pitch in radians
-float phiRad;           // Roll in radians
-float Xm;               // Value coming off the x magnitometer
-float Ym;               // Value coming off the Y Magnitometer
-float psi;              // Heading angle
-float dt;               // Delta time
-unsigned long millisOld;// Old value of time in milliseconds
-float GoldenDirection;  // The direction if the final goal
+float phiFnew = 0;          // Overall System Roll Filtered (New)
+float theta = 0;            // Overall System Pitch
+float phi = 0;              // Overall System Roll
+float thetaRad = 0;         // Pitch in radians
+float phiRad = 0;           // Roll in radians
+float Xm = 0;               // Value coming off the x magnitometer
+float Ym = 0;               // Value coming off the Y Magnitometer
+float psi = 0;              // Heading angle
+float dt = 0;               // Delta time
+unsigned long millisOld = 0;// Old value of time in milliseconds
+float GoldenDirection = 0;  // The direction if the final goal
 
 
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
@@ -96,4 +96,5 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
 int StepperSpeed = 600;                             // Speed of motor
 int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
+bool x = true;
 Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins
