@@ -1,79 +1,150 @@
-bool Navigation(float dir) {
+void Navigation(float dir) {
   int tempValue = 0;
+  float currentDirection = IMUDirection();
+  float targetDirection = 0;
+  Serial2.println("\n ======== Navigation Function Successfully Called ======== \n");
+  Serial2.print("Navigation Check On: \t");
+  Serial2.print(dir);
+  int switchCase = 0;
   if (dir < -170) {
-    tempValue = dir + 350;
-    if (IMUDirection() < dir + 10 || IMUDirection() > tempValue)
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = TRUE\t");
-      return true;
-    }
-    else
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = FALSE\t");
-      return false;
-    }
+    switchCase = 0;
   }
-  else if (dir > 170)
-  {
-    tempValue = dir - 350;
-    if (IMUDirection() > dir - 10 || IMUDirection() < tempValue)
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = TRUE\t");
-      return true;
-    }
-    else
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = FALSE\t");
-      return false;
-    }
+  else if (dir > 170) {
+    switchCase = 1;
   }
-  else
+  else if (dir <= 170 && dir >= -170)
   {
-    if (IMUDirection() > dir - 10 && IMUDirection() < dir + 10)
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = TRUE\t");
-      return true;
-    }
-    else
-    {
-      Serial2.print("GoldDir: \t");
-      Serial2.print(GoldenDirection);
-      Serial2.print("\tIMU: \t") ;
-      Serial2.print(IMUDirection());
-      Serial2.print("Navigation = FALSE\t");
-      return false;
-    }
+    switchCase = 2;
+  }
+  switch (switchCase)
+  {
+    case 0:
+      tempValue = dir + 350;
+      if (currentDirection < dir + 10 || currentDirection > tempValue)
+      {
+        Serial2.print("\tIMU reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+
+        tempValue = dir + 180;
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+      }
+      break;
+
+
+    case 1:
+      tempValue = dir - 350;
+      if (currentDirection > dir - 10 || currentDirection < tempValue)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        tempValue = dir - 180;
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+      }
+
+
+    case 2:
+      if (currentDirection > dir - 10 && currentDirection < dir + 10)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        if (dir < 0) {
+          tempValue = dir + 180;
+        }
+        if (dir > 0) {
+          tempValue = dir - 180;
+        }
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+        break;
+      }
   }
 }
 
+// IMU Roll function
+// This function gets the current Roll from the IMU
+float IMURoll()
+{
 
+  for (int i = 0; i < 10; i++) {                                         // Looping 10 times just to get a good average value
+    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+
+    phiM = -atan2(accel.y() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360;    // Math to get the roll from the accelerometer
+
+    phiFnew = .95 * phiFold + .05 * phiM;                             // Filter for accelerometer roll data
+
+    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
+    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
+    phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
+
+    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
+
+    phiFold = phiFnew;
+
+  }                                 // End of for loop
+  return phi;     // Return the absolute roll
+}
 
 // IMU Direction function
 // This function gets the current direction from the IMU
 float IMUDirection()
 {
 
-  for (int i = 0; i < 10; i++) {                                         // Looping 10 times just to get a good average value
+  for (int i = 0; i < 20; i++) {                                         // Looping 10 times just to get a good average value
     imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
     imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
     imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
@@ -150,10 +221,10 @@ void CalibrateIMU() {
     Serial2.println(system);
 
     if (x == true) {
-      if (stepperAngle < 60)
+      if (stepperAngle < 50)
       {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else
       {
@@ -162,10 +233,10 @@ void CalibrateIMU() {
     }
     else
     {
-      if (stepperAngle > -60)
+      if (stepperAngle > -50)
       {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else
       {
@@ -192,7 +263,7 @@ float GetGoldenDirection() {
   float sample1 = 0;
   float sample2 = 0;
   float sample3 = 0;
-  int i = 30;
+  int i = 9;
   unsigned long currentTime = millis();
   unsigned long oldTime = millis();
 
@@ -210,10 +281,10 @@ float GetGoldenDirection() {
     currentTime = millis();
     if (x == true)
     {
-      if (stepperAngle < 60)
+      if (stepperAngle < 50)
       {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else
       {
@@ -222,10 +293,10 @@ float GetGoldenDirection() {
     }
     else
     {
-      if (stepperAngle > -60)
+      if (stepperAngle > -50)
       {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else
       {
@@ -238,7 +309,7 @@ float GetGoldenDirection() {
   i = 1;
 
   while (i > 0) {
-    if (currentTime - oldTime > 5000) {
+    if (currentTime - oldTime > 1000) {
       sample1 = IMUDirection();
       Serial2.print("-------------------- Sample1: \t");
       Serial2.println(sample1);
@@ -250,9 +321,9 @@ float GetGoldenDirection() {
     currentTime = millis();
 
     if (x == true) {
-      if (stepperAngle < 60) {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+      if (stepperAngle < 50) {
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else {
         x = false;
@@ -260,9 +331,9 @@ float GetGoldenDirection() {
     }
     else
     {
-      if (stepperAngle > -60) {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+      if (stepperAngle > -50) {
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else {
         x = true;
@@ -275,7 +346,7 @@ float GetGoldenDirection() {
   i = 1;
 
   while (i > 0) {
-    if (currentTime - oldTime > 5000)
+    if (currentTime - oldTime > 1000)
     {
       sample2 = IMUDirection();
       Serial2.print("-------------------- Sample2: \t");
@@ -289,10 +360,10 @@ float GetGoldenDirection() {
 
     if (x == true)
     {
-      if (stepperAngle < 60)
+      if (stepperAngle < 50)
       {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else
       {
@@ -301,10 +372,10 @@ float GetGoldenDirection() {
     }
     else
     {
-      if (stepperAngle > -60)
+      if (stepperAngle > -50)
       {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else
       {
@@ -318,7 +389,7 @@ float GetGoldenDirection() {
   i = 1;
 
   while (i > 0) {
-    if (currentTime - oldTime > 5000)
+    if (currentTime - oldTime > 1000)
     {
       sample3 = IMUDirection();
       Serial2.print("-------------------- Sample3: \t");
@@ -332,10 +403,10 @@ float GetGoldenDirection() {
 
     if (x == true)
     {
-      if (stepperAngle < 60)
+      if (stepperAngle < 50)
       {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else
       {
@@ -344,10 +415,10 @@ float GetGoldenDirection() {
     }
     else
     {
-      if (stepperAngle > -60)
+      if (stepperAngle > -50)
       {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else
       {
@@ -367,6 +438,8 @@ float GetGoldenDirection() {
   else {
     Serial2.print("Golden Direction set to: ");
     Serial2.println(GoldenDirection);
-    delay(3000);
+    Serial2.println("Turn Stepper Motor To Face Forward\n");
+    stepperAngle = 0;
+    delay(9000);
   }
 }

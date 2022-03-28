@@ -6,7 +6,7 @@ void DCForward();
 void DCBack(int ReverseTime);
 void DCStop();
 
-bool Navigation(float dir);
+void Navigation(float dir);
 float IMUDirection();
 float IMUPitch();
 void CalibrateIMU();
@@ -20,11 +20,14 @@ void Drift(int dir);
 void TurnLeft(int deg);
 void TurnRight(int deg);
 
+void CenterStepper();
 float degToSteps(float deg);
 void StepperLeft(float deg);
 void StepperRight(float deg);
 
+void Avoidence();
 bool ObjectDetection();
+void MeasureObject();
 int GetDistance();
 float ServoPos(int deg);
 void LevelTOF();

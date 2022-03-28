@@ -67,13 +67,13 @@ void setup() {
   Serial2.println("StepperLeft(0); \t Sending Small Signal To Stepper Motor Before Calibration\n");   // Printing for debugging
   StepperLeft(0);
   Serial2.println("CalibrateIMU(); \t Calling IMU Calibration Function\n");   // Printing for debugging
-  CalibrateIMU();
+  //CalibrateIMU();
   
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   millisOld = millis();                   // Grabbing the system time for dt variable
 
   Serial2.println("GetGoldenDirection(); \t Calling Get Golden Direction Function \n");
-  GetGoldenDirection();
+  //GetGoldenDirection();
   
   // End of Void Setup
   Serial2.println("End of Void Setup\n");          // Printing for debugging

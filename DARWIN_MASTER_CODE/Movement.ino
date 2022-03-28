@@ -1,12 +1,27 @@
 void MoveForward(int dir) {
-  while (ObjectDetection() == false && Navigation(dir) == true) {
-    DCForward();
-    Serial2.println("Driving Forward");
+
+  Navigation(dir);
+  DCForward();
+
+  unsigned long currentTime = millis();
+  unsigned long prevTime = millis();
+
+  while (currentTime - prevTime < 5000 && ObjectDetection() == false && IMURoll() > -40 && IMURoll() < 40) {
+
+    Serial2.print("Moving Forward Towards: \t");
+    Serial2.print(dir);
+    Serial2.print("\tDistance Measured: \t");
+    Serial2.print(GetDistance());
+    Serial2.print("\tStepper Angle: \t");
+    Serial2.println(stepperAngle);
+
+    currentTime = millis();
+    LevelTOF();
     /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
     if (x == true) {
-      if (stepperAngle < 60) {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
+      if (stepperAngle < 50) {
+        stepperAngle = stepperAngle + 50;
+        StepperLeft(50);
       }
       else {
         x = false;
@@ -14,99 +29,94 @@ void MoveForward(int dir) {
     }
     else
     {
-      if (stepperAngle > -60) {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
+      if (stepperAngle > -50) {
+        stepperAngle = stepperAngle - 50;
+        StepperRight(50);
       }
       else {
         x = true;
       }
     }
     //////////////////////////////////////////////////////////////// end big chunk
-    LevelTOF();
   }
-  while (ObjectDetection() == false && Navigation(dir) == false) {
-    /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
-    if (x == true) {
-      if (stepperAngle < 60) {
-        stepperAngle = stepperAngle + 60;
-        StepperLeft(60);
-      }
-      else {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -60) {
-        stepperAngle = stepperAngle - 60;
-        StepperRight(60);
-      }
-      else {
-        x = true;
-      }
-    }
-    //////////////////////////////////////////////////////////////// end big chunk
-    LevelTOF();
-    Drift(dir);
+  DCStop();
+  if (ObjectDetection() == true) {
+    Serial2.print("\n\t OBJECT DETECTED AT: \t");
+    Serial2.println(GetDistance());
+    Serial2.println("");
+    //MeasureObject();
+    Avoidence();
   }
+  if (IMURoll() < -35) {
+    DCBack(3000);
+    TurnRight(30);
+  }
+  if (IMURoll() > 35) {
+    DCBack(3000);
+    TurnLeft(30);
+  }
+  Navigation(dir);
 }
 
 
 
-void Drift(int dir) {
-  int tempValue = 0;
-  if (dir < -170) {
-    tempValue = dir + 350;
-    if (IMUDirection() > dir + 10)
-    {
-      DCDriftRight();
-      Serial2.println("DCDriftRight");
-    }
-    else if (IMUDirection() < tempValue)
-    {
-      DCDriftLeft();
-      Serial2.println("DCDriftLeft");
-    }
-  }
-  else if (dir > 170) {
-    tempValue = dir - 350;
-    if (IMUDirection() < dir - 10)
-    {
-      DCDriftRight();
-      Serial2.println("DCDriftRight");
-    }
-    else if (IMUDirection() > tempValue)
-    {
-      DCDriftLeft();
-      Serial2.println("DCDriftLeft");
-    }
-  }
-  else
-  {
-    if (IMUDirection() < dir - 10)
-    {
-      DCDriftRight();
-      Serial2.println("DCDriftRight");
-    }
-    else (IMUDirection() > dir + 10);
-    {
-      DCDriftLeft();
-      Serial2.println("DCDriftLeft");
-    }
-  }
-}
+
+
+//void Drift(int dir) {
+//  int tempValue = 0;
+//  if (dir < -170) {
+//    tempValue = dir + 350;
+//    if (IMUDirection() > dir + 10)
+//    {
+//      DCDriftRight();
+//      Serial2.println("DCDriftRight");
+//    }
+//    else if (IMUDirection() < tempValue)
+//    {
+//      DCDriftLeft();
+//      Serial2.println("DCDriftLeft");
+//    }
+//  }
+//  else if (dir > 170) {
+//    tempValue = dir - 350;
+//    if (IMUDirection() < dir - 10)
+//    {
+//      DCDriftRight();
+//      Serial2.println("DCDriftRight");
+//    }
+//    else if (IMUDirection() > tempValue)
+//    {
+//      DCDriftLeft();
+//      Serial2.println("DCDriftLeft");
+//    }
+//  }
+//  else
+//  {
+//    if (IMUDirection() < dir - 10)
+//    {
+//      DCDriftRight();
+//      Serial2.println("DCDriftRight");
+//    }
+//    else (IMUDirection() > dir + 10);
+//    {
+//      DCDriftLeft();
+//      Serial2.println("DCDriftLeft");
+//    }
+//  }
+//}
 
 
 
 //TURN LEFT
 void TurnLeft(int deg)
 {
-  Serial2.println("\n == == = TurnLeft Function Successfully Called == == = ");        // Printing for testing
+  Serial2.println("\n======== TurnLeft Function Successfully Called ======== \n");        // Printing for testing
 
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
+
+  unsigned long prevTime2 = millis();      // Assigning variable to keep track of the time passing in milliseconds
+
   int NumLed = 0;                         // Initalizing NumLed and setting it to 0 for blinker functions
-  float currentDirection = 0;             // Creating local variable named currentDirection and setting it to 0
   float startingDirection = 0;            // Creating local variable named startingDirection and setting it to 0
   float targetDirection = 0;              // Creating local variable named targetDirection and setting it to 0
   float tempValue = 0;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
@@ -115,22 +125,20 @@ void TurnLeft(int deg)
   targetDirection = startingDirection - deg;  // setting targetDirction = to the startingDirection - the deg value we passed to this function
 
 
-  Serial2.print("\n Starting Direction: ");     // Printing for testing
-  Serial2.println(startingDirection);
+  Serial2.print("\n Starting Direction: \t");     // Printing for testing
+  Serial2.print(startingDirection);
 
   if (targetDirection < -180) {               // Calculating the target position if it goes over the -180 mark
     tempValue = -targetDirection - 180;
     targetDirection = 180 - tempValue;
   }
 
-  Serial2.print(" Target Direction: ");       // Printing for testing
+  Serial2.print("\t Target Direction: \t");       // Printing for testing
   Serial2.println(targetDirection);
+  Serial2.println("\nBegin Turning Left\n");
 
-  Serial2.println("Begin Turning Left");
-  currentDirection = IMUDirection();          // currentDirection is being updated to the value returned by the IMUDirection function
-
-
-  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {    // This while loop repeates untill the curentDirection has reached the target direction
+  DCLeft();
+  while (IMUDirection() > targetDirection + 10 || IMUDirection() < targetDirection - 10) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis();
     //Left turn signal LED animation
     if (currentTime - prevTime > 150) {
@@ -172,68 +180,81 @@ void TurnLeft(int deg)
           break;
       }
     }
-    DCLeft(); //Sets all DC motors to turn left
-    currentDirection = IMUDirection();
-    Serial2.print("Target Direction: ");
-    Serial2.print(targetDirection);
-    Serial2.print("Current Direction: ");
-    Serial2.println(currentDirection);
-
-    if (currentTime - prevTime > 8000) { // To get out if stuck
+    if (currentTime - prevTime2 > 8000) { // To get out if stuck
+      Serial2.println("-----------Darwin Stuck-----------");
       DCRight();
       delay(2000);
       DCStop();
       DCBack(2000);
+      prevTime2 = currentTime;
     }
+    /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
+    if (x == true) {
+      if (stepperAngle < 10) {
+        stepperAngle = stepperAngle + 10;
+        StepperLeft(10);
+      }
+      else {
+        x = false;
+      }
+    }
+    else
+    {
+      if (stepperAngle > -10) {
+        stepperAngle = stepperAngle - 10;
+        StepperRight(10);
+      }
+      else {
+        x = true;
+      }
+    }
+    //////////////////////////////////////////////////////////////// end big chunk
 
-    if (currentDirection < targetDirection - 10 || currentDirection < targetDirection - 30) {  // Correction if the robot overshoots
-      Serial2.print("\n-- -Correction Needed-- -\n");
-      int correction = targetDirection - currentDirection;
-      TurnRight(correction);
-    }
+    Serial2.print("Target Direction: \t");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: \t");
+    Serial2.println(IMUDirection());
   }
+
   DCStop(); //Stops all DC motors
   LightsOut(); //Turns all lights off
-  Serial2.println(" Left Turn Complete ");
-  Serial2.println("----------LeftTurn Function Complete----------");
-  Serial2.println(" ");
+  Serial2.println("\n Left Turn Complete \n");
   delay(MovementDelay); //Delay for set movement delay
 }
+
 
 
 //TURN RIGHT
 void TurnRight(int deg)
 {
-  Serial2.println(" ");
-  Serial2.println(" == == = TurnRight Function Successfully Called == == = ");
+  Serial2.println("\n======== TurnRight Function Successfully Called ======== \n");        // Printing for testing
 
-  unsigned long prevTime = millis();
-  int NumLed = 0;
-  float currentDirection = 0;
-  float startingDirection = 0;
-  float targetDirection = 0;
+  unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
+  unsigned long prevTime2 = millis();      // Assigning variable to keep track of the time passing in milliseconds
+
+  int NumLed = 0;                         // Initalizing NumLed and setting it to 0 for blinker functions
+  float startingDirection = 0;            // Creating local variable named startingDirection and setting it to 0
+  float targetDirection = 0;              // Creating local variable named targetDirection and setting it to 0
+  float tempValue = 0;                    // Creating variable named x for use in calculating targetDirection (holds a value while another variable is rewritten)
+
+  startingDirection = IMUDirection();         // setting startingDirection to the current value returned from the function IMUDirection()
+  targetDirection = IMUDirection() + deg;  // setting targetDirction = to the startingDirection - the deg value we passed to this function
 
 
-  startingDirection = IMUDirection();
-  targetDirection = startingDirection + deg;
+  Serial2.print("\n Starting Direction: \t");     // Printing for testing
+  Serial2.print(startingDirection);
 
-  Serial2.print(" Starting Direction: ");
-  Serial2.println(startingDirection);
-
-  if (targetDirection > 180) {     // Calculating the target position if it goes over the -180 mark
-    deg = -targetDirection + 180;
-    targetDirection = -180 - deg;
+  if (targetDirection < -180) {               // Calculating the target position if it goes over the -180 mark
+    tempValue = -targetDirection - 180;
+    targetDirection = 180 - tempValue;
   }
 
-  Serial2.print("Target Direction: ");
+  Serial2.print("\t Target Direction: \t");       // Printing for testing
   Serial2.println(targetDirection);
+  Serial2.println("\nBegin Turning Right\n");
 
-  Serial2.println("Begin Turning Right");
-  currentDirection = IMUDirection();
-
-
-
-  while (currentDirection > targetDirection + 10 || currentDirection < targetDirection - 10) {
+  DCRight();
+  while (IMUDirection() > targetDirection + 10 || IMUDirection() < targetDirection - 10) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis();
     //Right turn signal LED animation
     if (currentTime - prevTime > 150) {
@@ -275,30 +296,43 @@ void TurnRight(int deg)
           break;
       }
     }
-    DCRight(); //Sets all DC motors to turn right
-    currentDirection = IMUDirection();
-    Serial2.print("Target Direction: ");
-    Serial2.print(targetDirection);
-    Serial2.print("Current Direction: ");
-    Serial2.println(currentDirection);
-
-    if (currentTime - prevTime > 8000) { // To get out if stuck
+    if (currentTime - prevTime2 > 8000) { // To get out if stuck
+      Serial2.println("-----------Darwin Stuck-----------");
       DCLeft();
       delay(2000);
       DCStop();
       DCBack(2000);
+      prevTime2 = currentTime;
     }
+    /////////////////////////////////////////////////////////// this whole big chunk moves the stepper motor in single motions so we can still do other stuff between each swing
+    if (x == true) {
+      if (stepperAngle < 10) {
+        stepperAngle = stepperAngle + 10;
+        StepperLeft(10);
+      }
+      else {
+        x = false;
+      }
+    }
+    else
+    {
+      if (stepperAngle > -10) {
+        stepperAngle = stepperAngle - 10;
+        StepperRight(10);
+      }
+      else {
+        x = true;
+      }
+    }
+    //////////////////////////////////////////////////////////////// end big chunk
 
-    if (currentDirection > targetDirection - 10 || currentDirection > targetDirection - 30) {  // Correction if the robot overshoots
-      Serial2.print("\n-- -Correction Needed-- -\n");
-      int correction = targetDirection - currentDirection;
-      TurnLeft(correction);
-    } // End of if correction
-  }   // End of While
-  DCStop(); //Stops all DC Motors
+    Serial2.print("Target Direction: \t");
+    Serial2.print(targetDirection);
+    Serial2.print("Current Direction: \t");
+    Serial2.println(IMUDirection());
+  }
+  DCStop(); //Stops all DC motors
   LightsOut(); //Turns all lights off
-  Serial2.println(" Right Turn Complete ");
-  Serial2.println("----------RightTurn Function Complete----------");
-  Serial2.println(" ");
+  Serial2.println("\n Right Turn Complete \n");
   delay(MovementDelay); //Delay for set movement delay
 }
