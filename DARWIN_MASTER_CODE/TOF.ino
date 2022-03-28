@@ -1,9 +1,49 @@
-void CenterStepper(){
+void CenterStepper() {
 
+  Serial2.println("---Centering Stepper --- Centering Stepper --- Centering Stepper ---");
   ServoPos(0);
-  
-  
+  stepperAngle = 0;
+    while (GetDistance() > 40) {      // Find first left side
+    StepperLeft(20);
+  }
+  StepperRight(30);
+  while (GetDistance() > 40) {      // Find first left side
+    StepperLeft(1);
+  }
+  while (GetDistance() < 40) {
+    StepperRight(1);
+  }
+
+
+  StepperRight(135);                // Jump to right side and measure
+  int stepperAngle1 = 135;
+
+  while (GetDistance() > 40) {
+    StepperRight(1);
+    stepperAngle1 = stepperAngle1 + 1;
+  }
+  while (GetDistance() < 40) {
+    StepperLeft(1);
+    stepperAngle1--;
+  }
+
+  StepperLeft(135);                 // Jump back to left side
+  int stepperAngle2 = 135;
+  while (GetDistance() > 40) {
+    StepperLeft(1);
+    stepperAngle2 = stepperAngle2 + 1;
+  }
+  while (GetDistance() < 40) {
+    StepperRight(1);
+     stepperAngle2--;
+  }
+  stepperAngle = (stepperAngle1 + stepperAngle2) / 2;
+  StepperRight((stepperAngle / 2) + 15);
+  stepperAngle = 0;
 }
+
+
+
 
 void Avoidence() {
   int LeftDist = 0;
@@ -103,7 +143,7 @@ void Avoidence() {
   RightAng = stepperAngle;
   Serial2.print("\tRight Angle Final:\t");
   Serial2.println(RightAng);
-  
+
   StepperLeft(stepperAngle);/////////////////////////////////////////
   stepperAngle = 0;//////////////////////////////////////////////////replace with "Center Stepper" Function
 

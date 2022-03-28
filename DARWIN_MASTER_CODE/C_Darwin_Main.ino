@@ -1,12 +1,6 @@
 void loop() {
-  ServoPos(0);
-
-  while (GetDistance() > 50) {
-    Serial2.println(GetDistance());
-    StepperLeft(1);
-  }
-    Serial2.println(GetDistance());
-    delay(10000);
+CenterStepper();
+delay(5000);
 }
 
 // go towards the golden direction
