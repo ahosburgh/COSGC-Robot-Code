@@ -19,8 +19,8 @@ void Navigation(float dir) {
   switch (switchCase)
   {
     case 0:
-      tempValue = dir + 350;
-      if (currentDirection < dir + 10 || currentDirection > tempValue)
+      tempValue = dir + 345;
+      if (currentDirection < dir + 15 || currentDirection > tempValue)
       {
         Serial2.print("\tIMU reading: \t") ;
         Serial2.print(currentDirection);
@@ -50,8 +50,8 @@ void Navigation(float dir) {
 
 
     case 1:
-      tempValue = dir - 350;
-      if (currentDirection > dir - 10 || currentDirection < tempValue)
+      tempValue = dir - 345;
+      if (currentDirection > dir - 15 || currentDirection < tempValue)
       {
         Serial2.print("\tIMU Reading: \t") ;
         Serial2.print(currentDirection);
@@ -79,7 +79,7 @@ void Navigation(float dir) {
 
 
     case 2:
-      if (currentDirection > dir - 10 && currentDirection < dir + 10)
+      if (currentDirection > dir - 15 && currentDirection < dir + 15)
       {
         Serial2.print("\tIMU Reading: \t") ;
         Serial2.print(currentDirection);
@@ -219,31 +219,8 @@ void CalibrateIMU() {
 
     Serial2.print("\tSystem: \t");
     Serial2.println(system);
-
-    if (x == true) {
-      if (stepperAngle < 50)
-      {
-        stepperAngle = stepperAngle + 50;
-        StepperLeft(50);
-      }
-      else
-      {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -50)
-      {
-        stepperAngle = stepperAngle - 50;
-        StepperRight(50);
-      }
-      else
-      {
-        x = true;
-      }
-    }
   }
+
   while (IMUDirection() == 0)
   {
     Serial2.print("Calibration Failed -- Restart -- \t");
@@ -279,30 +256,6 @@ float GetGoldenDirection() {
     Serial2.print("Current Direction: \t");
     Serial2.println(IMUDirection());
     currentTime = millis();
-    if (x == true)
-    {
-      if (stepperAngle < 50)
-      {
-        stepperAngle = stepperAngle + 50;
-        StepperLeft(50);
-      }
-      else
-      {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -50)
-      {
-        stepperAngle = stepperAngle - 50;
-        StepperRight(50);
-      }
-      else
-      {
-        x = true;
-      }
-    }
   }
   currentTime = millis();
   oldTime = millis();
@@ -319,26 +272,6 @@ float GetGoldenDirection() {
     Serial2.print("Current Direction: \t");
     Serial2.println(IMUDirection());
     currentTime = millis();
-
-    if (x == true) {
-      if (stepperAngle < 50) {
-        stepperAngle = stepperAngle + 50;
-        StepperLeft(50);
-      }
-      else {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -50) {
-        stepperAngle = stepperAngle - 50;
-        StepperRight(50);
-      }
-      else {
-        x = true;
-      }
-    }
   }
 
   currentTime = millis();
@@ -357,31 +290,6 @@ float GetGoldenDirection() {
     Serial2.print("Current Direction: \t");
     Serial2.println(IMUDirection());
     currentTime = millis();
-
-    if (x == true)
-    {
-      if (stepperAngle < 50)
-      {
-        stepperAngle = stepperAngle + 50;
-        StepperLeft(50);
-      }
-      else
-      {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -50)
-      {
-        stepperAngle = stepperAngle - 50;
-        StepperRight(50);
-      }
-      else
-      {
-        x = true;
-      }
-    }
   }
 
   currentTime = millis();
@@ -400,31 +308,6 @@ float GetGoldenDirection() {
     Serial2.print("Current Direction: \t");
     Serial2.println(IMUDirection());
     currentTime = millis();
-
-    if (x == true)
-    {
-      if (stepperAngle < 50)
-      {
-        stepperAngle = stepperAngle + 50;
-        StepperLeft(50);
-      }
-      else
-      {
-        x = false;
-      }
-    }
-    else
-    {
-      if (stepperAngle > -50)
-      {
-        stepperAngle = stepperAngle - 50;
-        StepperRight(50);
-      }
-      else
-      {
-        x = true;
-      }
-    }
   }
 
   GoldenDirection = (sample1 + sample2 + sample3) / 3;
@@ -438,8 +321,5 @@ float GetGoldenDirection() {
   else {
     Serial2.print("Golden Direction set to: ");
     Serial2.println(GoldenDirection);
-    Serial2.println("Turn Stepper Motor To Face Forward\n");
-    stepperAngle = 0;
-    delay(9000);
   }
 }

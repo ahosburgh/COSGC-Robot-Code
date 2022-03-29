@@ -1,6 +1,5 @@
 void loop() {
-CenterStepper();
-delay(5000);
+MoveForward(GoldenDirection);
 }
 
 // go towards the golden direction

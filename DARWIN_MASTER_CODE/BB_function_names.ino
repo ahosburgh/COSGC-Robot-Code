@@ -25,6 +25,7 @@ float degToSteps(float deg);
 void StepperLeft(float deg);
 void StepperRight(float deg);
 
+bool Sweep();
 void Avoidence();
 bool ObjectDetection();
 void MeasureObject();

@@ -1,50 +1,3 @@
-void CenterStepper() {
-
-  Serial2.println("---Centering Stepper --- Centering Stepper --- Centering Stepper ---");
-  ServoPos(0);
-  stepperAngle = 0;
-    while (GetDistance() > 40) {      // Find first left side
-    StepperLeft(20);
-  }
-  StepperRight(30);
-  while (GetDistance() > 40) {      // Find first left side
-    StepperLeft(1);
-  }
-  while (GetDistance() < 40) {
-    StepperRight(1);
-  }
-
-
-  StepperRight(135);                // Jump to right side and measure
-  int stepperAngle1 = 135;
-
-  while (GetDistance() > 40) {
-    StepperRight(1);
-    stepperAngle1 = stepperAngle1 + 1;
-  }
-  while (GetDistance() < 40) {
-    StepperLeft(1);
-    stepperAngle1--;
-  }
-
-  StepperLeft(135);                 // Jump back to left side
-  int stepperAngle2 = 135;
-  while (GetDistance() > 40) {
-    StepperLeft(1);
-    stepperAngle2 = stepperAngle2 + 1;
-  }
-  while (GetDistance() < 40) {
-    StepperRight(1);
-     stepperAngle2--;
-  }
-  stepperAngle = (stepperAngle1 + stepperAngle2) / 2;
-  StepperRight((stepperAngle / 2) + 15);
-  stepperAngle = 0;
-}
-
-
-
-
 void Avoidence() {
   int LeftDist = 0;
   int RightDist = 0;
@@ -52,57 +5,35 @@ void Avoidence() {
   int RightAng = 0;
   int FrontDist = 0;
 
-  LevelTOF();
   Serial2.println("\n ======== Avoidence Function Successfully Called ======== \n");
 
-  Serial2.println("Centering Stepper\n");
-  Serial2.print("Stepper Position: \t");
-  Serial2.println(stepperAngle);
-  if (stepperAngle > 0) {
-    while (stepperAngle != 0) {
-      StepperLeft(1);
-      stepperAngle = stepperAngle - 1;
-      Serial2.print("Stepper Angle: \t");
-      Serial2.println(stepperAngle);
-    }
-  }
-  else
-  {
-    while (stepperAngle != 0) {
-      StepperRight(1);
-      stepperAngle = stepperAngle + 1;
-      Serial2.print("Stepper Angle: \t");
-      Serial2.println(stepperAngle);
-    }
-  }
-
+  CenterStepper();
+  LevelTOF();
   Serial2.println("\nMeasuring Objects Width: \n");
 
   FrontDist = GetDistance();
   Serial2.print("Front measurement: \t");
   Serial2.println(FrontDist);
-
+  Serial2.println("Measuring Left Side...");
   while (stepperAngle < 90 && LeftDist < 8000) {
     stepperAngle = stepperAngle + 1;
     StepperLeft(1);
     LeftDist = GetDistance();
-    Serial2.print("StepperAngle:\t");
-    Serial2.print(stepperAngle);
-    Serial2.print("\tLeftDist:\t");
-    Serial2.println(LeftDist);
+    //    Serial2.print("StepperAngle:\t");
+    //    Serial2.print(stepperAngle);
+    //    Serial2.print("\tLeftDist:\t");
+    //    Serial2.println(LeftDist);
   }
 
-  if (LeftDist > 8000 && stepperAngle > 0) {
-    Serial2.println("Object Edge Detected. Reversing Direction");
-    while (LeftDist > 8000) {
-      stepperAngle = stepperAngle - 1;
-      StepperRight(1);
-      LeftDist = GetDistance();
-      Serial2.print("StepperAngle:\t");
-      Serial2.print(stepperAngle);
-      Serial2.print("\tLeftDist:\t");
-      Serial2.println(LeftDist);
-    }
+  Serial2.println("Object Edge Detected. Reversing Direction");
+  while (LeftDist > 8000 && stepperAngle > 0) {
+    stepperAngle = stepperAngle - 1;
+    StepperRight(1);
+    LeftDist = GetDistance();
+    //      Serial2.print("StepperAngle:\t");
+    //      Serial2.print(stepperAngle);
+    //      Serial2.print("\tLeftDist:\t");
+    //      Serial2.println(LeftDist);
   }
 
   Serial2.print("\nLeft Distance Final:\t");
@@ -114,27 +45,25 @@ void Avoidence() {
   stepperAngle = 0;
   delay(1000);
 
-  while (stepperAngle < 90 && GetDistance() < 8000) {
+  while (stepperAngle < 90 && RightDist < 8000) {
     stepperAngle = stepperAngle + 1;
     StepperRight(1);
     RightDist = GetDistance();
-    Serial2.print("StepperAngle:\t");
-    Serial2.print(stepperAngle);
-    Serial2.print("\tRightDist:\t");
-    Serial2.println(RightDist);
+    //    Serial2.print("StepperAngle:\t");
+    //    Serial2.print(stepperAngle);
+    //    Serial2.print("\tRightDist:\t");
+    //    Serial2.println(RightDist);
   }
 
-  if (RightDist > 8000 && stepperAngle > 0) {
-    Serial2.println("Object Edge Detected. Reversing Direction");
-    while (RightDist > 8000) {
-      stepperAngle = stepperAngle - 1;
-      StepperLeft(1);
-      RightDist = GetDistance();
-      Serial2.print("StepperAngle:\t");
-      Serial2.print(stepperAngle);
-      Serial2.print("\tRightDist:\t");
-      Serial2.println(RightDist);
-    }
+  Serial2.println("Object Edge Detected. Reversing Direction");
+  while (RightDist > 8000 && stepperAngle > 0) {
+    stepperAngle = stepperAngle - 1;
+    StepperLeft(1);
+    RightDist = GetDistance();
+    //    Serial2.print("StepperAngle:\t");
+    //    Serial2.print(stepperAngle);
+    //    Serial2.print("\tRightDist:\t");
+    //    Serial2.println(RightDist);
   }
 
 
@@ -144,8 +73,9 @@ void Avoidence() {
   Serial2.print("\tRight Angle Final:\t");
   Serial2.println(RightAng);
 
-  StepperLeft(stepperAngle);/////////////////////////////////////////
-  stepperAngle = 0;//////////////////////////////////////////////////replace with "Center Stepper" Function
+  StepperLeft(RightAng);
+  CenterStepper();
+  LevelTOF();
 
   int LeftWidth;
   LeftWidth = sqrt(sq(LeftDist) - sq(FrontDist));
@@ -168,7 +98,10 @@ void Avoidence() {
     Serial2.print(" degrees.");
     DCBack(1000);
     TurnLeft(LeftAng + 10);
-    MoveForward(LeftAng + 10);
+    int tempDir = IMUDirection();
+    for (int i = 0; i < 3; i++) {
+      MoveForward(tempDir);
+    }
   }
   else
   {
@@ -177,7 +110,10 @@ void Avoidence() {
     Serial2.print(" degrees.");
     DCBack(1000);
     TurnRight(RightAng + 10);
-    MoveForward(RightAng + 10);
+    int tempDir = IMUDirection();
+    for (int i = 0; i < 3; i++) {
+      MoveForward(tempDir);
+    }
   }
 }
 
@@ -189,16 +125,16 @@ bool ObjectDetection() {
 
   distance = GetDistance();
   if (distance > minDistance) {
-    //    Serial2.print("ObjectDetection() = FALSE \t Distance = \t");
-    //    Serial2.print(distance);
-    //    Serial2.print("\t");
+    Serial2.print("ObjectDetection() = FALSE \t Distance = \t");
+    Serial2.print(distance);
+    Serial2.print("\t");
     return false;
   }
   else
   {
-    //    Serial2.print("ObjectDetection() = TRUE \t Distance = \t");
-    //    Serial2.print(distance);
-    //    Serial2.print("\t");
+    Serial2.print("ObjectDetection() = TRUE \t Distance = \t");
+    Serial2.print(distance);
+    Serial2.print("\t");
     return true;
   }
 }
@@ -265,9 +201,45 @@ float ServoPos(int deg) {
   TOFServo.write(DegToServo(deg));
 }
 
+bool Sweep() {
+  FastCenter();
+  Serial2.print("\nSweeping for Objects\n");
+  LevelTOF();
+  while (stepperAngle < 45 && ObjectDetection() == false) {
+    StepperLeft(1);
+    stepperAngle++;
+    Serial2.print("\nStepper Angle:\t");
+    Serial2.println(stepperAngle);
+  }
+  if (ObjectDetection() == true)
+  {
+    return true;
+  }
+  StepperRight(stepperAngle);
+  stepperAngle = 0;
+
+  while (stepperAngle < 45 && ObjectDetection() == false) {
+    StepperRight(1);
+    stepperAngle++;
+    Serial2.print("\nStepper Angle: \t");
+    Serial2.println(stepperAngle);
+  }
+  if (ObjectDetection() == true)
+  {
+    return true;
+  }
+  FastCenter();
+  return false;
+}
+
 void LevelTOF() {
   int deg = 0;
-  deg = DegToServo(IMUPitch() + 80);
+  deg = (-3 / 2) * (IMUPitch() - 60);
+  deg = deg + 40;
+  Serial2.print("\nIMU:\t");
+  Serial2.print(IMUPitch());
+  Serial2.print("Servo Degree:\t");
+  Serial2.println(deg);
   TOFServo.write(deg);
 }
 
