@@ -165,9 +165,7 @@ void MeasureObject() {
 
 
 
-float ServoPos(int deg) {
-  TOFServo.write(DegToServo(deg));
-}
+
 
 bool Sweep() {
   if (stepperAngle != 0) {
@@ -202,35 +200,3 @@ bool Sweep() {
   FastCenter();
   return false;
 }
-
-void LevelTOF() { ///////////////////////////Works! Dont touch it
-  int servoValue = 90;
-  servoValue = (IMUPitch() + 50.4) / 0.56;
-  if (servoValue < 0){
-    servoValue = 0;
-  }
-  if (servoValue > 180){
-    servoValue = 180;
-  }
-  Serial2.print("\nIMU:\t");
-  Serial2.print(IMUPitch());
-  Serial2.print("\tServo Degree:\t");
-  Serial2.print(servoValue);
-  TOFServo.write(servoValue);
-}
-
-
-// Convert servos position value to degrees above ground level
-float ServoToDeg(int servoPos) {                                  // Send this function the servos coded position
-  float deg = 0;                                                      // Create a FLOAT named deg to store our value in degrees
-  deg = -0.4875 * servoPos + 133.875;                             // y = mx+b math to calculate the real value in degrees the servo is set to.
-  return deg;                                                     // Return the value of degrees as a float
-}                                                                 // End of ServoToDeg()
-
-
-// Convers a degree above ground level to a real value to set the servo to
-float DegToServo(float deg) {                                     // Send this function the degrees above ground level you wish to set the servo to
-  int servoPos = 0;                                                   // Create an INT named servoPos to store our value of the servo in
-  servoPos = (deg - 133.875) / -0.4875;                           // x = (y-b)/m math to calculate the value to send servo to achieve a speciffic degree
-  return servoPos;                                                // Return the value to set the servo to
-}                                                             // End of DegToServo()
