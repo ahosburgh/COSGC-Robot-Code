@@ -9,7 +9,7 @@ void DCStop();
 void Navigation(float dir);
 float IMUDirection();
 float IMUPitch();
-void CalibrateIMU();
+void setCal();
 float GetGoldenDirection();
 
 void StartUpLights();

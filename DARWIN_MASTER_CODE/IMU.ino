@@ -1,177 +1,81 @@
-void Navigation(float dir) {
-  int tempValue = 0;
-  float currentDirection = IMUDirection();
-  float targetDirection = 0;
-  Serial2.println("\n ======== Navigation Function Successfully Called ======== \n");
-  Serial2.print("Navigation Check On: \t");
-  Serial2.print(dir);
-  int switchCase = 0;
-  if (dir < -170) {
-    switchCase = 0;
-  }
-  else if (dir > 170) {
-    switchCase = 1;
-  }
-  else if (dir <= 170 && dir >= -170)
-  {
-    switchCase = 2;
-  }
-  switch (switchCase)
-  {
-    case 0:
-      tempValue = dir + 345;
-      if (currentDirection < dir + 15 || currentDirection > tempValue)
-      {
-        Serial2.print("\tIMU reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
+void setCal() {
+  // DAVES MOD - Writes calibration data to sensor//
+  byte calData;
+  bno.setMode( bno.OPERATION_MODE_CONFIG );    // Put into CONFIG_Mode
+  delay(25);
 
-        tempValue = dir + 180;
-        if (currentDirection > tempValue) {
-          targetDirection = 180 - currentDirection + tempValue;
-          Serial2.print("Turning Right \t") ;
-          Serial2.println(targetDirection);
-          TurnRight(targetDirection);
-        }
-        else if (currentDirection < tempValue) {
-          targetDirection = -1 * (dir - currentDirection);
-          Serial2.print("Turning Left \t") ;
-          Serial2.println(targetDirection);
-          TurnLeft(targetDirection);
-        }
-      }
-      break;
+  calData = bno.setCalvalARL(232);
 
+  calData = bno.setCalvalARM(3);
 
-    case 1:
-      tempValue = dir - 345;
-      if (currentDirection > dir - 15 || currentDirection < tempValue)
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
-        tempValue = dir - 180;
-        if (currentDirection > tempValue) {
-          targetDirection = 180 - currentDirection + tempValue;
-          Serial2.print("Turning Right \t") ;
-          Serial2.println(targetDirection);
-          TurnRight(targetDirection);
-        }
-        else if (currentDirection < tempValue) {
-          targetDirection = -1 * (dir - currentDirection);
-          Serial2.print("Turning Left \t") ;
-          Serial2.println(targetDirection);
-          TurnLeft(targetDirection);
-        }
-      }
+  calData = bno.setCalvalMRL(79);
 
+  calData = bno.setCalvalMRM(3);
 
-    case 2:
-      if (currentDirection > dir - 15 && currentDirection < dir + 15)
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
-        if (dir < 0) {
-          tempValue = dir + 180;
-        }
-        if (dir > 0) {
-          tempValue = dir - 180;
-        }
-        if (currentDirection > tempValue) {
-          targetDirection = 180 - currentDirection + tempValue;
-          Serial2.print("Turning Right \t") ;
-          Serial2.println(targetDirection);
-          TurnRight(targetDirection);
-        }
-        else if (currentDirection < tempValue) {
-          targetDirection = -1 * (dir - currentDirection);
-          Serial2.print("Turning Left \t") ;
-          Serial2.println(targetDirection);
-          TurnLeft(targetDirection);
-        }
-        break;
-      }
-  }
+  calData = bno.setCalvalAOXL(249);
+
+  calData = bno.setCalvalAOXM(255);
+
+  calData = bno.setCalvalAOYL(88);
+
+  calData = bno.setCalvalAOYM(0);
+
+  calData = bno.setCalvalAOZL(235);
+
+  calData = bno.setCalvalAOZM(255);
+
+  calData = bno.setCalvalMOXL(1);
+
+  calData = bno.setCalvalMOXM(2);
+
+  calData = bno.setCalvalMOYL(16);
+
+  calData = bno.setCalvalMOYM(3);
+
+  calData = bno.setCalvalMOZL(108);
+
+  calData = bno.setCalvalMOZM(7);
+
+  calData = bno.setCalvalGOXL(255);
+
+  calData = bno.setCalvalGOXM(255);
+
+  calData = bno.setCalvalGOYL(255);
+
+  calData = bno.setCalvalGOYM(255);
+
+  calData = bno.setCalvalGOZL(3);
+
+  calData = bno.setCalvalGOZM(0);
+
+  bno.setMode( bno.OPERATION_MODE_NDOF );    // Put into NDOF Mode
+  delay(25);
 }
+
+
 
 // IMU Roll function
 // This function gets the current Roll from the IMU
 float IMURoll()
 {
-
-  for (int i = 0; i < 10; i++) {                                         // Looping 10 times just to get a good average value
-    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-    phiM = -atan2(accel.y() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360;    // Math to get the roll from the accelerometer
-
-    phiFnew = .95 * phiFold + .05 * phiM;                             // Filter for accelerometer roll data
-
-    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
-    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
-    phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-
-    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
-
-    phiFold = phiFnew;
-
-  }                                 // End of for loop
-  return phi;     // Return the absolute roll
+  //NEW
+  sensors_event_t event;
+  bno.getEvent(&event);
+  setCal();
+  float roll = (event.orientation.z, 4);
+  roll  = roll + 8;
+  return (event.orientation.z, 4);
 }
 
 // IMU Direction function
 // This function gets the current direction from the IMU
 float IMUDirection()
 {
-
-  for (int i = 0; i < 20; i++) {                                         // Looping 10 times just to get a good average value
-    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-    thetaM = -atan2(accel.x() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360;  // Math to get the pitch from the accelerometer
-    phiM = -atan2(accel.y() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360;    // Math to get the roll from the accelerometer
-
-    phiFnew = .95 * phiFold + .05 * phiM;                             // Filter for accelerometer roll data
-    thetaFnew = .95 * thetaFold + .05 * thetaM;                       // Filter for accelerometer pitch data
-
-    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
-    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
-    theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
-    phi = (phi - gyro.x() * dt) * .95 + phiM * .05;                   // Calculating Absolute Pitch using fancy math  (and running a filter on it)
-
-    phiRad = phi / 360 * (2 * 3.14);                                  // Calculating
-    thetaRad = theta / 360 * (2 * 3.14);
-
-    Xm = mag.x() * cos(thetaRad) - mag.y() * sin(phiRad) * sin(thetaRad) + mag.z() * cos(phiRad) * sin(thetaRad); // Absolute X Direction of magnitometer after fancy math
-    Ym = mag.y() * cos(phiRad) + mag.z() * sin(phiRad);                                                 // Absolute Y Direction of magnitometer after fancy math
-
-    psi = atan2(Ym, Xm) / (2 * 3.14) * 360;                           // Absolute heading of the robot
-
-    phiFold = phiFnew;
-    thetaFold = thetaFnew;
-  }                                 // End of for loop
-  return psi;     // Return the absolute heading
+  //NEW
+  sensors_event_t event;
+  bno.getEvent(&event);
+  setCal();
+  return (event.orientation.x, 4);
 }
 
 
@@ -180,55 +84,13 @@ float IMUDirection()
 // This function gets the current pitch angle from the IMU
 float IMUPitch()
 {
-  for (int i = 0; i < 10; i++) {                                         // Looping 10 times just to get a good average value
-    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-    thetaM = -atan2(accel.x() / 9.8, accel.z() / 9.8) / 2 / 3.141592654 * 360;  // Math to get the pitch from the accelerometer
-    thetaFnew = .95 * thetaFold + .05 * thetaM;                       // Filter for accelerometer pitch data
-    dt = (millis() - millisOld) / 1000.;                              // Measuring the change in time since last millis measurement
-    millisOld = millis();                                             // Setting millisOld to millis to update it for next calculation
-    theta = (theta + gyro.y() * dt) * .95 + thetaM * .05;             // Calculating Absolute Roll using fancy math (and running a filter on it)
-    thetaFold = thetaFnew;
-  }                                 // End of for loop
-  return theta;     // Return the absolute pitch
+  //NEW
+  sensors_event_t event;
+  bno.getEvent(&event);
+  setCal();
+  return (event.orientation.y, 4);
 }
 
-void CalibrateIMU() {
-  Serial2.println("\n==========CalibrateIMU Function==========\n");
-  Serial2.println("Rotate, Twist, and Invert Darwin Until Values For All Axis's = 3\n");
-  delay(1000);
-
-  uint8_t system, gyroCal, accelCal, magCal = 0;
-
-  while (accelCal < 3) {
-    DarwinIMU.getCalibration(&system, &gyroCal, &accelCal, &magCal);
-    imu::Vector<3> accel = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
-    imu::Vector<3> gyro = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
-    imu::Vector<3> mag = DarwinIMU.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
-
-    Serial2.print("Accel: \t");
-    Serial2.print(accelCal);
-
-    Serial2.print("\tGyro: \t");
-    Serial2.print(gyroCal);
-
-    Serial2.print("\tMag: \t");
-    Serial2.print(magCal);
-
-    Serial2.print("\tSystem: \t");
-    Serial2.println(system);
-  }
-
-  while (IMUDirection() == 0)
-  {
-    Serial2.print("Calibration Failed -- Restart -- \t");
-    Serial2.println(IMUDirection());
-  }
-  Serial2.println("\n==========IMU Calibration Successful==========\n");
-  delay(3000);
-}
 
 
 
@@ -257,22 +119,11 @@ float GetGoldenDirection() {
     Serial2.println(IMUDirection());
     currentTime = millis();
   }
-  currentTime = millis();
-  oldTime = millis();
-  i = 1;
 
-  while (i > 0) {
-    if (currentTime - oldTime > 1000) {
-      sample1 = IMUDirection();
-      Serial2.print("-------------------- Sample1: \t");
-      Serial2.println(sample1);
-      oldTime = currentTime;
-      i = 0;
-    }
-    Serial2.print("Current Direction: \t");
-    Serial2.println(IMUDirection());
-    currentTime = millis();
-  }
+  sample1 = IMUDirection();
+  Serial2.print("-------------------- Sample1: \t");
+  Serial2.println(sample1);
+  oldTime = currentTime;
 
   currentTime = millis();
   oldTime = millis();
@@ -311,15 +162,6 @@ float GetGoldenDirection() {
   }
 
   GoldenDirection = (sample1 + sample2 + sample3) / 3;
-
-  if (GoldenDirection == 0) {
-    Serial2.println("GoldenDirection = 0; \t Process Failed. \t Restart");
-    while (1 > 0) {
-      // do nothing
-    }
-  }
-  else {
-    Serial2.print("Golden Direction set to: ");
-    Serial2.println(GoldenDirection);
-  }
+  Serial2.print("Golden Direction set to: ");
+  Serial2.println(GoldenDirection);
 }

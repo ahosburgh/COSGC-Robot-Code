@@ -55,24 +55,10 @@ unsigned long previousTime = 0;
 #include <Adafruit_Sensor.h>                    // Adafruit Unified Sensor Library
 #include <Adafruit_BNO055.h>                    // Adafruit BNO055 Library 
 #include <utility/imumaths.h>                   // Utility included in one of the 2 libraries above, but needs to be called specifically
-#include <math.h>                               // Math library required for trig functions in compass
-#include <EEPROM.h>                             // EEprom library required save/load data from arduinos long term memory
+#include <math.h>                               // Math library required for trig functions in compas
 #define BNO055_SAMPLERATE_DELAY_MS 100          // Instructing the sensor to sample every 100 ms
 Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU", giving it the id 55 and address 0x28
-float thetaM = 0;           // Pitch from Accelerometer
-float phiM = 0;             // Roll from Accellerometer
-float thetaFold = 0;    // Overall System Pitch Filtered (Old)
-float thetaFnew = 0;        // Overall System Pitch Filtered (New)
-float phiFold = 0;      // Overall System Roll Filtered  (Old)
-float phiFnew = 0;          // Overall System Roll Filtered (New)
-float theta = 0;            // Overall System Pitch
-float phi = 0;              // Overall System Roll
-float thetaRad = 0;         // Pitch in radians
-float phiRad = 0;           // Roll in radians
-float Xm = 0;               // Value coming off the x magnitometer
-float Ym = 0;               // Value coming off the Y Magnitometer
-float psi = 0;              // Heading angle
-float dt = 0;               // Delta time
+
 unsigned long millisOld = 0;// Old value of time in milliseconds
 float GoldenDirection = 0;  // The direction if the final goal
 
@@ -95,6 +81,7 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #define steps 64                                    // Setting the number of steps per rotation the motor takes. This is mechanically defined in the motors spec sheet
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
 int StepperSpeed = 600;                             // Speed of motor
-int stepperAngle = 0;  
-int fastCenter = 0;// A global counter for determining the angle of the stepper motor 
+int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
+int centerOffset = 0;
+int fastCenter = 0;                                 
 Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins

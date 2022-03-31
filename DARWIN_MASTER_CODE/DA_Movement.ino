@@ -1,3 +1,121 @@
+
+void Navigation(float dir) {
+  int tempValue = 0;
+  float currentDirection = IMUDirection();
+  float targetDirection = 0;
+  Serial2.println("\n ======== Navigation Function Successfully Called ======== \n");
+  Serial2.print("Navigation Check On: \t");
+  Serial2.print(dir);
+  int switchCase = 0;
+  if (dir < -170) {
+    switchCase = 0;
+  }
+  else if (dir > 170) {
+    switchCase = 1;
+  }
+  else if (dir <= 170 && dir >= -170)
+  {
+    switchCase = 2;
+  }
+  switch (switchCase)
+  {
+    case 0:
+      tempValue = dir + 345;
+      if (currentDirection < dir + 15 || currentDirection > tempValue)
+      {
+        Serial2.print("\tIMU reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+
+        tempValue = dir + 180;
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+      }
+      break;
+
+
+    case 1:
+      tempValue = dir - 345;
+      if (currentDirection > dir - 15 || currentDirection < tempValue)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        tempValue = dir - 180;
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+      }
+
+
+    case 2:
+      if (currentDirection > dir - 15 && currentDirection < dir + 15)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        if (dir < 0) {
+          tempValue = dir + 180;
+        }
+        if (dir > 0) {
+          tempValue = dir - 180;
+        }
+        if (currentDirection > tempValue) {
+          targetDirection = 180 - currentDirection + tempValue;
+          Serial2.print("Turning Right \t") ;
+          Serial2.println(targetDirection);
+          TurnRight(targetDirection);
+        }
+        else if (currentDirection < tempValue) {
+          targetDirection = -1 * (dir - currentDirection);
+          Serial2.print("Turning Left \t") ;
+          Serial2.println(targetDirection);
+          TurnLeft(targetDirection);
+        }
+        break;
+      }
+  }
+}
+
+
+
 void MoveForward(int dir) {
   LevelTOF();
   if (Sweep() == false) {

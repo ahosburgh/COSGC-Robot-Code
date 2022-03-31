@@ -58,16 +58,22 @@ void setup() {
   //IMU Sensor Setup
 
   DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
-  Serial2.println("DarwinIMU.begin(); \t IMU Connection Established\n");
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
+  /* Initialise the sensor */
+  if (!DarwinIMU.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial2.print("Ooops, no BNO055 detected ... Restart");
+    while (1);
+  }
+  Serial2.println("DarwinIMU.begin(); \t IMU Connection Established\n");
   int8_t temp = DarwinIMU.getTemp();      // int8_t is a special type of int variable type that stores values from -120 to 120. super compact. Some of the measurements from the IMU are dependant on tempature. So we need to measure the tempature of the IMU first. So we will create a new variable named temp of type int8_t and set it = to a function return of the imu library that does exactly that.*/
   Serial2.print("IMU Tempature: ");       // Printing for debugging
   Serial2.println(temp);                  // Printing the measured tempature to the screen for sanity check.
 
-  Serial2.println("StepperLeft(0); \t Sending Small Signal To Stepper Motor Before Calibration\n");   // Printing for debugging
-  StepperLeft(0);
-  Serial2.println("CalibrateIMU(); \t Calling IMU Calibration Function\n");   // Printing for debugging
-  CalibrateIMU();
+
+  Serial2.println("setCal(); \t Loading Calibration Offsets\n");   // Printing for debugging
+  setCal();
 
   DarwinIMU.setExtCrystalUse(true);       // Dont use the crystal on the chip itself, use crystal on the board (for time keeping)
   millisOld = millis();                   // Grabbing the system time for dt variable
@@ -75,8 +81,8 @@ void setup() {
   Serial2.println("GetGoldenDirection(); \t Calling Get Golden Direction Function \n");
   GetGoldenDirection();
 
-
   CenterStepper();
   CenterStepper();
+  
   Serial2.println("Main Program is About to Begin");
 }
