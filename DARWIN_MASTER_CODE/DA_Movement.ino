@@ -1,4 +1,3 @@
-
 void Navigation(float dir) {
   int tempValue = 0;
   float currentDirection = IMUDirection();

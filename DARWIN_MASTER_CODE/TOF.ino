@@ -125,7 +125,7 @@ void MeasureObject() {
   int AdjDist = 0;
   int OppDist = 0;
   double ObjHeight = 0;
-
+  FastCenter();
   Serial2.print("Stepper Angle: \t");
   Serial2.println(stepperAngle);
   if (stepperAngle > 0) {
