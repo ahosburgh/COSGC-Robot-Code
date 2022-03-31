@@ -120,46 +120,6 @@ void Avoidence() {
 
 
 
-void MeasureObject() {
-  int AdjAng =  0;
-  int AdjDist = 0;
-  int OppDist = 0;
-  double ObjHeight = 0;
-  FastCenter();
-  Serial2.print("Stepper Angle: \t");
-  Serial2.println(stepperAngle);
-  if (stepperAngle > 0) {
-    while (stepperAngle != 0) {
-      StepperLeft(1);
-      stepperAngle = stepperAngle - 1;
-      Serial2.print("Stepper Angle: \t");
-      Serial2.println(stepperAngle);
-    }
-  }
-  else
-  {
-    while (stepperAngle != 0) {
-      StepperRight(1);
-      stepperAngle = stepperAngle + 1;
-      Serial2.print("Stepper Angle: \t");
-      Serial2.println(stepperAngle);
-    }
-  }
-  LevelTOF();
-  AdjDist = GetDistance();
-  AdjAng = DegToServo(IMUPitch() + 80);
-  while (GetDistance() < 8000 || AdjAng < 180) {
-    ServoPos(AdjAng);
-    OppDist = GetDistance();
-    AdjAng = AdjAng + 1;
-  }
-
-  ObjHeight = 220 + (sqrt(sq(OppDist) - sq(AdjDist)));
-  Serial2.print(" Object Height: \t");
-  Serial2.println(ObjHeight / 10);
-  LevelTOF();
-  delay(8000);
-}
 
 
 

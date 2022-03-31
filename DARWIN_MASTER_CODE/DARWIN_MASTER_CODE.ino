@@ -66,6 +66,9 @@ float GoldenDirection = 0;  // The direction if the final goal
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
+int objectWidth[10];                             // width of objects found
+int objectHeight[10];                              // height of objects 
+int arrayCounter = 0;
 // SCL - gray SDA - white
 
 

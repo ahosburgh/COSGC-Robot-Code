@@ -6,12 +6,15 @@ float ServoPos(int deg) {               // Send this function a value in degrees
 
 
 // Levels the TOF sensor based on the IMU's pitch reading
-void LevelTOF() {
+void LevelTOF(int) {
   int Offset = -64;                               // value to offset degrees by
   ServoPos(DegToServo(IMUPitch() + Offset));    // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
 }
 
-
+// Levels the TOF sensor based on the IMU's pitch reading
+void LevelTOF90(int) {
+  ServoPos(DegToServo(IMUPitch()));    // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
+}
 
 // Convers a degree above ground level to a real value to set the servo to
 float DegToServo(float deg) {         // Send this function the degrees above ground level you wish to set the servo to. - for down, + for up. 0 = straight in front
