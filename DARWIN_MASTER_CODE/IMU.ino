@@ -1,54 +1,54 @@
 void setCal() {
   // DAVES MOD - Writes calibration data to sensor//
   byte calData;
-  bno.setMode( bno.OPERATION_MODE_CONFIG );    // Put into CONFIG_Mode
+  DarwinIMU.setMode( DarwinIMU.OPERATION_MODE_CONFIG );    // Put into CONFIG_Mode
   delay(25);
 
-  calData = bno.setCalvalARL(232);
+  calData = DarwinIMU.setCalvalARL(232);
 
-  calData = bno.setCalvalARM(3);
+  calData = DarwinIMU.setCalvalARM(3);
 
-  calData = bno.setCalvalMRL(79);
+  calData = DarwinIMU.setCalvalMRL(79);
 
-  calData = bno.setCalvalMRM(3);
+  calData = DarwinIMU.setCalvalMRM(3);
 
-  calData = bno.setCalvalAOXL(249);
+  calData = DarwinIMU.setCalvalAOXL(249);
 
-  calData = bno.setCalvalAOXM(255);
+  calData = DarwinIMU.setCalvalAOXM(255);
 
-  calData = bno.setCalvalAOYL(88);
+  calData = DarwinIMU.setCalvalAOYL(88);
 
-  calData = bno.setCalvalAOYM(0);
+  calData = DarwinIMU.setCalvalAOYM(0);
 
-  calData = bno.setCalvalAOZL(235);
+  calData = DarwinIMU.setCalvalAOZL(235);
 
-  calData = bno.setCalvalAOZM(255);
+  calData = DarwinIMU.setCalvalAOZM(255);
 
-  calData = bno.setCalvalMOXL(1);
+  calData = DarwinIMU.setCalvalMOXL(1);
 
-  calData = bno.setCalvalMOXM(2);
+  calData = DarwinIMU.setCalvalMOXM(2);
 
-  calData = bno.setCalvalMOYL(16);
+  calData = DarwinIMU.setCalvalMOYL(16);
 
-  calData = bno.setCalvalMOYM(3);
+  calData = DarwinIMU.setCalvalMOYM(3);
 
-  calData = bno.setCalvalMOZL(108);
+  calData = DarwinIMU.setCalvalMOZL(108);
 
-  calData = bno.setCalvalMOZM(7);
+  calData = DarwinIMU.setCalvalMOZM(7);
 
-  calData = bno.setCalvalGOXL(255);
+  calData = DarwinIMU.setCalvalGOXL(255);
 
-  calData = bno.setCalvalGOXM(255);
+  calData = DarwinIMU.setCalvalGOXM(255);
 
-  calData = bno.setCalvalGOYL(255);
+  calData = DarwinIMU.setCalvalGOYL(255);
 
-  calData = bno.setCalvalGOYM(255);
+  calData = DarwinIMU.setCalvalGOYM(255);
 
-  calData = bno.setCalvalGOZL(3);
+  calData = DarwinIMU.setCalvalGOZL(3);
 
-  calData = bno.setCalvalGOZM(0);
+  calData = DarwinIMU.setCalvalGOZM(0);
 
-  bno.setMode( bno.OPERATION_MODE_NDOF );    // Put into NDOF Mode
+  DarwinIMU.setMode( DarwinIMU.OPERATION_MODE_NDOF );    // Put into NDOF Mode
   delay(25);
 }
 
@@ -60,11 +60,8 @@ float IMURoll()
 {
   //NEW
   sensors_event_t event;
-  bno.getEvent(&event);
-  setCal();
-  float roll = (event.orientation.z, 4);
-  roll  = roll + 8;
-  return (event.orientation.z, 4);
+  DarwinIMU.getEvent(&event);
+  return (event.orientation.z + 8);
 }
 
 // IMU Direction function
@@ -73,9 +70,9 @@ float IMUDirection()
 {
   //NEW
   sensors_event_t event;
-  bno.getEvent(&event);
-  setCal();
-  return (event.orientation.x, 4);
+  DarwinIMU.getEvent(&event);
+
+  return (event.orientation.x);
 }
 
 
@@ -86,9 +83,9 @@ float IMUPitch()
 {
   //NEW
   sensors_event_t event;
-  bno.getEvent(&event);
-  setCal();
-  return (event.orientation.y, 4);
+  DarwinIMU.getEvent(&event);
+  float pitch = (event.orientation.y);
+  return pitch;
 }
 
 

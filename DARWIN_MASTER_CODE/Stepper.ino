@@ -7,13 +7,16 @@ void CenterStepper() {
   stepperAngle = 0;
   while (GetDistance() > 40) {      // Find first left side
     StepperLeft(20);
+    delay(50);
   }
   StepperRight(30);
   while (GetDistance() > 40) {      // Find first left side
     StepperLeft(1);
+    delay(50);
   }
   while (GetDistance() < 40) {
     StepperRight(1);
+        delay(50);
   }
 
 
@@ -23,10 +26,12 @@ void CenterStepper() {
   while (GetDistance() > 40) {
     StepperRight(1);
     stepperAngle1 = stepperAngle1 + 1;
+        delay(50);
   }
   while (GetDistance() < 40) {
     StepperLeft(1);
     stepperAngle1--;
+        delay(50);
   }
 
   StepperLeft(135);                 // Jump back to left side
@@ -34,10 +39,12 @@ void CenterStepper() {
   while (GetDistance() > 40) {
     StepperLeft(1);
     stepperAngle2 = stepperAngle2 + 1;
+        delay(50);
   }
   while (GetDistance() < 40) {
     StepperRight(1);
     stepperAngle2--;
+        delay(50);
   }
   stepperAngle = (stepperAngle1 + stepperAngle2) / 2;
   fastCenter = (stepperAngle / 2) + centerOffset;

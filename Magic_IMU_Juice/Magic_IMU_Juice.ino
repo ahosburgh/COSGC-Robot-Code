@@ -114,11 +114,14 @@ void loop(void)
 //setCal();
     /* Display the floating point data */
     Serial.print("X: ");
-    Serial.print(event.orientation.x, 4);
+    float x = (event.orientation.x);
+    Serial.print(x);
     Serial.print("\tY: ");
-    Serial.print(event.orientation.y, 4);
+    float y = (event.orientation.y);
+    Serial.print(y);
     Serial.print("\tZ: ");
-    Serial.print(event.orientation.z, 4);
+    float z = (event.orientation.z);
+    Serial.print(z);
     Serial.println("");
   //Serial.println(IMUDirection());
   delay(BNO055_SAMPLERATE_DELAY_MS);

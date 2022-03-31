@@ -1,5 +1,7 @@
 void loop() {
-MoveForward(GoldenDirection);
+FloorFinder();
+
+//MoveForward(GoldenDirection);
 }
 
 // go towards the golden direction

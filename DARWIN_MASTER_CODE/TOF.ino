@@ -203,15 +203,20 @@ bool Sweep() {
   return false;
 }
 
-void LevelTOF() {
-  int deg = 0;
-  deg = (-3 / 2) * (IMUPitch() - 60);
-  deg = deg + 40;
+void LevelTOF() { ///////////////////////////Works! Dont touch it
+  int servoValue = 90;
+  servoValue = (IMUPitch() + 50.4) / 0.56;
+  if (servoValue < 0){
+    servoValue = 0;
+  }
+  if (servoValue > 180){
+    servoValue = 180;
+  }
   Serial2.print("\nIMU:\t");
   Serial2.print(IMUPitch());
-  Serial2.print("Servo Degree:\t");
-  Serial2.println(deg);
-  TOFServo.write(deg);
+  Serial2.print("\tServo Degree:\t");
+  Serial2.print(servoValue);
+  TOFServo.write(servoValue);
 }
 
 
