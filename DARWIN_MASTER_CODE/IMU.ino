@@ -91,7 +91,7 @@ float IMUPitch()
 
 
 
-float GetGoldenDirection() {
+int GetGoldenDirection() {
   Serial2.println("\n==========Golden Direction==========\n");
   Serial2.println("Place Darwin on the ground and prepare for run");
   delay(3000);

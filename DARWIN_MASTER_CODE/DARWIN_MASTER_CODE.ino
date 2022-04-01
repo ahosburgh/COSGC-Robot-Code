@@ -60,8 +60,9 @@ unsigned long previousTime = 0;
 Adafruit_BNO055 DarwinIMU = Adafruit_BNO055(55, 0x28);  // Using adafruit library to create IMU object named "DarwinIMU", giving it the id 55 and address 0x28
 
 unsigned long millisOld = 0;// Old value of time in milliseconds
-float GoldenDirection = 0;  // The direction if the final goal
+int GoldenDirection = 0;  // The direction if the final goal
 
+float pi = 3.14159265;
 
 //********************TOF Sensor*******************TOF Sensor********************TOF Sensor********************
 #include <Adafruit_VL53L0X.h>                       // VL53L0X TOF Sensor Library

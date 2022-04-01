@@ -1,7 +1,8 @@
 void loop() {
-FloorFinder();
+MeasureObject();
 
-//MoveForward(GoldenDirection);
+
+  //MoveForward(GoldenDirection);
 }
 
 // go towards the golden direction

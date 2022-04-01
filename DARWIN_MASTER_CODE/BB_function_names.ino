@@ -6,11 +6,11 @@ void DCForward();
 void DCBack(int ReverseTime);
 void DCStop();
 
-void Navigation(float dir);
+void Navigation(int dir);
 float IMUDirection();
 float IMUPitch();
 void setCal();
-float GetGoldenDirection();
+int GetGoldenDirection();
 
 void StartUpLights();
 void LightsOut();
@@ -22,15 +22,16 @@ void TurnRight(int deg);
 
 void CenterStepper();
 float degToSteps(float deg);
-void StepperLeft(float deg);
-void StepperRight(float deg);
+void StepperLeft(int deg);
+void StepperRight(int deg);
 
 bool Sweep();
 void Avoidence();
 bool ObjectDetection();
 void MeasureObject();
 int GetDistance();
-float ServoPos(int deg);
+int ServoPos(int deg);
 void LevelTOF();
-float ServoToDeg(int servoPos);
-float DegToServo(float deg);
+int ReadServoInDeg();
+int ServoToDeg(int servoPos);
+int DegToServo(int deg);

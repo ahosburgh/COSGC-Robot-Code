@@ -52,11 +52,10 @@ void setup() {
   pinMode(Led6, OUTPUT);
   Serial2.println("All LED Pins set to OUTPUT\n");
   Serial2.println("Running StartUpLights()\n");
-  //StartUpLights();
+  StartUpLights();
 
 
   //IMU Sensor Setup
-
   DarwinIMU.begin();                      // Starting the IMU waiting 1 second to give it time to power on and make its connection before sending another command
   delay(1000);                            // waiting 1 second to give it time to power on and make its connection before sending another command
   /* Initialise the sensor */
@@ -79,9 +78,9 @@ void setup() {
   millisOld = millis();                   // Grabbing the system time for dt variable
 
   Serial2.println("GetGoldenDirection(); \t Calling Get Golden Direction Function \n");
-  //GetGoldenDirection();
+  GetGoldenDirection();
 
-  //CenterStepper();
+  CenterStepper();
   //CenterStepper();
   
   Serial2.println("Main Program is About to Begin");
