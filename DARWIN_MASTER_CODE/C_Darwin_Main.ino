@@ -1,5 +1,5 @@
 void loop() {
-Sweep();
+MeasureObject();
 delay(5000);
 
   //MoveForward(GoldenDirection);
