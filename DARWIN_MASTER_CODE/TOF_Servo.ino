@@ -6,16 +6,15 @@ int ServoPos(int deg) {                         // Send this function a value in
 
 
 // Levels the TOF sensor based on the IMU's pitch reading
-void LevelTOF() {
-  int Offset = -64;                               // value to offset degrees by
-  ServoPos(DegToServo(IMUPitch() + Offset));      // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
+void LevelTOF(int Offset) {
+  ServoPos(IMUPitch() + Offset);      // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
 }
 
 
 
 // Levels the TOF sensor based on the IMU's pitch reading
 void LevelTOF90() {
-  ServoPos(DegToServo(IMUPitch()));               // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
+  ServoPos(IMUPitch());               // Same as float ServoPos() except this time we pass it the pitch value from the IMU instead of another degree.
 }
 
 

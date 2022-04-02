@@ -16,7 +16,7 @@ int GetDistance() {
 bool ObjectDetection() {
 
   int distance = 0;
-  int minDistance = 600;
+  int minDistance = 480;
 
   distance = GetDistance();
   if (distance > minDistance) {
@@ -56,20 +56,16 @@ void MeasureObject() {
   double rightWidth = 0;
   double width = 0;
 
-
-  FastCenter();
   Serial2.print("LevelTOF();\n");
-  LevelTOF();
+  LevelTOF(0);
   delay(500);
 
   straightDist = GetDistance();
   straightAng = ReadServoInDeg();
   if (straightDist > 900) {
     Serial2.print("\n\nstraightDist > 900 - Remeasuring\n\n");
-    while (straightDist > 900) {
-      straightDist = GetDistance();
-      Serial2.print("straightDist:\t");
-      Serial2.println(straightDist);
+    if (Sweep() == false) {
+      return;
     }
   }
   Serial2.print("straightDist:\t");
@@ -168,99 +164,154 @@ void MeasureObject() {
   Serial2.print("\n\n\t\tObject Height in mm: \t");
   Serial2.println(height);   // height in cm
 
-    ServoPos(straightAng);
-    Serial2.print("\nServoPos(straightAng):");
-    Serial2.print(DegToServo(straightAng));
-    delay(100);
-  
-    // measure left
-    Serial2.print("\n\nMeasuring Left Side\n\n");
-    while (GetDistance() < 900) {
+  ServoPos(straightAng);
+  Serial2.print("\nServoPos(straightAng):");
+  Serial2.print(DegToServo(straightAng));
+  delay(100);
+
+
+  // measure left
+  TOFStepper.setSpeed(600);
+  Serial2.print("\n\nMeasuring Left Side\n\n");
+  while (GetDistance() < 900) {
+    leftDist = GetDistance();
+    StepperLeft(10);
+    leftAng = leftAng + 10;
+    Serial2.print("Distance:\t");
+    Serial2.print(leftDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(leftAng);
+    delay(50);
+  }
+  while (GetDistance() > 900) {
+    leftDist = GetDistance();
+    StepperRight(20);
+    leftAng = leftAng - 20;
+    Serial2.print("Distance:\t");
+    Serial2.print(leftDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(leftAng);
+    delay(50);
+  }
+  TOFStepper.setSpeed(100);
+  while (GetDistance() < 900) {
+    leftDist = GetDistance();
+    StepperLeft(1);
+    leftAng = leftAng + 1;
+    Serial2.print("Distance:\t");
+    Serial2.print(leftDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(leftAng);
+    delay(50);
+  }
+
+  if (leftDist > 900) {
+    Serial2.print("\nOvershot!!! Reversing Direction\n");
+    while (leftDist > 900) {
       leftDist = GetDistance();
-      StepperLeft(5);
-      leftAng = leftAng + 5;
+      StepperRight(1);
+      leftAng = leftAng - 1;
       Serial2.print("Distance:\t");
       Serial2.print(leftDist);
       Serial2.print("\tAngle:\t");
       Serial2.println(leftAng);
-      delay(100);
+      delay(50);
     }
-    if (leftDist > 900) {
-      Serial2.print("\nOvershot!!! Reversing Direction\n");
-      while (leftDist > 900) {
-        leftDist = GetDistance();
-        StepperRight(5);
-        leftAng = leftAng - 5;
-        Serial2.print("Distance:\t");
-        Serial2.print(leftDist);
-        Serial2.print("\tAngle:\t");
-        Serial2.println(leftAng);
-        delay(100);
-      }
-    }
-    FastCenter();
-    delay(100);
-  
-    straightDist = GetDistance();
-    Serial2.print("NEW straightDist:\t");
-    Serial2.print(straightDist);
-    delay(100);
-  
-    // measure right
-    Serial2.print("\n\nMeasuring Right Side\n\n");
-    while (GetDistance() < 900) {
+  }
+  TOFStepper.setSpeed(600);
+  StepperRight(leftAng);
+
+  straightDist = GetDistance();
+  Serial2.print("NEW straightDist:\t");
+  Serial2.print(straightDist);
+  delay(100);
+
+  // measure right
+  Serial2.print("\n\nMeasuring right Side\n\n");
+  while (GetDistance() < 900) {
+    rightDist = GetDistance();
+    StepperRight(10);
+    rightAng = rightAng + 10;
+    Serial2.print("Distance:\t");
+    Serial2.print(rightDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(rightAng);
+    delay(50);
+  }
+  while (GetDistance() > 900) {
+    rightDist = GetDistance();
+    StepperLeft(20);
+    rightAng = rightAng - 20;
+    Serial2.print("Distance:\t");
+    Serial2.print(rightDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(rightAng);
+    delay(50);
+  }
+  TOFStepper.setSpeed(100);
+  while (GetDistance() < 900) {
+    rightDist = GetDistance();
+    StepperRight(1);
+    rightAng = rightAng + 1;
+    Serial2.print("Distance:\t");
+    Serial2.print(rightDist);
+    Serial2.print("\tAngle:\t");
+    Serial2.println(rightAng);
+    delay(50);
+  }
+
+  if (rightDist > 900) {
+    Serial2.print("\nOvershot!!! Reversing Direction\n");
+    while (rightDist > 900) {
       rightDist = GetDistance();
-      StepperRight(5);
-      rightAng = rightAng + 5;
+      StepperLeft(1);
+      rightAng = rightAng - 1;
       Serial2.print("Distance:\t");
       Serial2.print(rightDist);
       Serial2.print("\tAngle:\t");
       Serial2.println(rightAng);
-      delay(100);
+      delay(50);
     }
-    if (leftDist > 900) {
-      Serial2.print("\nOvershot!!! Reversing Direction\n");
-      while (leftDist > 900) {
-        rightDist = GetDistance();
-        StepperLeft(5);
-        rightAng = rightAng - 5;
-        Serial2.print("Distance:\t");
-        Serial2.print(rightDist);
-        Serial2.print("\tAngle:\t");
-        Serial2.println(rightAng);
-        delay(100);
-      }
-    }
-    Serial2.print("\n\nleftDist:\t");
-    Serial2.print(leftDist);
-    Serial2.print("\tstraightDist:\t");
-    Serial2.print(straightDist);
-    Serial2.print("\trightDist:\t");
-    Serial2.print(rightDist);
-    Serial2.print("\ndownAng:\t");
-    Serial2.print(leftAng);
-    Serial2.print("\tstraightAng\t");
-    Serial2.print(straightAng);
-    Serial2.print("\tupAng\t");
-    Serial2.print(rightAng);
-  
-    leftWidth = leftDist * (sin(leftAng * 180 / pi));
-    rightWidth = rightDist * (sin(rightAng * 180 / pi));
-    width = abs(leftWidth)  + abs(rightWidth);
-  
-    Serial2.print("\n\n\t\t Object Width in cm: \t");
-    Serial2.println(width / 10);   // height in cm
-  
-    if (arrayCounter > 10) {
-      arrayCounter = 0;
-    }
-      objectWidth[arrayCounter] = width;
+  }
+
+  TOFStepper.setSpeed(600);
+  StepperLeft(rightAng);
+  Serial2.print("\n\nleftDist:\t");
+  Serial2.print(leftDist);
+  Serial2.print("\tstraightDist:\t");
+  Serial2.print(straightDist);
+  Serial2.print("\trightDist:\t");
+  Serial2.print(rightDist);
+  Serial2.print("\ndownAng:\t");
+  Serial2.print(leftAng);
+  Serial2.print("\tstraightAng\t");
+  Serial2.print(straightAng);
+  Serial2.print("\tupAng\t");
+  Serial2.print(rightAng);
+
+  leftWidth = leftDist * (sin(leftAng * 180 / pi));
+  rightWidth = rightDist * (sin(rightAng * 180 / pi));
+  width = abs(leftWidth)  + abs(rightWidth);
+
+  Serial2.print("\n\n\t\t Object Width in cm: \t");
+  Serial2.println(width / 10);   // height in cm
+
+
+  objectWidth[arrayCounter] = width;
   objectHeight[arrayCounter] = height;
   arrayCounter = arrayCounter + 1;
   displayObjectArray();
+  if (arrayCounter > 10) {
+    arrayCounter = 0;
+    Serial2.println("\tObject table full --- Creating new table");
+    for (int i = 0; i < 10; i++) {
+      objectWidth[i] = 0;
+      objectHeight[i] = 0;
+    }
+  }
 
-  
   delay(5000);
+
 }
 
 
@@ -281,4 +332,109 @@ void displayObjectArray() {
     Serial2.println(objectHeight[i]);
   }
   delay(3000);
+}
+
+
+bool Sweep() {
+
+  // Manually call a FastCenter() before running Sweep
+  int distance = 0;
+  stepperAngle = 0;
+  TOFStepper.setSpeed(600);
+
+  //Forward
+  LevelTOF(18);
+  distance = GetDistance();
+  if (distance < 450) {
+    Serial2.print("\nObject found at angle:\t");
+    Serial2.print(stepperAngle);
+    Serial2.print("\tDistance:\t");
+    Serial2.println(distance);
+    DCStop();
+    return true;
+  }
+  Serial2.print("Distance:\t");
+  Serial2.print(distance);
+  Serial2.print("\tStepper Angle:\t");
+  Serial2.println(stepperAngle);
+
+  // Left 65
+  LevelTOF(50);
+  stepperAngle = 55;
+  LorR = false;
+  StepperLeft(55);
+  distance = GetDistance();
+  if (distance < 274) {
+    Serial2.print("\nObject found at angle:\t");
+    Serial2.print(stepperAngle);
+    Serial2.print("\tDistance:\t");
+    Serial2.println(distance);
+    DCStop();
+    return true;
+  }
+  Serial2.print("Distance:\t");
+  Serial2.print(distance);
+  Serial2.print("\tStepper Angle:\t");
+  Serial2.println(stepperAngle);
+  
+  // Right 50
+  LevelTOF(23);
+  stepperAngle = 40;
+  LorR = true;
+  StepperRight(95);
+  distance = GetDistance();
+  if (distance < 522) {
+    Serial2.print("\nObject found at angle:\t");
+    Serial2.print(stepperAngle);
+    Serial2.print("\tDistance:\t");
+    Serial2.println(distance);
+    DCStop();
+    return true;
+  }
+  Serial2.print("Distance:\t");
+  Serial2.print(distance);
+  Serial2.print("\tStepper Angle:\t");
+  Serial2.println(stepperAngle);
+  
+  // Left 50
+  LevelTOF(23);
+  stepperAngle = 40;
+  LorR = false;
+  StepperLeft(80);
+  distance = GetDistance();
+  if (distance < 522) {
+    Serial2.print("\nObject found at angle:\t");
+    Serial2.print(stepperAngle);
+    Serial2.print("\tDistance:\t");
+    Serial2.println(distance);
+    DCStop();
+    return true;
+  }
+  Serial2.print("Distance:\t");
+  Serial2.print(distance);
+  Serial2.print("\tStepper Angle:\t");
+  Serial2.println(stepperAngle);
+  
+  // Right 65
+  LevelTOF(23);
+  stepperAngle = 55;
+  LorR = true;
+  StepperRight(95);
+  distance = GetDistance();
+  if (distance < 522) {
+    Serial2.print("\nObject found at angle:\t");
+    Serial2.print(stepperAngle);
+    Serial2.print("\tDistance:\t");
+    Serial2.println(distance);
+    DCStop();
+    return true;
+  }
+  Serial2.print("Distance:\t");
+  Serial2.print(distance);
+  Serial2.print("\tStepper Angle:\t");
+  Serial2.println(stepperAngle);
+  StepperLeft(45);
+  
+  return false;
+  
 }

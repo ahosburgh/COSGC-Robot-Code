@@ -31,7 +31,7 @@ bool ObjectDetection();
 void MeasureObject();
 int GetDistance();
 int ServoPos(int deg);
-void LevelTOF();
+void LevelTOF(int);
 int ReadServoInDeg();
 int ServoToDeg(int servoPos);
 int DegToServo(int deg);

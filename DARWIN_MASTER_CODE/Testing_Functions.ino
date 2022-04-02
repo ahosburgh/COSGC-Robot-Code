@@ -1,7 +1,16 @@
+void StepperOffset(){
+  CenterStepper();
+delay(5000);
+StepperLeft(30);
+delay(1000);
+StepperRight(44);
+delay(1000);
+}
+
 void FloorFinder() {
 
 
-    LevelTOF();
+    LevelTOF(0);
 
     Serial2.print("\tdistance:\t");
     Serial2.println(GetDistance());
@@ -10,12 +19,12 @@ void FloorFinder() {
 }
 
 void LevelTOFTest(){
-  TOFServo.write(45);
+
   Serial2.print("\nIMUPitch:\t");
-  Serial2.println(IMUPitch());
-//  Serial.print("\nDegToServo:\t");
-  //Serial.print(DegToServo(IMUPitch()));
-  //LevelTOF();
+  Serial2.print(IMUPitch());
+  Serial2.print("\tDegToServo:\t");
+  Serial2.print(DegToServo(IMUPitch()));
+  LevelTOF(0);
 }
 
 void ServoUpDownValues() { // Moves the servo up and down and outputs the degrees being sent and the values being written
