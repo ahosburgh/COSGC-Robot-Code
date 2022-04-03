@@ -69,7 +69,7 @@ void MeasureObject() {
   straightAng = ReadServoInDeg();                                               // Measure the servos actual degree position and set it = to straight angle
 
 
-  // SMALL MEASURE HEIGHT
+  //                                                            // SMALL MEASURE HEIGHT
   if (straightDist > 900) {                                                     // If the sensor cannot detect anything
     Serial2.print("\n\nMeasuring Height SMALL SMALL SMALL\n\n");                // Run the "Small Object" version of the height algrothim.
     small = true;                                                               // Set the bool upOrDown = to true. This means that we are looking at a "small" object < the servos 0 degree height
@@ -144,7 +144,7 @@ void MeasureObject() {
     Serial2.print("\n\n\t\tdown Height in mm: \t");
     Serial2.println(downHeight);   // height in cm
 
-    height = abs(straightHeight - upHeight);                                         // Calculating Height by subtracting the smaller height calculated between the beam and the top of the object, from the large straightHeight value that goes all the way down to the bottom/
+    height = abs(straightHeight - upHeight);                                    // Calculating Height by subtracting the smaller height calculated between the beam and the top of the object, from the large straightHeight value that goes all the way down to the bottom/
     Serial2.print("\n\n\t\tHeight in mm: \t");
     Serial2.println(height);   // height in cm
   }
@@ -246,7 +246,7 @@ void MeasureObject() {
     Serial2.print(downHeight);
 
 
-    upHeight = abs(upDist * sin(upAng));                                         // upHeight is the height of the upper portion of the object
+    upHeight = abs(upDist * sin(upAng));                                        // upHeight is the height of the upper portion of the object
     Serial2.print("\n\n\t\tup Height in mm: \t");
     Serial2.println(upHeight);   // height in cm
 
@@ -260,20 +260,16 @@ void MeasureObject() {
     Serial2.print("\nServoPos(straightAng):");
     Serial2.print(DegToServo(straightAng));
     delay(100);
+  }                                                             // END OF MEASURE HEIGHT
 
 
-
-
-  }                                                           // END OF MEASURE HEIGHT
-
-
-  // MEASURE LEFT
-  TOFStepper.setSpeed(600);                                                     // Set the stepper speed to the fastest it can handle
+  //                                                            // MEASURE LEFT
+  TOFStepper.setSpeed(100);                                                     // Set the stepper speed to slow so we can turn smoothly.
   Serial2.print("\n\nMeasuring Left Side\n\n");
   while (leftDist < 900 && leftAng < 100) {                                     // while the distance is not reading infinity, and the stepper hasn't moved more than 100 degrees
     leftDist = GetDistance();                                                   // Start setting the value for leftDist
-    StepperLeft(10);                                                            // Move the stepper left 10 steps at a time (we are basically running towards the edge)
-    leftAng = leftAng + 10;                                                     // increase the value of our leftAng value by 10
+    StepperLeft(1);                                                             // Move the stepper left 10 steps at a time (we are basically running towards the edge)
+    leftAng = leftAng + 1;                                                      // increase the value of our leftAng value by 10
     Serial2.print("Distance:\t");                                               // Printing for debugging
     Serial2.print(leftDist);
     Serial2.print("\tAngle:\t");
@@ -283,8 +279,8 @@ void MeasureObject() {
 
   while (leftDist > 900 && leftAng < 0) {                                       // The edge or limit has been detected. reverse direction until we see it again.
     leftDist = GetDistance();
-    StepperRight(20);
-    leftAng = leftAng - 20;
+    StepperRight(1);
+    leftAng = leftAng - 1;
     Serial2.print("Distance:\t");
     Serial2.print(leftDist);
     Serial2.print("\tAngle:\t");
@@ -292,7 +288,6 @@ void MeasureObject() {
     delay(50);
   }
 
-  TOFStepper.setSpeed(100);                                                     // Set the stepper to a very low speed
   while (GetDistance() < 900 && leftAng < 100) {                                // slowly walk ourselves to the edge again.
     leftDist = GetDistance();
     StepperLeft(1);
@@ -317,34 +312,33 @@ void MeasureObject() {
       delay(50);
     }
   }
+  for (int i = 0; i < leftAng; i++) {                                           // Bringing the stepper back to its starting position
+    StepperRight(1);
+  }
 
-  TOFStepper.setSpeed(600);                                                     // Set stepper back to fastest speed
-  StepperRight(leftAng);                                                        // Set it back to 0 by moving in the opposite direction the amount leftAng said it turned
-
-  // MEASURE RIGHT
+  //                                                            // MEASURE RIGHT
   rightAng = 0;                                                                 // Same thing just one the other side.
   Serial2.print("\n\nMeasuring right Side\n\n");
   while (GetDistance() < 900 && rightAng < 100) {
     rightDist = GetDistance();
-    StepperRight(10);
-    rightAng = rightAng + 10;
+    StepperRight(1);
+    rightAng = rightAng + 1;
     Serial2.print("Distance:\t");
     Serial2.print(rightDist);
     Serial2.print("\tAngle:\t");
     Serial2.println(rightAng);
     delay(50);
   }
-  while (GetDistance() > 900 && rightAng > 0) {                          //
+  while (GetDistance() > 900 && rightAng > 0) {                                 //
     rightDist = GetDistance();
-    StepperLeft(20);
-    rightAng = rightAng - 20;
+    StepperLeft(1);
+    rightAng = rightAng - 1;
     Serial2.print("Distance:\t");
     Serial2.print(rightDist);
     Serial2.print("\tAngle:\t");
     Serial2.println(rightAng);
     delay(50);
   }
-  TOFStepper.setSpeed(100);
   while (GetDistance() < 900 && rightAng < 100) {                          //
     rightDist = GetDistance();
     StepperRight(1);
@@ -370,9 +364,11 @@ void MeasureObject() {
     }
   }
 
+  for (int i = 0; i < rightAng; i++) {                                    // Bringing the stepper back to its starting position
+    StepperLeft(1);
+  }
 
-  TOFStepper.setSpeed(600);                                               // Seting stepper back to fast speed
-  StepperLeft(rightAng);
+  TOFStepper.setSpeed(600);                                               // Setting the stepper back to its fast speed
   FastCenter();                                                           // Centering the stepper since we are done with it
 
   Serial2.print("\n\nleftDist:\t");                                       // Printing for debugging
@@ -419,10 +415,10 @@ void MeasureObject() {
   Serial2.print("\nslopeDist3\t");
   Serial2.print(slopeDist3);
 
-  if (small == true) {                                                // Calculating small object slope
+  if (small == true) {                                                // Calculating small object slope variable
     slopeHeight2 = abs(downHeight - upHeight);                                 // We now have the opposite side of a 3rd right triangle whos hypotenuse is actually the slope itself, and whos adjacent side is paralell with our 0 degree line.
   }
-  else {                                                              // Calculating large object slope
+  else {                                                              // Calculating large object slope variable
     slopeHeight2 = abs(downHeight + upHeight);                                 // We didn't use downHeight for the actual height measurements, but it is usefull here for creating the final right triangle
   }
   Serial2.print("\nslopeHeight2\t");
@@ -434,7 +430,7 @@ void MeasureObject() {
   if (isnan(slope)) {
     Serial2.print("\nNAN SLOPE\n");
     slope = asin(slopeDist3 / slopeHeight2) * 180 / pi;
-//    slope = abs(90 - slope);
+    //    slope = abs(90 - slope);
   }
   Serial2.print("\nslope\t");
   Serial2.print(slope);
@@ -446,7 +442,7 @@ void MeasureObject() {
   arrayCounter = arrayCounter + 1;                                        // increase the counter of the array
   displayObjectArray();                                                   // display the arrays current values
 
-  if (arrayCounter = 10) {                                                // Check the cycle of the array and make a new one if necessary
+  if (arrayCounter >= 10) {                                               // Check the cycle of the array and make a new one if necessary
     arrayCounter = 0;
     Serial2.println("\t--- Object table full --- \n\t--- Creating new table---");
     for (int i = 0; i < 10; i++) {                                        // It doesn't really make a "new" one. Just sets the old one to zero. But we're saving data seperatly so it doesn't matter.
