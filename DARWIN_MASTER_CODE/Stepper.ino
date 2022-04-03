@@ -65,11 +65,13 @@ void FastCenter() {
   ServoPos(90);
   delay(50);
   TOFStepper.setSpeed(600);
+
   while (GetDistance() > 50) {      // Find first left side
     StepperLeft(20);
     delay(50);
   }
   StepperRight(30);
+  delay(50);
   TOFStepper.setSpeed(100);
   while (GetDistance() > 50) {      // Find first left side
     StepperLeft(1);
@@ -84,7 +86,6 @@ void FastCenter() {
   LevelTOF(0);
   delay(50);
 }
-
 
 
 
