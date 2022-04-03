@@ -55,6 +55,8 @@ void MeasureObject() {
   double rightDist = 0;
   double rightWidth = 0;
   double width = 0;
+  double angle = 0;
+  bool upOrDown = false;
 
   Serial2.print("LevelTOF();\n");///////////////////////////////////////////////////////probably take out
   LevelTOF(0);
@@ -63,11 +65,13 @@ void MeasureObject() {
   straightDist = GetDistance();
   straightAng = ReadServoInDeg();
 
-  if (straightDist > 900 || upAng > -50) {  // object is lower than sensor height
+  if (straightDist > 900) {  // object is lower than sensor height
     Serial2.print("\n\nMeasuring Height\n\n");
+    upOrDown = true;
     upAng = straightAng;
-    while (upDist > 900) {
-      upAng--;
+    upDist = straightDist;
+    while (upDist > 900 && upAng < 50) {
+      upAng++;
       upDist = GetDistance();
       ServoPos(upAng);
       Serial2.print("Distance:\t");
@@ -76,7 +80,7 @@ void MeasureObject() {
       Serial2.println(upAng);
       delay(100);
     }
-    straightDist = (upDist * cos(upAng)) * 180 / pi;
+    straightDist = abs((upDist * cos(upAng)));
     Serial2.print("\nupDist:\t");
     Serial2.print(upDist);
     Serial2.print("\tupAng\t");
@@ -85,7 +89,7 @@ void MeasureObject() {
     Serial2.println(straightDist);
 
 
-    downAng = (atan (235 / straightDist) * 180 / 3.14159265);
+    downAng = (atan (235 / straightDist) * 180 / pi);
     downAng = downAng - straightAng;
     ServoPos(downAng);
 
@@ -101,6 +105,7 @@ void MeasureObject() {
         downDist = GetDistance();
         Serial2.print("\tdownDist:\t");
         Serial2.print(downDist);
+        while (1);
         //////////////////////////////////////////////////////////////////////////////////potential infinate loop. break out after some time.
       }
     }
@@ -110,11 +115,11 @@ void MeasureObject() {
     Serial2.print("\n\nServoPos(downAng):");
     Serial2.print(downAng);
 
-    upperHeight = (upDist * sin(upAng) * 180 / pi);
+    upperHeight = abs((upDist * sin(upAng)));
     Serial2.print("\n\n\t\tUpper Height in mm: \t");
     Serial2.println(upperHeight);   // height in cm
 
-    lowerHeight = (downDist * sin(downAng) * 180 / pi) - upperHeight;
+    lowerHeight = abs((downDist * sin(downAng)) - upperHeight);
     Serial2.print("\n\n\t\tLower Height in mm: \t");
     Serial2.println(lowerHeight);   // height in cm
 
@@ -169,7 +174,7 @@ void MeasureObject() {
     Serial2.print("\n\nServoPos(downAng):");
     Serial2.print(downAng);
 
-    lowerHeight = ((downDist * sin(downAng * 180 / pi)  + (straightDist * cos(downAng * 180 / pi)))) / 2;     
+    lowerHeight = (abs((downDist * sin(downAng))  + abs((straightDist * cos(downAng))))) / 2;
     Serial2.print("\n\n\t\tLower Height in mm: \t");
     Serial2.println(lowerHeight);   // height in cm
 
@@ -226,7 +231,7 @@ void MeasureObject() {
     Serial2.print(upAng);
 
 
-    upperHeight = ((upDist * sin(upAng * 180 / pi) + (straightDist * cos(upAng * 180 / pi)))) / 2;
+    upperHeight = (abs(upDist * sin(upAng)) + (abs(straightDist * cos(upAng)))) / 2;
     Serial2.print("\n\n\t\tUpper Height in mm: \t");
     Serial2.println(upperHeight);   // height in cm
 
@@ -240,10 +245,11 @@ void MeasureObject() {
     delay(100);
 
 
+  }
     // measure left
     TOFStepper.setSpeed(600);
     Serial2.print("\n\nMeasuring Left Side\n\n");
-    while (GetDistance() < 900) {
+    while (GetDistance() < 900 && GetDistance() > 300) {
       leftDist = GetDistance();
       StepperLeft(10);
       leftAng = leftAng + 10;
@@ -253,7 +259,7 @@ void MeasureObject() {
       Serial2.println(leftAng);
       delay(50);
     }
-    while (GetDistance() > 900) {
+    while (GetDistance() > 900 || GetDistance () < 300) {
       leftDist = GetDistance();
       StepperRight(20);
       leftAng = leftAng - 20;
@@ -264,7 +270,7 @@ void MeasureObject() {
       delay(50);
     }
     TOFStepper.setSpeed(100);
-    while (GetDistance() < 900) {
+    while (GetDistance() < 900 && GetDistance() > 300) {
       leftDist = GetDistance();
       StepperLeft(1);
       leftAng = leftAng + 1;
@@ -274,7 +280,7 @@ void MeasureObject() {
       Serial2.println(leftAng);
       delay(50);
     }
-
+  
     if (leftDist > 900) {
       Serial2.print("\nOvershot!!! Reversing Direction\n");
       while (leftDist > 900) {
@@ -290,15 +296,16 @@ void MeasureObject() {
     }
     TOFStepper.setSpeed(600);
     StepperRight(leftAng);
-
+  
     straightDist = GetDistance();
     Serial2.print("NEW straightDist:\t");
     Serial2.print(straightDist);
     delay(100);
-
+  
     // measure right
+    rightAng = 0;
     Serial2.print("\n\nMeasuring right Side\n\n");
-    while (GetDistance() < 900) {
+    while (GetDistance() < 900 && GetDistance() > 300) {
       rightDist = GetDistance();
       StepperRight(10);
       rightAng = rightAng + 10;
@@ -308,7 +315,7 @@ void MeasureObject() {
       Serial2.println(rightAng);
       delay(50);
     }
-    while (GetDistance() > 900) {
+    while (GetDistance() > 900 || GetDistance() < 300) {
       rightDist = GetDistance();
       StepperLeft(20);
       rightAng = rightAng - 20;
@@ -319,7 +326,7 @@ void MeasureObject() {
       delay(50);
     }
     TOFStepper.setSpeed(100);
-    while (GetDistance() < 900) {
+    while (GetDistance() < 900 && GetDistance() > 300) {
       rightDist = GetDistance();
       StepperRight(1);
       rightAng = rightAng + 1;
@@ -329,7 +336,7 @@ void MeasureObject() {
       Serial2.println(rightAng);
       delay(50);
     }
-
+  
     if (rightDist > 900) {
       Serial2.print("\nOvershot!!! Reversing Direction\n");
       while (rightDist > 900) {
@@ -343,9 +350,9 @@ void MeasureObject() {
         delay(50);
       }
     }
-
+  
     TOFStepper.setSpeed(600);
-    StepperLeft(rightAng);
+    FastCenter();
     Serial2.print("\n\nleftDist:\t");
     Serial2.print(leftDist);
     Serial2.print("\tstraightDist:\t");
@@ -358,27 +365,23 @@ void MeasureObject() {
     Serial2.print(straightAng);
     Serial2.print("\tupAng\t");
     Serial2.print(rightAng);
-
-    leftWidth = leftDist * (sin(leftAng * 180 / pi));
-    rightWidth = rightDist * (sin(rightAng * 180 / pi));
+  
+    leftWidth = leftDist * (sin(leftAng ));
+    rightWidth = rightDist * (sin(rightAng));
     width = abs(leftWidth)  + abs(rightWidth);
-
+  
     Serial2.print("\n\n\t\t Object Width in cm: \t");
     Serial2.println(width / 10);   // height in cm
 
 
-
-
-
-
-
   objectWidth[arrayCounter] = width;
   objectHeight[arrayCounter] = height;
+
   arrayCounter = arrayCounter + 1;
   displayObjectArray();
   if (arrayCounter > 10) {
     arrayCounter = 0;
-    Serial2.println("\tObject table full --- Creating new table");
+    Serial2.println("\t--- Object table full --- \n\t--- Creating new table---");
     for (int i = 0; i < 10; i++) {
       objectWidth[i] = 0;
       objectHeight[i] = 0;
@@ -386,16 +389,15 @@ void MeasureObject() {
   }
 
   delay(5000);
-
 }
 
 
 
 void displayObjectArray() {
-  Serial2.println("\t---- Objects Detected ----");
+  Serial2.println("\n\t---- Objects Detected ----");
   Serial2.print("Object #\t");
   Serial2.print("Width\t");
-  Serial2.println("Height");
+  Serial2.print("Height\t");
 
   for (int i = 0; i < 10; i++)
   {
@@ -404,7 +406,7 @@ void displayObjectArray() {
     Serial2.print("\t");
     Serial2.print(objectWidth[i]);
     Serial2.print("\t");
-    Serial2.println(objectHeight[i]);
+    Serial2.print(objectHeight[i]);
   }
   delay(3000);
 }

@@ -69,6 +69,7 @@ float pi = 3.14159265;
 Adafruit_VL53L0X DarwinTOF = Adafruit_VL53L0X();    // Creating a new Adafruit_VL53L0X object named "DarwinTOF"
 int objectWidth[10];                             // width of objects found
 int objectHeight[10];                              // height of objects 
+int objectAngle[10];
 int arrayCounter = 0;
 // SCL - gray SDA - white
 
