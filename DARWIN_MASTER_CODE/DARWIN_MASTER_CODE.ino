@@ -89,5 +89,7 @@ int StepperSpeed = 600;                             // Speed of motor
 bool LorR = false;  // false for Left, True for right
 int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
 int centerOffset = 15;
-int fastCenter = 0;                                 
+int fastCenter = 0;    
+double leftAng = 0;
+double rightAng = 0;                             
 Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins
