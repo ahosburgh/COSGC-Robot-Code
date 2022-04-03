@@ -429,9 +429,13 @@ void MeasureObject() {
   Serial2.print(slopeHeight2);
 
 
-  
   slope = asin(slopeHeight2 / slopeDist3) * 180 / pi;                     // And this is the angle between the measured "top" and the measured "bottom" points      ang = arcsin h/d (but apperantly not cause arduino poopy)
-  if(slope = nan
+
+  if (isnan(slope)) {
+    Serial2.print("\nNAN SLOPE\n");
+    slope = asin(slopeDist3 / slopeHeight2) * 180 / pi;
+//    slope = abs(90 - slope);
+  }
   Serial2.print("\nslope\t");
   Serial2.print(slope);
 
@@ -442,7 +446,7 @@ void MeasureObject() {
   arrayCounter = arrayCounter + 1;                                        // increase the counter of the array
   displayObjectArray();                                                   // display the arrays current values
 
-  if (arrayCounter > 10) {                                                // Check the cycle of the array and make a new one if necessary
+  if (arrayCounter = 10) {                                                // Check the cycle of the array and make a new one if necessary
     arrayCounter = 0;
     Serial2.println("\t--- Object table full --- \n\t--- Creating new table---");
     for (int i = 0; i < 10; i++) {                                        // It doesn't really make a "new" one. Just sets the old one to zero. But we're saving data seperatly so it doesn't matter.
