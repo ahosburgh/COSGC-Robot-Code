@@ -56,13 +56,18 @@ void setCal() {
 
 // IMU Roll function
 // This function gets the current Roll from the IMU
-float IMURoll()
+bool IMURoll()
 {
   //NEW
   sensors_event_t event;
   DarwinIMU.getEvent(&event);
-  return (event.orientation.z + 8);
+  float roll = (event.orientation.z);
+  if (roll > -40 && roll < 40) {
+    return true;
+  }
+  return false;
 }
+
 
 // IMU Direction function
 // This function gets the current direction from the IMU

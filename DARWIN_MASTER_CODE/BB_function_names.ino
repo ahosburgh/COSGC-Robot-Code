@@ -6,7 +6,7 @@ void DCForward();
 void DCBack(int ReverseTime);
 void DCStop();
 
-void Navigation(int dir);
+bool Navigation(float dir);
 float IMUDirection();
 float IMUPitch();
 void setCal();

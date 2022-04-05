@@ -38,6 +38,8 @@ int fast = 255;
 #define DCmotorBackBI1 39
 #define DCmotorBackBI2 37
 
+#define body 1867             // The length of time it takes to move 1 body lenght in ideal conditions
+
 
 //********************LED Pins*******************LED Pins********************LED Pins********************
 // Defining LED pins for the taillights
@@ -71,6 +73,9 @@ int objectWidth[10];                             // width of objects found
 int objectHeight[10];                              // height of objects 
 int objectAngle[10];
 int arrayCounter = 0;
+double straightDist = 0;
+double leftWidth = 0;
+double rightWidth = 0;
 // SCL - gray SDA - white
 
 

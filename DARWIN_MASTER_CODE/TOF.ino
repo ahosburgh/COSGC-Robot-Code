@@ -29,7 +29,7 @@ int GetAvgDistance() {
       while (distance > 900 && currentTime - prevTime < 5000) {   // run this loop to correct for misfirings in the tof, but only for 5 seconds max.
         distance = measure.RangeMilliMeter;                       // because if we are "holding" an infinity reading, then we're probably looking at infintiy.
         Serial2.print("GetAveDistance error! Reading:\t");
-        Serial2.print(distance);
+        Serial2.println(distance);
         currentTime = millis();
       }
       if (distance > 900) {
