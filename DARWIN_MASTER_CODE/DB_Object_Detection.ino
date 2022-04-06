@@ -367,8 +367,9 @@ void MeasureObject() {
   slope = asin(slopeHeight2 / slopeDist3) * 180 / pi;                          // And this is the angle between the measured "top" and the measured "bottom" points      ang = arcsin h/d (but apperantly not cause arduino poopy)
 
   if (isnan(slope)) {
+    slope = abs(90 - asin(slopeDist3 / slopeHeight2) * 180 / pi);
     Serial2.print("\nNAN SLOPE\n");
-    slope = 90;
+    //slope = 90;
 
     //slope = asin(slopeDist3 / slopeHeight2) * 180 / pi;
     //slope = abs(90 - slope);
@@ -428,14 +429,13 @@ bool Sweep() {
   rightAng = 0;
   TOFStepper.setSpeed(600);
 
-
   //Forward 1111111111111
-  LevelTOF(21);
+  LevelTOF(18);
   delay(50);
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 251) {
+  if (distance < 450) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -443,20 +443,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println("0");
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println("0");
 
 
   // Left 26
-  LevelTOF(19);
+  LevelTOF(18);
   StepperLeft(26 - leftAng + rightAng);
   leftAng = 26;
   rightAng = 0;
   delay(50);
   distance = GetDistance();
-  if (distance < 276) {
+  if (distance < 475) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(leftAng);
     Serial2.print("\tDistance:\t");
@@ -464,20 +464,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(leftAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(leftAng);
 
 
   // Left 40
-  LevelTOF(27);
+  LevelTOF(30);
   StepperLeft(40 - leftAng + rightAng);
   delay(50);
   leftAng = 40;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 198) {
+  if (distance < 295) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(leftAng);
     Serial2.print("\tDistance:\t");
@@ -485,20 +485,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(leftAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(leftAng);
 
 
   // Left 26
-  LevelTOF(19);
+  LevelTOF(18);
   StepperLeft(26 - leftAng + rightAng);
   leftAng = 26;
   rightAng = 0;
   delay(50);
   distance = GetDistance();
-  if (distance < 276) {
+  if (distance < 475) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(leftAng);
     Serial2.print("\tDistance:\t");
@@ -506,10 +506,10 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(leftAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(leftAng);
   
   
   StepperRight(leftAng);    // recentering somewhat
@@ -517,11 +517,11 @@ bool Sweep() {
 
 
   //Forward 1111111111111
-  LevelTOF(21);
+  LevelTOF(18);
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 251) {
+  if (distance < 450) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -529,20 +529,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println("0");
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println("0");
 
 
   // Right 26
-  LevelTOF(19);
+  LevelTOF(18);
   StepperRight(26 - rightAng + leftAng);
   leftAng = 0;
   rightAng = 26;
   delay(50);
   distance = GetDistance();
-  if (distance < 276) {
+  if (distance < 475) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(rightAng);
     Serial2.print("\tDistance:\t");
@@ -550,20 +550,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(rightAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(rightAng);
 
 
   // Right 40
-  LevelTOF(27);
+  LevelTOF(30);
   StepperRight(40 - rightAng + leftAng);
   delay(50);
   leftAng = 0;
   rightAng = 40;
   distance = GetDistance();
-  if (distance < 198) {
+  if (distance < 295) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(rightAng);
     Serial2.print("\tDistance:\t");
@@ -571,20 +571,20 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(rightAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(rightAng);
 
 
   // Right 26
-  LevelTOF(19);
+  LevelTOF(18);
   StepperRight(26 - rightAng + leftAng);
   leftAng = 0;
   rightAng = 26;
   delay(50);
   distance = GetDistance();
-  if (distance < 276) {
+  if (distance < 475) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(rightAng);
     Serial2.print("\tDistance:\t");
@@ -592,10 +592,10 @@ bool Sweep() {
     DCStop();
     return true;
   }
-  Serial2.print("Distance:\t");
-  Serial2.print(distance);
-  Serial2.print("\tStepper Angle:\t");
-  Serial2.println(rightAng);
+//  Serial2.print("Distance:\t");
+//  Serial2.print(distance);
+//  Serial2.print("\tStepper Angle:\t");
+//  Serial2.println(rightAng);
 
   StepperLeft(rightAng);    // recentering somewhat
   delay(50);
