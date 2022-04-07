@@ -1,82 +1,8 @@
-bool Navigation(float dir) {
-  int tempValue = 0;
-  float currentDirection = IMUDirection();
-  float targetDirection = 0;
-
-  Serial2.print("Navigation Check On: \t");
-  Serial2.print(dir);
-  int switchCase = 0;
-  if (dir < 10) {
-    switchCase = 0;
-  }
-  else if (dir > 350) {
-    switchCase = 1;
-  }
-  else if (dir <= 350 && dir >= 10)
-  {
-    switchCase = 2;
-  }
-  switch (switchCase)
-  {
-    case 0:
-      tempValue = 360 - dir;
-      if (currentDirection < dir + 10 || currentDirection > tempValue - 10)
-      {
-        Serial2.print("\tIMU reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-        return true;
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
-        return false;
-      }
-      break;
-
-    case 1:
-      tempValue = 360 - dir;
-      if (currentDirection > dir - 10 || currentDirection < tempValue)
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-        return true;
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
-        return false;
-      }
-
-    case 2:
-      if (currentDirection > dir - 10 && currentDirection < dir + 10)
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = TRUE\t");
-        return true;
-      }
-      else
-      {
-        Serial2.print("\tIMU Reading: \t") ;
-        Serial2.print(currentDirection);
-        Serial2.println("\tNavigation = FALSE\t");
-        return false;
-      }
-      break;
-  }
-}
-
-
-
-
 void MoveForward(int dir, int distInTime) {
   Serial2.println("Start of move forward");
+  if (dir == GoldenDirection) {
+    Serial2.println("TOWARDS GOLDEN DIRECTION");
+  }
 
   int turnAng = 0;
   bool timeCheck = true;
@@ -97,6 +23,7 @@ void MoveForward(int dir, int distInTime) {
   bool navigation = Navigation(dir);
   bool roll = IMURoll();
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Clean
   if (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
     //DCForward();
     while (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
@@ -105,58 +32,194 @@ void MoveForward(int dir, int distInTime) {
         currentTime = millis();
       }
 
-      Serial2.print("Inside loop Moving Forward Towards: \t");
-      Serial2.println(dir);
+      Serial2.print("Moving Forward Towards: \t");
+      Serial2.print(dir);
+      Serial2.print("\t");
       sweep = Sweep();
       navigation = Navigation(dir);
       roll = IMURoll();
-    }
-    Serial2.println("Event Detected, Exiting Loop");
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Drift I put the drift inside the while because of reasons
 
-    if (sweep == true) {
-      if (leftAng > rightAng) {     // thanks to sweep, only one of these should be above 0 at any given time.
-        TurnLeft(leftAng);
-        Serial2.println("turn left");
 
-   
+      while (sweep == false && navigation == false && roll == true && currentTime - prevTime < distInTime) {
+        int switchCase = 0;
+        int tempValue = 0;
+        float currentDirection = IMUDirection();
+        float targetDirection = 0;
+        Serial2.print("Drifting Towards: \t");
+        Serial2.println(dir);
+        currentDirection = IMUDirection();
+
+        if (timeCheck == true) {
+          currentTime = millis();
+        }
+
+        if (dir < 5) {
+          switchCase = 0;
+        }
+        else if (dir > 355) {
+          switchCase = 1;
+        }
+        else if (dir <= 355 && dir >= 5) {
+          switchCase = 2;
+        }
+
+        switch (switchCase)
+        {
+          case 0:
+          Serial2.println("\n Case 0 \n");
+            tempValue = 360 - dir;
+            if (currentDirection < dir + 5 || currentDirection > tempValue - 5) {
+              Serial2.print("\tDrift Complete\n");
+            }
+            else {
+              if (currentDirection > dir + 5 && currentDirection < dir + 180) {
+                Serial2.print("\t   Drifting Left   \n");
+              }
+              else if (currentDirection < tempValue - 5 && currentDirection > tempValue - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+              }
+            }
+            break;
+
+          case 1:
+          Serial2.println("\n Case 1 \n");
+            tempValue = 360 - dir;
+            if (currentDirection > dir - 5 || currentDirection < tempValue + 5) {
+              Serial2.println("\tDrift Complete\n");
+            }
+            else {
+              if (currentDirection < dir - 5 && currentDirection > dir - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+              }
+              else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
+                Serial2.print("\t   Drifting Left   \n");
+              }
+            }
+
+
+          case 2:
+          Serial2.println("\n Case 3 \n");
+            tempValue = 360 - dir;
+            if (currentDirection > dir - 5 && currentDirection < dir + 5) {
+              Serial2.println("\tDrift Complete\t");
+            }
+            else {
+              if (currentDirection < dir - 5 || currentDirection > tempValue - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+              }
+              else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
+                Serial2.print("\t   Drifting Left   \n");
+              }
+            }
+            break;
+        }
+        sweep = Sweep();
+        navigation = Navigation(dir);
+        roll = IMURoll();
       }
-      else {
-        //TurnRight(rightAng);
-        Serial2.println("turn left");
-
-  
-      }
-      Avoidence();
     }
-    if (navigation == false) {
-      // If we are within 45 degrees of front
-      // drift
+  }
 
-      // else turn the angle we need to
+  Serial2.println("\nEvent Detected, Exiting Loop\n");
 
-      Serial2.println("Drift");
-  
-
+  if (sweep == true) {
+    if (leftAng > rightAng) {     // thanks to sweep, only one of these should be above 0 at any given time.
+      TurnLeft(leftAng);
+      Serial2.println("turn left to face object");
     }
-    if (roll == false) {
-      Serial2.println("IMURoll");
-  
-      //    DCBack(body);
-      //    TurnLeft(45);
-      //    int dir = IMUDirection();
-      //    MoveForward(dir, body);
-      //    TurnRight(45);
+    else {
+      TurnRight(rightAng);
+      Serial2.println("turn right to face object");
     }
+    Avoidence();
+    CenterRobot();
+  }
+
+  if (roll == false) {
+    Serial2.println("IMURoll");
+
+    //    DCBack(body);
+    //    TurnLeft(45);
+    //    int dir = IMUDirection();
+    //    MoveForward(dir, body);
+    //    TurnRight(45);
   }
 }
 
 
+bool Navigation(float dir) {
+  int tempValue = 0;
+  float currentDirection = IMUDirection();
+  float targetDirection = 0;
 
+  Serial2.print("Navigation Check On: \t");
+  Serial2.print(dir);
+  int switchCase = 0;
+  if (dir < 5) {
+    switchCase = 0;
+  }
+  else if (dir > 355) {
+    switchCase = 1;
+  }
+  else if (dir <= 355 && dir >= 5)
+  {
+    switchCase = 2;
+  }
+  switch (switchCase)
+  {
+    case 0:
+      tempValue = 360 - dir;
+      if (currentDirection < dir + 5 || currentDirection > tempValue - 5)
+      {
+        Serial2.print("\tIMU reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+        return true;
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        return false;
+      }
+      break;
 
+    case 1:
+      tempValue = 360 - dir;
+      if (currentDirection > dir - 5 || currentDirection < tempValue + 5)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+        return true;
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        return false;
+      }
 
-
-void Drift(int dir) {
-
+    case 2:
+      if (currentDirection > dir - 5 && currentDirection < dir + 5)
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = TRUE\t");
+        return true;
+      }
+      else
+      {
+        Serial2.print("\tIMU Reading: \t") ;
+        Serial2.print(currentDirection);
+        Serial2.println("\tNavigation = FALSE\t");
+        return false;
+      }
+      break;
+  }
 }
 
 
@@ -240,10 +303,10 @@ void TurnLeft(int deg)
     //      prevTime2 = currentTime;
     //      DCLeft();
     //    }
-    Serial2.print("Target Direction: \t");
-    Serial2.print(targetDirection);
-    Serial2.print("Current Direction: \t");
-    Serial2.println(IMUDirection());
+    //    Serial2.print("Target Direction: \t");
+    //    Serial2.print(targetDirection);
+    //    Serial2.print("Current Direction: \t");
+    //    Serial2.println(IMUDirection());
   }
 
   DCStop(); //Stops all DC motors
@@ -257,7 +320,7 @@ void TurnLeft(int deg)
 //TURN Right
 void TurnRight(int deg)
 {
-  Serial2.println("\n======== TurnLeft Function Successfully Called ======== \n");        // Printing for testing
+  Serial2.println("\n======== TurnRight Function Successfully Called ======== \n");        // Printing for testing
 
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   unsigned long prevTime2 = millis();      // Assigning variable to keep track of the time passing in milliseconds
@@ -279,7 +342,7 @@ void TurnRight(int deg)
 
   Serial2.print("\t Target Direction: \t");       // Printing for testing
   Serial2.println(targetDirection);
-  Serial2.println("\nBegin Turning Left\n");
+  Serial2.println("\nBegin Turning Right\n");
 
   //DCRight();
   while (Navigation(targetDirection) == false) {    // This while loop repeates untill the curentDirection has reached the target direction
@@ -333,10 +396,10 @@ void TurnRight(int deg)
     //      prevTime2 = currentTime;
     //      DCLeft();
     //    }
-    Serial2.print("\nTarget Direction: \t");
-    Serial2.print(targetDirection);
-    Serial2.print("Current Direction: \t");
-    Serial2.println(IMUDirection());
+    //    Serial2.print("\nTarget Direction: \t");
+    //    Serial2.print(targetDirection);
+    //    Serial2.print("Current Direction: \t");
+    //    Serial2.println(IMUDirection());
   }
 
   DCStop(); //Stops all DC motors
@@ -350,24 +413,25 @@ void TurnRight(int deg)
 
 void Avoidence() {
   int turnAng = 0;
-  int forward = body * 2;
+  int forward = body * 5;
   FastCenter();
   MeasureObject();
   if (leftWidth > rightWidth) {
-    turnAng = (atan(straightDist / (leftWidth + 1000))) * 180 / pi;
+    turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
     //DCBack(body);
     TurnRight(turnAng);
   }
   else {
-    turnAng = (atan(straightDist / (rightWidth + 1000))) * 180 / pi;
+    turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
     //DCBack(body);
     TurnRight(turnAng);
   }
+  turnAng = IMUDirection();
   MoveForward(turnAng, forward);
 }
 
 
-void centerRobot() {
+void CenterRobot() {
 
   int tempValue = 0;
   float currentDirection = IMUDirection();
@@ -377,13 +441,13 @@ void centerRobot() {
 
   int switchCase = 0;
 
-  if (GoldenDirection < 10) {
+  if (GoldenDirection < 5) {
     switchCase = 0;
   }
-  else if (GoldenDirection > 350) {
+  else if (GoldenDirection > 355) {
     switchCase = 1;
   }
-  else if (GoldenDirection <= 350 && GoldenDirection >= 10)
+  else if (GoldenDirection <= 355 && GoldenDirection >= 5)
   {
     switchCase = 2;
   }
@@ -392,7 +456,7 @@ void centerRobot() {
   {
     case 0:
       tempValue = 360 - GoldenDirection;
-      if (currentDirection < GoldenDirection + 10 || currentDirection > tempValue - 10)
+      if (currentDirection < GoldenDirection + 5 || currentDirection > tempValue - 5)
       {
         Serial2.print("\tIMU reading: \t") ;
         Serial2.print(currentDirection);
@@ -405,11 +469,11 @@ void centerRobot() {
         Serial2.print(currentDirection);
         Serial2.println("\tNavigation = FALSE\t");
 
-        if (currentDirection > GoldenDirection + 10 && currentDirection < GoldenDirection + 180) {
+        if (currentDirection > GoldenDirection + 5 && currentDirection < GoldenDirection + 180) {
           targetDirection = currentDirection - GoldenDirection;
           TurnLeft(targetDirection);
         }
-        else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
+        else if (currentDirection < tempValue - 5 && currentDirection > tempValue - 180) {
           targetDirection = tempValue - currentDirection;
           TurnRight(targetDirection);
         }
@@ -426,7 +490,7 @@ void centerRobot() {
 
     case 1:
       tempValue = 360 - GoldenDirection;
-      if (currentDirection > GoldenDirection - 10 || currentDirection < tempValue + 10)
+      if (currentDirection > GoldenDirection - 5 || currentDirection < tempValue + 5)
       {
         Serial2.print("\tIMU Reading: \t") ;
         Serial2.print(currentDirection);
@@ -439,11 +503,11 @@ void centerRobot() {
         Serial2.print(currentDirection);
         Serial2.println("\tNavigation = FALSE\t");
 
-        if (currentDirection < GoldenDirection - 10 && currentDirection > GoldenDirection - 180) {
+        if (currentDirection < GoldenDirection - 5 && currentDirection > GoldenDirection - 180) {
           targetDirection = GoldenDirection - currentDirection;
           TurnRight(targetDirection);
         }
-        else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+        else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
           targetDirection = currentDirection - tempValue;
           TurnLeft(targetDirection);
         }
@@ -459,7 +523,7 @@ void centerRobot() {
 
     case 2:
       tempValue = 360 - GoldenDirection;
-      if (currentDirection > GoldenDirection - 10 && currentDirection < GoldenDirection + 10)
+      if (currentDirection > GoldenDirection - 5 && currentDirection < GoldenDirection + 5)
       {
         Serial2.print("\tIMU Reading: \t") ;
         Serial2.print(currentDirection);
@@ -471,11 +535,11 @@ void centerRobot() {
         Serial2.print(currentDirection);
         Serial2.println("\tNavigation = FALSE\t");
 
-        if (currentDirection < GoldenDirection - 10 || currentDirection > tempValue - 180) {/////////////////////////////////////////////////////////////////////////////////////
+        if (currentDirection < GoldenDirection - 5 || currentDirection > tempValue - 180) {/////////////////////////////////////////////////////////////////////////////////////
           targetDirection = GoldenDirection - currentDirection;
           TurnRight(targetDirection);
         }
-        else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+        else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
           targetDirection = currentDirection - tempValue;
           TurnLeft(targetDirection);
         }

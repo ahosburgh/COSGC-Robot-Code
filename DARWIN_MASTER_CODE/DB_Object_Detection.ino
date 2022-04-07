@@ -25,30 +25,30 @@ bool ObjectDetection() {
 
 void MeasureObject() {
 
-  double straightAng =  0;
+  float straightAng =  0;
   straightDist = 0;
-  double straightHeight = 0;
-  double downAng = 0;
-  double downDist = 0;
-  double downHeight = 0;
-  double upAng = 0;
-  double upDist = 0;
-  double upHeight = 0;
-  double height = 0;
+  float straightHeight = 0;
+  float downAng = 0;
+  float downDist = 0;
+  float downHeight = 0;
+  float upAng = 0;
+  float upDist = 0;
+  float upHeight = 0;
+  float height = 0;
   leftAng = 0;                    // Global variable. Used by other functions.
-  double leftDist = 0;
+  float leftDist = 0;
   leftWidth = 0;
   rightAng = 0;                   // Global variable. Used by other functions.
-  double rightDist = 0;
+  float rightDist = 0;
   rightWidth = 0;
-  double width = 0;
-  double slopeDist1 = 0;
-  double slopeDist2 = 0;
-  double slopeDist3 = 0;
-  double slopeHeight1 = 0;
-  double slopeHeight2 = 0;
-  double slopeAng = 0;
-  double slope = 0;
+  float width = 0;
+  float slopeDist1 = 0;
+  float slopeDist2 = 0;
+  float slopeDist3 = 0;
+  float slopeHeight1 = 0;
+  float slopeHeight2 = 0;
+  float slopeAng = 0;
+  float slope = 0;
   bool small = false;                                                           // is the object small? are we running the small version of the code? true = yes;
 
   straightDist = GetDistance();                                                 // Measure the "straight" distance from the TOF sensor at a 0 degree angle
@@ -77,6 +77,7 @@ void MeasureObject() {
       ServoPos(upAng);
       delay(100);
     }
+    
     upDist = GetAvgDistance();                                                  // Get a GOOD measurement for the point we are looking at
     Serial2.print("Distance:\t");                                               // Printing for debugging
     Serial2.print(upDist);

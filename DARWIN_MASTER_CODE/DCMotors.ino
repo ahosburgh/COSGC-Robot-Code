@@ -1,57 +1,57 @@
 void DCDriftLeft()
 {
-      // Set speed of motors
-      analogWrite(DCmotorFrontPWMA, fast);   // Front Right
-      analogWrite(DCmotorFrontPWMB, slow);   // Front Left
-      analogWrite(DCmotorMiddlePWMA, fast);  // Middle Right
-      analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
-      analogWrite(DCmotorBackPWMA, fast);    // Back Right
-      analogWrite(DCmotorBackPWMB, slow);    // Back Left
+  // Set speed of motors
+  analogWrite(DCmotorFrontPWMA, fast);   // Front Right
+  analogWrite(DCmotorFrontPWMB, slow);   // Front Left
+  analogWrite(DCmotorMiddlePWMA, fast);  // Middle Right
+  analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
+  analogWrite(DCmotorBackPWMA, fast);    // Back Right
+  analogWrite(DCmotorBackPWMB, slow);    // Back Left
 
-      // All Right Motors move forward
-      digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward
-      digitalWrite(DCmotorFrontAI2, HIGH);
-      digitalWrite(DCmotorMiddleAI1, LOW);      // Middle Right Forward
-      digitalWrite(DCmotorMiddleAI2, HIGH);
-      digitalWrite(DCmotorBackAI1, LOW);        // Back Right Forward
-      digitalWrite(DCmotorBackAI2, HIGH);
+  // All Right Motors move forward
+  digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);      // Middle Right Forward
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);        // Back Right Forward
+  digitalWrite(DCmotorBackAI2, HIGH);
 
-      // All Left Motors move forward
-      digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
-      digitalWrite(DCmotorFrontBI2, HIGH);
-      digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
-      digitalWrite(DCmotorMiddleBI2, HIGH);
-      digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
-      digitalWrite(DCmotorBackBI2, HIGH);
+  // All Left Motors move forward
+  digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
+  digitalWrite(DCmotorBackBI2, HIGH);
 }
 
 
 
-void DCDriftRight(){
-  
-      // Set speed of motors.
-      analogWrite(DCmotorFrontPWMA, slow);   // Front Right
-      analogWrite(DCmotorFrontPWMB, fast);   // Front Left
-      analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
-      analogWrite(DCmotorMiddlePWMB, fast);  // Middle Left
-      analogWrite(DCmotorBackPWMA, slow);    // Back Right
-      analogWrite(DCmotorBackPWMB, fast);    // Back Left
+void DCDriftRight() {
 
-      // All Right Motors move forward
-      digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward
-      digitalWrite(DCmotorFrontAI2, HIGH);
-      digitalWrite(DCmotorMiddleAI1, LOW);      // Middle Right Forward
-      digitalWrite(DCmotorMiddleAI2, HIGH);
-      digitalWrite(DCmotorBackAI1, LOW);        // Back Right Forward
-      digitalWrite(DCmotorBackAI2, HIGH);
+  // Set speed of motors.
+  analogWrite(DCmotorFrontPWMA, slow);   // Front Right
+  analogWrite(DCmotorFrontPWMB, fast);   // Front Left
+  analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
+  analogWrite(DCmotorMiddlePWMB, fast);  // Middle Left
+  analogWrite(DCmotorBackPWMA, slow);    // Back Right
+  analogWrite(DCmotorBackPWMB, fast);    // Back Left
 
-      // All Left Motors move forward
-      digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
-      digitalWrite(DCmotorFrontBI2, HIGH);
-      digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
-      digitalWrite(DCmotorMiddleBI2, HIGH);
-      digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
-      digitalWrite(DCmotorBackBI2, HIGH);
+  // All Right Motors move forward
+  digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward
+  digitalWrite(DCmotorFrontAI2, HIGH);
+  digitalWrite(DCmotorMiddleAI1, LOW);      // Middle Right Forward
+  digitalWrite(DCmotorMiddleAI2, HIGH);
+  digitalWrite(DCmotorBackAI1, LOW);        // Back Right Forward
+  digitalWrite(DCmotorBackAI2, HIGH);
+
+  // All Left Motors move forward
+  digitalWrite(DCmotorFrontBI1, LOW);       // Front Left Forward
+  digitalWrite(DCmotorFrontBI2, HIGH);
+  digitalWrite(DCmotorMiddleBI1, LOW);      // Middle Left Forward
+  digitalWrite(DCmotorMiddleBI2, HIGH);
+  digitalWrite(DCmotorBackBI1, LOW);        // Back Left Forward
+  digitalWrite(DCmotorBackBI2, HIGH);
 }
 
 void DCLeft()
@@ -110,7 +110,7 @@ void DCRight()
 
 void DCForward()
 {
-  Serial.println("Moving forward");
+  Serial.println("DC Moving forward");
   LightsOut(); //Turns all lights off
 
   // Set speed of all motors to 100%
@@ -141,6 +141,9 @@ void DCForward()
 
 void DCBack(int ReverseTime)
 {
+  Serial2.print("Reversing for: \t");
+  Serial2.println(ReverseTime);
+
   int NumLed = 1; //Starts LED switch case ar 1
   unsigned long targetTime = millis();
   unsigned long currentTime = millis();

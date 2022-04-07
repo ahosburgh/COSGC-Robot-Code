@@ -73,9 +73,9 @@ int objectWidth[10];                             // width of objects found
 int objectHeight[10];                              // height of objects 
 int objectAngle[10];
 int arrayCounter = 0;
-double straightDist = 0;
-double leftWidth = 0;
-double rightWidth = 0;
+float straightDist = 0;
+float leftWidth = 0;
+float rightWidth = 0;
 // SCL - gray SDA - white
 
 
@@ -95,6 +95,6 @@ bool LorR = false;  // false for Left, True for right
 int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
 int centerOffset = 15;
 int fastCenter = 0;    
-double leftAng = 0;
-double rightAng = 0;                             
+float leftAng = 0;
+float rightAng = 0;                             
 Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins
