@@ -77,9 +77,11 @@ void MoveForward(int dir, int distInTime, int center) {
             else {
               if (currentDirection > dir + 5 && currentDirection < dir + 180) {
                 Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
               }
               else if (currentDirection < tempValue - 5 && currentDirection > tempValue - 180) {
                 Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
               }
             }
             break;
@@ -93,9 +95,11 @@ void MoveForward(int dir, int distInTime, int center) {
             else {
               if (currentDirection < dir - 5 && currentDirection > dir - 180) {
                 Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
               }
               else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
                 Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
               }
             }
 
@@ -109,9 +113,11 @@ void MoveForward(int dir, int distInTime, int center) {
             else {
               if (currentDirection < dir - 5 || currentDirection > tempValue - 180) {
                 Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
               }
               else if (currentDirection > tempValue + 5 && currentDirection < 180 - tempValue) {
                 Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
               }
             }
             break;
@@ -130,15 +136,19 @@ void MoveForward(int dir, int distInTime, int center) {
       TurnLeft(leftAng);
       Serial2.println("turn left to face object");
     }
-    else {
+    else if ( rightAng < leftAng)
+    {
       TurnRight(rightAng);
       Serial2.println("turn right to face object");
+    }
+    else {
+
     }
     Avoidence();
     CenterRobot();
   }
 
-
+  navigation = Navigation(dir);
   if (navigation == false) {
     CenterRobot();
   }
