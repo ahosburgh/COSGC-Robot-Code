@@ -7,6 +7,9 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
   bool timeCheck = true; //Variable to update time
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   unsigned long currentTime = millis();
+  unsigned long prevSensorTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
+  unsigned long currentSensorTime = millis();
+
 
   if (distInTime == 0) { //Continuously run function not for a set amount of time
     timeCheck = false;
@@ -31,7 +34,13 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       if (timeCheck == true) { //update time
         currentTime = millis();
       }
-
+      currentSensorTime = millis();
+      if (currentSensorTime - prevSensorTime > 10000) {
+        DCStop();
+        FastCenter();
+        prevSensorTime, currentSensorTime = millis();
+        DCForward();
+      }
       Serial2.print("Moving Forward Towards: \t");
       Serial2.print(dir);
       Serial2.print("\t");
@@ -49,11 +58,17 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         Serial2.println(dir);
         currentDirection = IMUDirection(); //update current direction
 
-        if (timeCheck == true) {
+        if (timeCheck == true) { //update time
           currentTime = millis();
         }
-
-        if (dir < 10) {
+        currentSensorTime = millis();
+        if (currentSensorTime - prevSensorTime > 10000) {
+          DCStop();
+          FastCenter();
+          prevSensorTime, currentSensorTime = millis();
+          DCForward();
+        }
+        if (dir < 10) { //determines which case to call depending on value of direction given
           switchCase = 0;
         }
         else if (dir > 350) {
@@ -67,16 +82,16 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         {
           case 0:
             Serial2.println("\n Case 0 \n");
-            tempValue = 360 - dir;
-            if (currentDirection < dir + 10 || currentDirection > tempValue - 10) {
+            tempValue = 360 - dir; //used to determine left side of direction
+            if (currentDirection < dir + 10 || currentDirection > tempValue - 10) { //within window?
               Serial2.print("\tDrift Complete\n");
               DCForward();
             }
-            else if (currentDirection > dir + 10 && currentDirection < dir + 180) {
+            else if (currentDirection > dir + 10 && currentDirection < dir + 180) { //too far right?
               Serial2.print("\t   Drifting Left   \n");
               DCDriftLeft();
             }
-            else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
+            else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) { //too far left?
               Serial2.print("\t   Drifting Right   \n");
               DCDriftRight();
             }
@@ -117,48 +132,48 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
             }
             break;
         }
-        sweep = Sweep();
-        navigation = Navigation(dir);
-        roll = IMURoll();
+        sweep = Sweep(); //calls sweep function
+        navigation = Navigation(dir); //calls navigation function
+        roll = IMURoll(); //calls roll function
       }
     }
   }
 
   Serial2.println("\nEvent Detected, Exiting Loop\n");
 
-  if (sweep == true) {
+  if (sweep == true) { //if an object is detected
     if (leftAng > rightAng) {     // thanks to sweep, only one of these should be above 0 at any given time.
-      TurnLeft(leftAng);
+      TurnLeft(leftAng); //turn left degree amount returned
       Serial2.println("turn left to face object");
     }
     else if ( rightAng < leftAng)
     {
-      TurnRight(rightAng);
+      TurnRight(rightAng); //turn right degree amount returned
       Serial2.println("turn right to face object");
     }
     else {
 
     }
-    Avoidence();
-    CenterRobot();
-    FastCenter();
+    Avoidence(); //calls avoidence function
+    CenterRobot(); //centers robot
+    FastCenter(); //fast centers sensor
   }
 
-  navigation = Navigation(dir);
-  if (navigation == false) {
-    CenterRobot();
+  navigation = Navigation(dir); //call navigation function
+  if (navigation == false) { //if we are not lined up with the direction
+    CenterRobot(); //center robot
   }
 
 
 
-  if (roll == false) {
+  if (roll == false) { //robot is tilting past allowed value(will roll over if continuing to move forward)
     Serial2.println("IMURoll");
 
-    DCBack(body);
-    TurnLeft(45);
-    int dir = IMUDirection();
-    MoveForward(dir, body, 0);
-    TurnRight(45);
+    DCBack(body); //back up a bodylength
+    TurnLeft(45); //turn left 45 degrees
+    int dir = IMUDirection(); //store direction as current heading
+    MoveForward(dir, body, 0); //move forward in the new direction for a bodylength of time and do not center
+    TurnRight(45); //turn right 45 degrees
   }
 }
 
@@ -430,21 +445,25 @@ void Avoidence() {
   int turnAng = 0;
   int forward = body * 2;
   FastCenter();
-  MeasureObject();
-  if (leftWidth > rightWidth) {
-    turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
-    DCBack(body);
-    TurnRight(turnAng);
+  if (GetDistance() < 900) {
+    MeasureObject();
+    if (leftWidth > rightWidth) {
+      turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
+      DCBack(body);
+      TurnRight(turnAng);
+    }
+    else {
+      turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
+      DCBack(body);
+      TurnRight(turnAng);
+    }
+    turnAng = IMUDirection();
+    MoveForward(turnAng, forward, 0);
   }
   else {
-    turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
-    DCBack(body);
-    TurnRight(turnAng);
+    return;
   }
-  turnAng = IMUDirection();
-  MoveForward(turnAng, forward, 0);
 }
-
 
 void CenterRobot() {
 
