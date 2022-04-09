@@ -1,4 +1,4 @@
-void MoveForward(int dir, int distInTime) {
+void MoveForward(int dir, int distInTime, int center) {
   Serial2.println("Start of move forward");
   if (dir == GoldenDirection) {
     Serial2.println("TOWARDS GOLDEN DIRECTION");
@@ -16,8 +16,10 @@ void MoveForward(int dir, int distInTime) {
     currentTime = 0;
   }
 
-  FastCenter();
-  delay(100);
+  if (center == 1) {
+    FastCenter();
+    delay(100);
+  }
 
   bool sweep = Sweep();
   bool navigation = Navigation(dir);
@@ -25,7 +27,7 @@ void MoveForward(int dir, int distInTime) {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Clean
   if (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
-    //DCForward();
+    DCForward();
     while (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
 
       if (timeCheck == true) {
@@ -67,7 +69,7 @@ void MoveForward(int dir, int distInTime) {
         switch (switchCase)
         {
           case 0:
-          Serial2.println("\n Case 0 \n");
+            Serial2.println("\n Case 0 \n");
             tempValue = 360 - dir;
             if (currentDirection < dir + 5 || currentDirection > tempValue - 5) {
               Serial2.print("\tDrift Complete\n");
@@ -83,7 +85,7 @@ void MoveForward(int dir, int distInTime) {
             break;
 
           case 1:
-          Serial2.println("\n Case 1 \n");
+            Serial2.println("\n Case 1 \n");
             tempValue = 360 - dir;
             if (currentDirection > dir - 5 || currentDirection < tempValue + 5) {
               Serial2.println("\tDrift Complete\n");
@@ -99,7 +101,7 @@ void MoveForward(int dir, int distInTime) {
 
 
           case 2:
-          Serial2.println("\n Case 3 \n");
+            Serial2.println("\n Case 3 \n");
             tempValue = 360 - dir;
             if (currentDirection > dir - 5 && currentDirection < dir + 5) {
               Serial2.println("\tDrift Complete\t");
@@ -135,6 +137,13 @@ void MoveForward(int dir, int distInTime) {
     Avoidence();
     CenterRobot();
   }
+
+
+  if (navigation == false) {
+    CenterRobot();
+  }
+
+
 
   if (roll == false) {
     Serial2.println("IMURoll");
@@ -243,7 +252,7 @@ void TurnLeft(int deg)
   Serial2.print("\n Starting Direction: \t");     // Printing for testing
   Serial2.print(startingDirection);
 
-  if (targetDirection < 0) {               // Calculating the target position if it goes over the -180 mark
+  if (targetDirection < 0) {                      // Calculating the target position if it goes over the -180 mark
     targetDirection = 360 + targetDirection;
   }
 
@@ -251,7 +260,7 @@ void TurnLeft(int deg)
   Serial2.println(targetDirection);
   Serial2.println("\nBegin Turning Left\n");
 
-  //DCLeft();
+  DCLeft();
   while (Navigation(targetDirection) == false) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis();
     //Left turn signal LED animation
@@ -344,7 +353,7 @@ void TurnRight(int deg)
   Serial2.println(targetDirection);
   Serial2.println("\nBegin Turning Right\n");
 
-  //DCRight();
+  DCRight();
   while (Navigation(targetDirection) == false) {    // This while loop repeates untill the curentDirection has reached the target direction
     unsigned long currentTime = millis();
     //Right turn signal LED animation
@@ -413,21 +422,21 @@ void TurnRight(int deg)
 
 void Avoidence() {
   int turnAng = 0;
-  int forward = body * 5;
+  int forward = body * 2;
   FastCenter();
   MeasureObject();
   if (leftWidth > rightWidth) {
     turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
-    //DCBack(body);
+    DCBack(body);
     TurnRight(turnAng);
   }
   else {
     turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
-    //DCBack(body);
+    DCBack(body);
     TurnRight(turnAng);
   }
   turnAng = IMUDirection();
-  MoveForward(turnAng, forward);
+  MoveForward(turnAng, forward, 0);
 }
 
 
