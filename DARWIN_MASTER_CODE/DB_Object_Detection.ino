@@ -436,7 +436,7 @@ bool Sweep() {
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 750) {
+  if (distance < 600) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -452,7 +452,7 @@ bool Sweep() {
   rightAng = 0;
   delay(50);
   distance = GetDistance();
-  if (distance < 750) {
+  if (distance < 600) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(leftAng);
     Serial2.print("\tDistance:\t");
@@ -470,7 +470,7 @@ bool Sweep() {
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 750) {
+  if (distance < 600) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -486,7 +486,7 @@ bool Sweep() {
   rightAng = 26;
   delay(50);
   distance = GetDistance();
-  if (distance < 750) {
+  if (distance < 600) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(rightAng);
     Serial2.print("\tDistance:\t");
