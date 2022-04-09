@@ -1,54 +1,55 @@
-void MoveForward(int dir, int distInTime, int center) { //Function takes in a direction, an amount of time to move forward, and if you want to fast center(1) or not(0)
+void MoveForward(int dir, int distInTime, int center) {
   Serial2.println("Start of move forward");
-  if (dir == GoldenDirection) { //Moving towards golden direction
+  if (dir == GoldenDirection) {
     Serial2.println("TOWARDS GOLDEN DIRECTION");
   }
 
-  bool timeCheck = true; //Variable to update time
+  bool timeCheck = true;
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   unsigned long currentTime = millis();
 
-  if (distInTime == 0) { //Continuously run function not for a set amount of time
+  if (distInTime == 0) {
     timeCheck = false;
     distInTime = 1;
     prevTime = 0;
     currentTime = 0;
   }
 
-  if (center == 1) { //fast center
+  if (center == 1) {
     FastCenter();
     delay(100);
   }
 
-  bool sweep = Sweep();  //run sweep function and store result
-  bool navigation = Navigation(dir); //run navigation function and store result
-  bool roll = IMURoll(); //run roll function and store result
+  bool sweep = Sweep();
+  bool navigation = Navigation(dir);
+  bool roll = IMURoll();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Clean
-  if (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) { //If no issues are present
-    DCForward(); //moves rover forward
-    while (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) { //while there are no issues
-      if (timeCheck == true) { //update time
+  if (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
+    DCForward();
+    while (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) {
+
+      if (timeCheck == true) {
         currentTime = millis();
       }
 
       Serial2.print("Moving Forward Towards: \t");
       Serial2.print(dir);
       Serial2.print("\t");
-      sweep = Sweep(); //run sweep function
-      navigation = Navigation(dir); //run navigation function
-      roll = IMURoll(); //run roll function
+      sweep = Sweep();
+      navigation = Navigation(dir);
+      roll = IMURoll();
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Drift I put the drift inside the while because of reasons
 
 
-      while (sweep == false && navigation == false && roll == true && currentTime - prevTime < distInTime) { //drift function(No longer moving towards golden direction)
-        int switchCase = 0; //start switch case 0
+      while (sweep == false && navigation == false && roll == true && currentTime - prevTime < distInTime) {
+
+        int switchCase = 0;
         int tempValue = 0;
-        float currentDirection = IMUDirection(); //update current direction
+        float currentDirection = IMUDirection();
         float targetDirection = 0;
         Serial2.print("Drifting Towards: \t");
         Serial2.println(dir);
-        currentDirection = IMUDirection();
 
         if (timeCheck == true) {
           currentTime = millis();
@@ -72,13 +73,15 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
             if (currentDirection < dir + 10 || currentDirection > tempValue - 10) {
               Serial2.print("\tDrift Complete\n");
             }
-            else if (currentDirection > dir + 10 && currentDirection < dir + 180) {
-              Serial2.print("\t   Drifting Left   \n");
-              DCDriftLeft();
-            }
-            else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
-              Serial2.print("\t   Drifting Right   \n");
-              DCDriftRight();
+            else {
+              if (currentDirection > dir + 10 && currentDirection < dir + 180) {
+                Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
+              }
+              else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
+              }
             }
             break;
 
@@ -88,30 +91,33 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
             if (currentDirection > dir - 10 || currentDirection < tempValue + 10) {
               Serial2.println("\tDrift Complete\n");
             }
-            else if (currentDirection < dir - 10 && currentDirection > dir - 180) {
-              Serial2.print("\t   Drifting Right   \n");
-              DCDriftRight();
+            else {
+              if (currentDirection < dir - 10 && currentDirection > dir - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
+              }
+              else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+                Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
+              }
             }
-            else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
-              Serial2.print("\t   Drifting Left   \n");
-              DCDriftLeft();
-            }
-            break;
 
 
           case 2:
-            Serial2.println("\n Case 3 \n");
+            Serial2.println("\n Case 2 \n");
             tempValue = 360 - dir;
             if (currentDirection > dir - 10 && currentDirection < dir + 10) {
               Serial2.println("\tDrift Complete\t");
             }
-            else if (currentDirection < dir - 10 || currentDirection > tempValue - 180) {
-              Serial2.print("\t   Drifting Right   \n");
-              DCDriftRight();
-            }
-            else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
-              Serial2.print("\t   Drifting Left   \n");
-              DCDriftLeft();
+            else {
+              if (currentDirection < dir - 10 || currentDirection > tempValue - 180) {
+                Serial2.print("\t   Drifting Right   \n");
+                DCDriftRight();
+              }
+              else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+                Serial2.print("\t   Drifting Left   \n");
+                DCDriftLeft();
+              }
             }
             break;
         }
@@ -139,15 +145,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
     }
     Avoidence();
     CenterRobot();
-    FastCenter();
   }
-
-  navigation = Navigation(dir);
-  if (navigation == false) {
-    CenterRobot();
-  }
-
-
 
   if (roll == false) {
     Serial2.println("IMURoll");
