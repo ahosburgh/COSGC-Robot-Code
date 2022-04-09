@@ -96,5 +96,5 @@ int stepperAngle = 0;                               // A global counter for dete
 int centerOffset = 15;
 int fastCenter = 0;    
 float leftAng = 0;
-float rightAng = 0;                             
+float rightAng = 0;                           
 Stepper TOFStepper(steps, A8, A10, A9, A11);        // Creating Stepper object named TOFStepper and defining the steppers pins

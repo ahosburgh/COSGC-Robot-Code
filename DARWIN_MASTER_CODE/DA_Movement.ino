@@ -4,7 +4,6 @@ void MoveForward(int dir, int distInTime, int center) {
     Serial2.println("TOWARDS GOLDEN DIRECTION");
   }
 
-  int turnAng = 0;
   bool timeCheck = true;
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   unsigned long currentTime = millis();
@@ -44,13 +43,13 @@ void MoveForward(int dir, int distInTime, int center) {
 
 
       while (sweep == false && navigation == false && roll == true && currentTime - prevTime < distInTime) {
+
         int switchCase = 0;
         int tempValue = 0;
         float currentDirection = IMUDirection();
         float targetDirection = 0;
         Serial2.print("Drifting Towards: \t");
         Serial2.println(dir);
-        currentDirection = IMUDirection();
 
         if (timeCheck == true) {
           currentTime = millis();
@@ -89,7 +88,7 @@ void MoveForward(int dir, int distInTime, int center) {
           case 1:
             Serial2.println("\n Case 1 \n");
             tempValue = 360 - dir;
-            if (currentDirection > dir - 10 || currentDirection < tempValue + 5) {
+            if (currentDirection > dir - 10 || currentDirection < tempValue + 10) {
               Serial2.println("\tDrift Complete\n");
             }
             else {
@@ -105,7 +104,7 @@ void MoveForward(int dir, int distInTime, int center) {
 
 
           case 2:
-            Serial2.println("\n Case 3 \n");
+            Serial2.println("\n Case 2 \n");
             tempValue = 360 - dir;
             if (currentDirection > dir - 10 && currentDirection < dir + 10) {
               Serial2.println("\tDrift Complete\t");
@@ -146,24 +145,16 @@ void MoveForward(int dir, int distInTime, int center) {
     }
     Avoidence();
     CenterRobot();
-    FastCenter();
   }
-
-  navigation = Navigation(dir);
-  if (navigation == false) {
-    CenterRobot();
-  }
-
-
 
   if (roll == false) {
     Serial2.println("IMURoll");
 
-        DCBack(body);
-        TurnLeft(45);
-        int dir = IMUDirection();
-        MoveForward(dir, body, 0);
-        TurnRight(45);
+    DCBack(body);
+    TurnLeft(45);
+    int dir = IMUDirection();
+    MoveForward(dir, body, 0);
+    TurnRight(45);
   }
 }
 
