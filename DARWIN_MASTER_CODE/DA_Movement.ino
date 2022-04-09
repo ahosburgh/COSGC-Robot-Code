@@ -34,12 +34,12 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       if (timeCheck == true) { //update time
         currentTime = millis();
       }
-      currentSensorTime = millis();
-      if (currentSensorTime - prevSensorTime > 10000) {
-        DCStop();
-        FastCenter();
-        prevSensorTime, currentSensorTime = millis();
-        DCForward();
+      currentSensorTime = millis(); //update currentSensorTime
+      if (currentSensorTime - prevSensorTime > 10000) { //if 10 seconds has passed since last time prevSensorTime was updated
+        DCStop(); //Stop the rover
+        FastCenter(); //center the sensor
+        prevSensorTime = millis(); //update prevSensorTime
+        DCForward(); //Go back to moving forward
       }
       Serial2.print("Moving Forward Towards: \t");
       Serial2.print(dir);
@@ -61,12 +61,12 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         if (timeCheck == true) { //update time
           currentTime = millis();
         }
-        currentSensorTime = millis();
-        if (currentSensorTime - prevSensorTime > 10000) {
-          DCStop();
-          FastCenter();
-          prevSensorTime, currentSensorTime = millis();
-          DCForward();
+        currentSensorTime = millis(); //update currentSensorTime
+        if (currentSensorTime - prevSensorTime > 10000) { //if 10 seconds has passed since last time prevSensorTime was updated
+          DCStop(); //Stop the rover
+          FastCenter(); //center the sensor
+          prevSensorTime = millis(); //update prevSensorTime
+          DCForward(); //Go back to moving forward
         }
         if (dir < 10) { //determines which case to call depending on value of direction given
           switchCase = 0;
