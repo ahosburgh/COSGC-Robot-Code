@@ -1,11 +1,10 @@
-void MoveForward(int dir, int distInTime, int center) {
+void MoveForward(int dir, int distInTime, int center) { //Function takes in a direction, an amount of time to move forward, and if you want to fast center(1) or not(0)
   Serial2.println("Start of move forward");
-  if (dir == GoldenDirection) {
+  if (dir == GoldenDirection) { //Moving towards golden direction
     Serial2.println("TOWARDS GOLDEN DIRECTION");
   }
 
-  int turnAng = 0;
-  bool timeCheck = true;
+  bool timeCheck = true; //Variable to update time
   unsigned long prevTime = millis();      // Assigning variable to keep track of the time passing in milliseconds
   unsigned long currentTime = millis();
 
@@ -74,34 +73,31 @@ void MoveForward(int dir, int distInTime, int center) {
             if (currentDirection < dir + 10 || currentDirection > tempValue - 10) {
               Serial2.print("\tDrift Complete\n");
             }
-            else {
-              if (currentDirection > dir + 10 && currentDirection < dir + 180) {
-                Serial2.print("\t   Drifting Left   \n");
-                DCDriftLeft();
-              }
-              else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
-                Serial2.print("\t   Drifting Right   \n");
-                DCDriftRight();
-              }
+            else if (currentDirection > dir + 10 && currentDirection < dir + 180) {
+              Serial2.print("\t   Drifting Left   \n");
+              DCDriftLeft();
+            }
+            else if (currentDirection < tempValue - 10 && currentDirection > tempValue - 180) {
+              Serial2.print("\t   Drifting Right   \n");
+              DCDriftRight();
             }
             break;
 
           case 1:
             Serial2.println("\n Case 1 \n");
             tempValue = 360 - dir;
-            if (currentDirection > dir - 10 || currentDirection < tempValue + 5) {
+            if (currentDirection > dir - 10 || currentDirection < tempValue + 10) {
               Serial2.println("\tDrift Complete\n");
             }
-            else {
-              if (currentDirection < dir - 10 && currentDirection > dir - 180) {
-                Serial2.print("\t   Drifting Right   \n");
-                DCDriftRight();
-              }
-              else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
-                Serial2.print("\t   Drifting Left   \n");
-                DCDriftLeft();
-              }
+            else if (currentDirection < dir - 10 && currentDirection > dir - 180) {
+              Serial2.print("\t   Drifting Right   \n");
+              DCDriftRight();
             }
+            else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+              Serial2.print("\t   Drifting Left   \n");
+              DCDriftLeft();
+            }
+            break;
 
 
           case 2:
@@ -110,15 +106,13 @@ void MoveForward(int dir, int distInTime, int center) {
             if (currentDirection > dir - 10 && currentDirection < dir + 10) {
               Serial2.println("\tDrift Complete\t");
             }
-            else {
-              if (currentDirection < dir - 10 || currentDirection > tempValue - 180) {
-                Serial2.print("\t   Drifting Right   \n");
-                DCDriftRight();
-              }
-              else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
-                Serial2.print("\t   Drifting Left   \n");
-                DCDriftLeft();
-              }
+            else if (currentDirection < dir - 10 || currentDirection > tempValue - 180) {
+              Serial2.print("\t   Drifting Right   \n");
+              DCDriftRight();
+            }
+            else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
+              Serial2.print("\t   Drifting Left   \n");
+              DCDriftLeft();
             }
             break;
         }
@@ -159,11 +153,11 @@ void MoveForward(int dir, int distInTime, int center) {
   if (roll == false) {
     Serial2.println("IMURoll");
 
-        DCBack(body);
-        TurnLeft(45);
-        int dir = IMUDirection();
-        MoveForward(dir, body, 0);
-        TurnRight(45);
+    DCBack(body);
+    TurnLeft(45);
+    int dir = IMUDirection();
+    MoveForward(dir, body, 0);
+    TurnRight(45);
   }
 }
 
