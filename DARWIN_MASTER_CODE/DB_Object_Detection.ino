@@ -422,6 +422,114 @@ void displayObjectArray() {
 }
 
 
+
+
+bool MovingSweep() {
+
+  // Manually call a FastCenter() before running Sweep
+  int triggerDist = 550;
+  int distance = 0;
+  leftAng = 0;
+  rightAng = 0;
+  TOFStepper.setSpeed(600);
+
+  switch (stepperCounter) {
+    case 0:
+      //Forward 1111111111111
+      stepperCounter = 1;
+      LevelTOF(10);
+      delay(50);
+      leftAng = 0;
+      rightAng = 0;
+      distance = GetDistance();
+      if (distance < triggerDist) {
+        Serial2.print("\nObject found at angle:\t");
+        Serial2.print("0");
+        Serial2.print("\tDistance:\t");
+        Serial2.println(distance);
+        DCStop();
+        return true;
+      }
+      else {
+        return false;
+      }
+      break;
+
+    case 1:
+      stepperCounter = 2;
+      // Left 26
+      LevelTOF(10);
+      StepperLeft(26 - leftAng + rightAng);
+      leftAng = 26;
+      rightAng = 0;
+      delay(50);
+      distance = GetDistance();
+      if (distance < triggerDist) {
+        Serial2.print("\nObject found at angle:\t");
+        Serial2.print(leftAng);
+        Serial2.print("\tDistance:\t");
+        Serial2.println(distance);
+        DCStop();
+        return true;
+      }
+      else {
+        return false;
+      }
+      StepperRight(leftAng);    // recentering somewhat
+      delay(50);
+      break;
+
+    case 2:
+      stepperCounter = 3;
+      //Forward 1111111111111
+      LevelTOF(10);
+      leftAng = 0;
+      rightAng = 0;
+      distance = GetDistance();
+      if (distance < triggerDist) {
+        Serial2.print("\nObject found at angle:\t");
+        Serial2.print("0");
+        Serial2.print("\tDistance:\t");
+        Serial2.println(distance);
+        DCStop();
+        return true;
+      }
+      else {
+        return false;
+      }
+      break;
+
+    case 3:
+      stepperCounter = 4;
+      // Right 26
+      LevelTOF(10);
+      StepperRight(26 - rightAng + leftAng);
+      leftAng = 0;
+      rightAng = 26;
+      delay(50);
+      distance = GetDistance();
+      if (distance < triggerDist) {
+        Serial2.print("\nObject found at angle:\t");
+        Serial2.print(rightAng);
+        Serial2.print("\tDistance:\t");
+        Serial2.println(distance);
+        DCStop();
+        return true;
+      }
+      else {
+        return false;
+      }
+
+      StepperLeft(rightAng);    // recentering somewhat
+      delay(50);
+      stepperCounter = 0;
+      break;
+  }
+}
+
+
+
+
 bool Sweep() {
 
   // Manually call a FastCenter() before running Sweep

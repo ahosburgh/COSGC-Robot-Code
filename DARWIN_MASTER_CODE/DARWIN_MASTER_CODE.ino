@@ -92,6 +92,7 @@ int TOFServoPos = 90;           // Creating int named TOF_Y_Pos and setting it t
 #define degree 5.625                                // Setting the number of degrees the motor rotates per step
 int StepperSpeed = 600;                             // Speed of motor
 bool LorR = false;  // false for Left, True for right
+int stepperCounter = 0;
 int stepperAngle = 0;                               // A global counter for determining the angle of the stepper motor 
 int centerOffset = 15;
 int fastCenter = 0;    

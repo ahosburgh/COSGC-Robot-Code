@@ -45,7 +45,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       Serial2.print("Moving Forward Towards: \t");
       Serial2.print(dir);
       Serial2.print("\t");
-      sweep = Sweep(); //run sweep function
+      sweep = MovingSweep(); //run sweep function
       navigation = Navigation(dir); //run navigation function
       roll = IMURoll(); //run roll function
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Drift I put the drift inside the while because of reasons
@@ -134,7 +134,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
             }
             break;
         }
-        sweep = Sweep(); //calls sweep function
+        sweep = MovingSweep(); //calls sweep function
         navigation = Navigation(dir); //calls navigation function
         roll = IMURoll(); //calls roll function
       }
@@ -144,6 +144,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
   Serial2.println("\nEvent Detected, Exiting Loop\n");
 
   if (sweep == true) { //if an object is detected
+    Serial2.println("\nsweep = true\n");
     if (leftAng > rightAng) {     // thanks to sweep, only one of these should be above 0 at any given time.
       TurnLeft(leftAng); //turn left degree amount returned
       Serial2.println("turn left to face object");
@@ -158,19 +159,10 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
     }
     Avoidence(); //calls avoidence function
     CenterRobot(); //centers robot
-    FastCenter(); //fast centers sensor
   }
-
-  navigation = Navigation(dir); //call navigation function
-  if (navigation == false) { //if we are not lined up with the direction
-    CenterRobot(); //center robot
-  }
-
-
 
   if (roll == false) { //robot is tilting past allowed value(will roll over if continuing to move forward)
-    Serial2.println("IMURoll");
-
+    Serial2.println("\nroll = false\n");
     DCBack(body); //back up a bodylength
     TurnLeft(45); //turn left 45 degrees
     int dir = IMUDirection(); //store direction as current heading
@@ -564,7 +556,7 @@ void CenterRobot() {
         }
       }
       break;
-      
+
     case 2:
       tempValue = 360 - GoldenDirection;
       if (currentDirection > GoldenDirection - 10 && currentDirection < GoldenDirection + 10)

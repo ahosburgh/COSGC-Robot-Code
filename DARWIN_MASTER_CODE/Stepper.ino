@@ -61,6 +61,7 @@ void CenterStepper() {
 }
 
 void FastCenter() {
+  DCStop();
   Serial2.println("\nFast Center\n");
   ServoPos(90);
   delay(50);
