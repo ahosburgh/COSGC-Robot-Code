@@ -77,8 +77,8 @@ void MeasureObject() {
       ServoPos(upAng);
       delay(100);
     }
-    
-    upDist = GetAvgDistance();                                                  // Get a GOOD measurement for the point we are looking at
+
+    upDist = GetDistance();                                                  // Get a GOOD measurement for the point we are looking at
     Serial2.print("Distance:\t");                                               // Printing for debugging
     Serial2.print(upDist);
     Serial2.print("\tAngle:\t");
@@ -107,7 +107,7 @@ void MeasureObject() {
     ServoPos(downAng - straightAng);                                            // subtract straightAng from downAng to get the actual value to set the servo to.
     delay(100);                                                                 // wait for movement to complete
 
-    downDist = GetAvgDistance();                                                // Get a GOOD distance value for downDist. This will be a point near the bottom of the object.
+    downDist = GetDistance();                                                // Get a GOOD distance value for downDist. This will be a point near the bottom of the object.
 
     if (downDist > 900) {                                                       // If we do all of that and downDist is STILL infinity
       Serial2.print("\n\nPotential overhang discovered\n\n");                   // We might be looking at a hole or an overhang
@@ -135,7 +135,7 @@ void MeasureObject() {
   }
   else                                                          // BIG MEASURE HEIGHT
   {
-    straightDist = GetAvgDistance();
+    straightDist = GetDistance();
     Serial2.print("straightDist:\t");                                           // Printing for debugging
     Serial2.print(straightDist);
     Serial2.print("\tstraightAng:\t");
@@ -148,7 +148,7 @@ void MeasureObject() {
     ServoPos(downAng - straightAng);                                            // subtract straightAng from downAng to get the actual value to set the servo to.
     delay(100);                                                                 // wait for movement to complete);
 
-    downDist = GetAvgDistance();                                                // Get a distance value for downDist. This will be a point near the bottom of the object.
+    downDist = GetDistance();                                                // Get a distance value for downDist. This will be a point near the bottom of the object.
     if (downDist > 900) {                                                       // If we do all of that and downDist is STILL infinity
       Serial2.print("\n\nPotential overhang discovered\n\n");                   // We might be looking at a hole or an overhang
       downDist =  abs(straightHeight * sin(downAng));                                // Set downDist by using the straightHeight value as the opposite side and the angle the servo is at to approximate a downwards distance to the bottom of the object.
@@ -200,7 +200,7 @@ void MeasureObject() {
       ServoPos(-upAng);
       delay(100);
     }
-    upDist = GetAvgDistance();                                                  // Getting a GOOD final measurement for upDist
+    upDist = GetDistance();                                                  // Getting a GOOD final measurement for upDist
     Serial2.print("\nupDist:\t");                                               // Printing for debugging
     Serial2.print(upDist);
     Serial2.print("\tupAng\t");
@@ -267,7 +267,7 @@ void MeasureObject() {
     delay(50);
   }
   Serial2.print("\nObject Detected - Distance:\t");
-  leftDist = GetAvgDistance();
+  leftDist = GetDistance();
   Serial2.println(leftDist);
 
   for (int i = 0; i < leftAng; i++) {                                           // Bringing the stepper back to its starting position
@@ -305,7 +305,7 @@ void MeasureObject() {
     delay(50);
   }
   Serial2.print("\nObject Detected - Distance:\t");
-  rightDist = GetAvgDistance();
+  rightDist = GetDistance();
   Serial2.println(rightDist);
 
   for (int i = 0; i < rightAng; i++) {                                    // Bringing the stepper back to its starting position
@@ -425,18 +425,19 @@ void displayObjectArray() {
 bool Sweep() {
 
   // Manually call a FastCenter() before running Sweep
+  int triggerDist = 550;
   int distance = 0;
   leftAng = 0;
   rightAng = 0;
   TOFStepper.setSpeed(600);
-  
+
   //Forward 1111111111111
   LevelTOF(10);
   delay(50);
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 600) {
+  if (distance < triggerDist) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -452,15 +453,15 @@ bool Sweep() {
   rightAng = 0;
   delay(50);
   distance = GetDistance();
-  if (distance < 600) {
+  if (distance < triggerDist) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(leftAng);
     Serial2.print("\tDistance:\t");
     Serial2.println(distance);
     DCStop();
     return true;
-  }  
-  
+  }
+
   StepperRight(leftAng);    // recentering somewhat
   delay(50);
 
@@ -470,7 +471,7 @@ bool Sweep() {
   leftAng = 0;
   rightAng = 0;
   distance = GetDistance();
-  if (distance < 600) {
+  if (distance < triggerDist) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
@@ -486,7 +487,7 @@ bool Sweep() {
   rightAng = 26;
   delay(50);
   distance = GetDistance();
-  if (distance < 600) {
+  if (distance < triggerDist) {
     Serial2.print("\nObject found at angle:\t");
     Serial2.print(rightAng);
     Serial2.print("\tDistance:\t");

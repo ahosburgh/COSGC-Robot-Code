@@ -36,6 +36,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       }
       currentSensorTime = millis(); //update currentSensorTime
       if (currentSensorTime - prevSensorTime > 10000) { //if 10 seconds has passed since last time prevSensorTime was updated
+        Serial.println("Re-centering sensor");
         DCStop(); //Stop the rover
         FastCenter(); //center the sensor
         prevSensorTime = millis(); //update prevSensorTime
@@ -63,6 +64,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         }
         currentSensorTime = millis(); //update currentSensorTime
         if (currentSensorTime - prevSensorTime > 10000) { //if 10 seconds has passed since last time prevSensorTime was updated
+          Serial.println("Re-centering sensor");
           DCStop(); //Stop the rover
           FastCenter(); //center the sensor
           prevSensorTime = millis(); //update prevSensorTime
@@ -445,15 +447,21 @@ void Avoidence() {
   int turnAng = 0;
   int forward = body * 2;
   FastCenter();
-  if (GetDistance() < 900) {
+  if (Sweep() == true) {
     MeasureObject();
     if (leftWidth > rightWidth) {
       turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
+      if (turnAng < 45) {
+        turnAng = 45;
+      }
       DCBack(body);
       TurnRight(turnAng);
     }
     else {
       turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
+      if (turnAng < 45) {
+        turnAng = 45;
+      }
       DCBack(body);
       TurnRight(turnAng);
     }
@@ -461,6 +469,7 @@ void Avoidence() {
     MoveForward(turnAng, forward, 0);
   }
   else {
+    Serial.println("False alarm");
     return;
   }
 }
@@ -554,7 +563,8 @@ void CenterRobot() {
           while (1);
         }
       }
-
+      break;
+      
     case 2:
       tempValue = 360 - GoldenDirection;
       if (currentDirection > GoldenDirection - 10 && currentDirection < GoldenDirection + 10)
