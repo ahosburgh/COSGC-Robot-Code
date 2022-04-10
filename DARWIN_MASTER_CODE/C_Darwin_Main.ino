@@ -1,4 +1,3 @@
 void loop() {
-MoveForward(GoldenDirection, 0 , 1);
-  
+ MoveForward(GoldenDirection, 0 , 1);
 }

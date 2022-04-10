@@ -1,11 +1,11 @@
 void DCDriftLeft()
 {
   // Set speed of motors
-  analogWrite(DCmotorFrontPWMA, fast);   // Front Right
+  analogWrite(DCmotorFrontPWMA, med);   // Front Right
   analogWrite(DCmotorFrontPWMB, slow);   // Front Left
-  analogWrite(DCmotorMiddlePWMA, fast);  // Middle Right
+  analogWrite(DCmotorMiddlePWMA, med);  // Middle Right
   analogWrite(DCmotorMiddlePWMB, slow);  // Middle Left
-  analogWrite(DCmotorBackPWMA, fast);    // Back Right
+  analogWrite(DCmotorBackPWMA, med);    // Back Right
   analogWrite(DCmotorBackPWMB, slow);    // Back Left
 
   // All Right Motors move forward
@@ -31,11 +31,11 @@ void DCDriftRight() {
 
   // Set speed of motors.
   analogWrite(DCmotorFrontPWMA, slow);   // Front Right
-  analogWrite(DCmotorFrontPWMB, fast);   // Front Left
+  analogWrite(DCmotorFrontPWMB, med);   // Front Left
   analogWrite(DCmotorMiddlePWMA, slow);  // Middle Right
-  analogWrite(DCmotorMiddlePWMB, fast);  // Middle Left
+  analogWrite(DCmotorMiddlePWMB, med);  // Middle Left
   analogWrite(DCmotorBackPWMA, slow);    // Back Right
-  analogWrite(DCmotorBackPWMB, fast);    // Back Left
+  analogWrite(DCmotorBackPWMB, med);    // Back Left
 
   // All Right Motors move forward
   digitalWrite(DCmotorFrontAI1, LOW);       // Front Right Forward

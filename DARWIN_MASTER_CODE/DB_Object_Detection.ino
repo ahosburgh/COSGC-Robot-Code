@@ -431,7 +431,7 @@ bool MovingSweep() {
   int distance = 0;
   leftAng = 0;
   rightAng = 0;
-  TOFStepper.setSpeed(600);
+  TOFStepper.setSpeed(500);
 
   switch (stepperCounter) {
     case 0:
@@ -451,15 +451,16 @@ bool MovingSweep() {
         return true;
       }
       else {
-        return false;
+        Serial2.print("\tSweep 0 Distance:\t");
+        Serial2.println(distance);
       }
       break;
 
     case 1:
-      stepperCounter = 2;
       // Left 26
+      stepperCounter = 2;
       LevelTOF(10);
-      StepperLeft(26 - leftAng + rightAng);
+      StepperLeft(26);
       leftAng = 26;
       rightAng = 0;
       delay(50);
@@ -473,15 +474,16 @@ bool MovingSweep() {
         return true;
       }
       else {
-        return false;
+        Serial2.print("\tSweep 1 Distance:\t");
+        Serial2.println(distance);
+        StepperRight(leftAng);    // recentering somewhat
+        delay(50);
       }
-      StepperRight(leftAng);    // recentering somewhat
-      delay(50);
       break;
 
     case 2:
+      //Forward (Again)
       stepperCounter = 3;
-      //Forward 1111111111111
       LevelTOF(10);
       leftAng = 0;
       rightAng = 0;
@@ -495,15 +497,16 @@ bool MovingSweep() {
         return true;
       }
       else {
-        return false;
+        Serial2.print("\tSweep 2 Distance:\t");
+        Serial2.println(distance);
       }
       break;
 
     case 3:
-      stepperCounter = 4;
       // Right 26
+      stepperCounter = 0;
       LevelTOF(10);
-      StepperRight(26 - rightAng + leftAng);
+      StepperRight(26);
       leftAng = 0;
       rightAng = 26;
       delay(50);
@@ -517,14 +520,14 @@ bool MovingSweep() {
         return true;
       }
       else {
-        return false;
+        Serial2.print("\tSweep 3 Distance:\t");
+        Serial2.println(distance);
+        StepperLeft(rightAng);    // recentering somewhat
+        delay(50);
       }
-
-      StepperLeft(rightAng);    // recentering somewhat
-      delay(50);
-      stepperCounter = 0;
       break;
   }
+  return false;
 }
 
 
@@ -537,7 +540,7 @@ bool Sweep() {
   int distance = 0;
   leftAng = 0;
   rightAng = 0;
-  TOFStepper.setSpeed(600);
+  TOFStepper.setSpeed(500);
 
   //Forward 1111111111111
   LevelTOF(10);
@@ -546,13 +549,15 @@ bool Sweep() {
   rightAng = 0;
   distance = GetDistance();
   if (distance < triggerDist) {
-    Serial2.print("\nObject found at angle:\t");
+    Serial2.print("\n\n===Object found at angle:\t");
     Serial2.print("0");
     Serial2.print("\tDistance:\t");
     Serial2.println(distance);
     DCStop();
     return true;
   }
+  Serial2.print("Sweep Distance:\t");
+  Serial2.println(distance);
 
   // Left 26
   LevelTOF(10);
@@ -569,7 +574,8 @@ bool Sweep() {
     DCStop();
     return true;
   }
-
+  Serial2.print("Sweep Distance:\t");
+  Serial2.println(distance);
   StepperRight(leftAng);    // recentering somewhat
   delay(50);
 
@@ -587,6 +593,8 @@ bool Sweep() {
     DCStop();
     return true;
   }
+  Serial2.print("\tSweep Distance:\t");
+  Serial2.println(distance);
 
   // Right 26
   LevelTOF(10);
@@ -603,7 +611,8 @@ bool Sweep() {
     DCStop();
     return true;
   }
-
+  Serial2.print("\tSweep Distance:\t");
+  Serial2.println(distance);
   StepperLeft(rightAng);    // recentering somewhat
   delay(50);
 
