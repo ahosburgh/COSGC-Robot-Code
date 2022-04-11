@@ -395,7 +395,6 @@ void MeasureObject() {
     }
   }
   FastCenter();                                                                 // Centering the stepper since we are done with it
-  delay(5000);
 }
 
 

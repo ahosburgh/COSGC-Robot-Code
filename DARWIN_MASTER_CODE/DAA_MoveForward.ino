@@ -29,6 +29,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
   if (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) { //If no issues are present
     DCForward(); //moves rover forward
     while (sweep == false && navigation == true && roll == true && currentTime - prevTime < distInTime) { //while there are no issues
+      DCForward();
       if (timeCheck == true) { //update time
         currentTime = millis();
       }
@@ -40,7 +41,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         delay(100);
         prevSensorTime = millis(); //update prevSensorTime
         DCForward(); //Go back to moving forward
-        
+
       }
       Serial2.print("Moving Forward Towards: \t");
       Serial2.print(dir);
@@ -48,6 +49,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       sweep = MovingSweep(); //run sweep function
       navigation = Navigation(dir); //run navigation function
       roll = IMURoll(); //run roll function
+
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Move Forward Drift I put the drift inside the while because of reasons
 
 
@@ -71,6 +73,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
           prevSensorTime = millis(); //update prevSensorTime
           DCForward(); //Go back to moving forward
         }
+        
         if (dir < 10) { //determines which case to call depending on value of direction given
           switchCase = 0;
         }
@@ -132,6 +135,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
             else if (currentDirection > tempValue + 10 && currentDirection < 180 - tempValue) {
               Serial2.print("\t   Drifting Left   \n");
               DCDriftLeft();
+              
             }
             break;
         }

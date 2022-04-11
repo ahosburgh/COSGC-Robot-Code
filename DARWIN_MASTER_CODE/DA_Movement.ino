@@ -263,7 +263,7 @@ void TurnRight(int deg)
 
 void Avoidence() {
   int turnAng = 0;
-  int forward = body * 2;
+  int forward = body * 3;
   int i = 0;
   if (leftAng > rightAng) {     // thanks to sweep, only one of these should be above 0 at any given time.
     TurnLeft(leftAng); //turn left degree amount returned
@@ -282,26 +282,19 @@ void Avoidence() {
   FastCenter();
   if (Sweep() == true) {
     MeasureObject();
-    if (i == 0) {
-      TurnRight(leftAng);
-    }
-    if (i == 0) {
-      TurnLeft(rightAng);
-    }
-
 
     if (leftWidth > rightWidth) {
       turnAng = (atan(straightDist / (leftWidth))) * 180 / pi;
-      if (turnAng < 20) {
-        turnAng = 20;
+      if (turnAng < 45) {
+        turnAng = 45;
       }
       DCBack(body);
       TurnRight(turnAng);
     }
     else {
       turnAng = (atan(straightDist / (rightWidth))) * 180 / pi;
-      if (turnAng < 20) {
-        turnAng = 20;
+      if (turnAng < 45) {
+        turnAng = 45;
       }
       DCBack(body);
       TurnRight(turnAng);
@@ -314,7 +307,7 @@ void Avoidence() {
     if (i == 0) {
       TurnRight(leftAng);
     }
-    if (i == 0) {
+    if (i == 1) {
       TurnLeft(rightAng);
     }
     return;
