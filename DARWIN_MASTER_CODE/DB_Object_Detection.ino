@@ -96,7 +96,7 @@ void MeasureObject() {
     Serial2.print("\ndownAng:\t");                                              // Printing for debugging
     Serial2.print(downAng);
 
-    straightHeight = abs(straightDist * cos(downAng));                          // Calculating the big height between the estimated bottom of the object and the straightDist beam for future use.
+    straightHeight = abs(straightDist * tan(downAng));                          // Calculating the big height between the estimated bottom of the object and the straightDist beam for future use.
     Serial2.print("\nstraightHeight:\t");                                       // Printing for debugging
     Serial2.print(straightHeight);
 
@@ -159,7 +159,7 @@ void MeasureObject() {
     Serial2.print("\n\nServoPos(downAng):");
     Serial2.print(downAng);
 
-    straightHeight = abs(straightDist * cos(downAng));                          // Calculating the big height between the estimated bottom of the object and the straightDist beam for future use. This is also the estimated hight of the lower section of the object
+    straightHeight = abs(straightDist * tan(downAng));                          // Calculating the big height between the estimated bottom of the object and the straightDist beam for future use. This is also the estimated hight of the lower section of the object
     Serial2.print("\nstraightHeight:\t");                                       // Printing for debugging
     Serial2.print(straightHeight);
 
@@ -368,7 +368,7 @@ void MeasureObject() {
   slope = asin(slopeHeight2 / slopeDist3) * 180 / pi;                          // And this is the angle between the measured "top" and the measured "bottom" points      ang = arcsin h/d (but apperantly not cause arduino poopy)
 
   if (isnan(slope)) {
-    slope = abs(90 - asin(slopeDist3 / slopeHeight2) * 180 / pi);
+    slope = 0;
     Serial2.print("\nNAN SLOPE\n");
     //slope = 90;
 

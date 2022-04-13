@@ -1,3 +1,6 @@
 void loop() {
- MoveForward(GoldenDirection, 0 , 1);
+  FastCenter();
+MeasureObject();
+
+// MoveForward(GoldenDirection, 0 , 1);
 }
