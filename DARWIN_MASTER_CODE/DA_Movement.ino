@@ -201,37 +201,37 @@ void TurnRight(int deg)
     if (currentTime - prevTime > 150) {
       switch (NumLed) {
         case 0:
-          digitalWrite(A2, LOW);
+          digitalWrite(A3, HIGH);
           NumLed = 1;
           prevTime = currentTime;
           break;
 
         case 1:
-          digitalWrite(A1, LOW);
+          digitalWrite(A4, HIGH);
           NumLed = 2;
           prevTime = currentTime;
           break;
 
         case 2:
-          digitalWrite(A0, LOW);
+          digitalWrite(A5, HIGH);
           NumLed = 3;
           prevTime = currentTime;
           break;
 
         case 3:
-          digitalWrite(A2, HIGH);
+          digitalWrite(A3, LOW);
           NumLed = 4;
           prevTime = currentTime;
           break;
 
         case 4:
-          digitalWrite(A1, HIGH);
+          digitalWrite(A4, LOW);
           NumLed = 5;
           prevTime = currentTime;
           break;
 
         case 5:
-          digitalWrite(A0, HIGH);
+          digitalWrite(A5, LOW);
           NumLed = 0;
           prevTime = currentTime;
           break;
