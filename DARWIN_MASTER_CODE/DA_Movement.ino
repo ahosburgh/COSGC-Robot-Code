@@ -144,19 +144,19 @@ void TurnLeft(int deg)
           break;
       }
     }
-    //    if (currentTime - prevTime2 > 8000) { // To get out if stuck
-    //      Serial2.println("-----------Darwin Stuck-----------");
-    //      DCRight();
-    //      delay(2000);
-    //      DCStop();
-    //      DCBack(2000);
-    //      prevTime2 = currentTime;
-    //      DCLeft();
-    //    }
-    //    Serial2.print("Target Direction: \t");
-    //    Serial2.print(targetDirection);
-    //    Serial2.print("Current Direction: \t");
-    //    Serial2.println(IMUDirection());
+//        if (currentTime - prevTime2 > 9000) { // To get out if stuck
+//          Serial2.println("-----------Darwin Stuck-----------");
+//          DCRight();
+//          delay(500);
+//          DCStop();
+//          DCBack(500);
+//          prevTime2 = currentTime;
+//          DCLeft();
+//        }
+//        Serial2.print("Target Direction: \t");
+//        Serial2.print(targetDirection);
+//        Serial2.print("Current Direction: \t");
+//        Serial2.println(IMUDirection());
   }
 
   DCStop(); //Stops all DC motors
@@ -237,19 +237,19 @@ void TurnRight(int deg)
           break;
       }
     }
-    //    if (currentTime - prevTime2 > 8000) { // To get out if stuck
-    //      Serial2.println("-----------Darwin Stuck-----------");
-    //      DCRight();
-    //      delay(2000);
-    //      DCStop();
-    //      DCBack(2000);
-    //      prevTime2 = currentTime;
-    //      DCLeft();
-    //    }
-    //    Serial2.print("\nTarget Direction: \t");
-    //    Serial2.print(targetDirection);
-    //    Serial2.print("Current Direction: \t");
-    //    Serial2.println(IMUDirection());
+//        if (currentTime - prevTime2 > 9000) { // To get out if stuck
+//          Serial2.println("-----------Darwin Stuck-----------");
+//          DCRight();
+//          delay(500);
+//          DCStop();
+//          DCBack(500);
+//          prevTime2 = currentTime;
+//          DCLeft();
+//        }
+//        Serial2.print("\nTarget Direction: \t");
+//        Serial2.print(targetDirection);
+//        Serial2.print("Current Direction: \t");
+//        Serial2.println(IMUDirection());
   }
 
   DCStop(); //Stops all DC motors
@@ -270,7 +270,7 @@ void Avoidence() {
     Serial2.println("turn left to face object");
     i = 0;
   }
-  else if ( rightAng < leftAng)
+  else if ( rightAng > leftAng)
   {
     TurnRight(rightAng); //turn right degree amount returned
     Serial2.println("turn right to face object");
@@ -297,13 +297,13 @@ void Avoidence() {
         turnAng = 45;
       }
       DCBack(body);
-      TurnRight(turnAng);
+      TurnLeft(turnAng);
     }
     turnAng = IMUDirection();
     MoveForward(turnAng, forward, 0);
   }
   else {
-    Serial.println("False alarm");
+    Serial2.println("False alarm");
     if (i == 0) {
       TurnRight(leftAng);
     }

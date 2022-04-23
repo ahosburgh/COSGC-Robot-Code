@@ -110,7 +110,7 @@ void DCRight()
 
 void DCForward()
 {
-  Serial.println("DC Moving forward");
+  Serial2.println("DC Moving forward");
   LightsOut(); //Turns all lights off
 
   // Set speed of all motors to 100%

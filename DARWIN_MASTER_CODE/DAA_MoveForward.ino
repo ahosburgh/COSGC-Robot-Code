@@ -35,7 +35,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
       }
       currentSensorTime = millis(); //update currentSensorTime
       if (currentSensorTime - prevSensorTime > 10000) { //if 10 seconds has passed since last time prevSensorTime was updated
-        Serial.println("Re-centering sensor");
+        Serial2.println("Re-centering sensor");
         DCStop(); //Stop the rover
         FastCenter(); //center the sensor
         delay(100);
@@ -66,7 +66,7 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
         }
         currentSensorTime = millis(); //update currentSensorTime
         if (currentSensorTime - prevSensorTime > 5000) { //if 10 seconds has passed since last time prevSensorTime was updated
-          Serial.println("Re-centering sensor");
+          Serial2.println("Re-centering sensor");
           DCStop(); //Stop the rover
           FastCenter(); //center the sensor
           delay(100);
@@ -164,5 +164,8 @@ void MoveForward(int dir, int distInTime, int center) { //Function takes in a di
     int dir = IMUDirection(); //store direction as current heading
     MoveForward(dir, body, 0); //move forward in the new direction for a bodylength of time and do not center
     TurnRight(45); //turn right 45 degrees
+  }
+  if (Navigation == false){
+    CenterRobot();
   }
 }
