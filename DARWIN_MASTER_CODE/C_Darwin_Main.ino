@@ -1,4 +1,4 @@
 void loop() {
-Animation();
-//MoveForward(GoldenDirection, 0 , 1);
+//Animation();
+MoveForward(GoldenDirection, 0 , 1);
 }

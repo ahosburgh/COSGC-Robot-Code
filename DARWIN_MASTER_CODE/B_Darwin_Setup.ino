@@ -78,8 +78,8 @@ void setup() {
   millisOld = millis();                   // Grabbing the system time for dt variable
 
   Serial2.println("GetGoldenDirection(); \t Calling Get Golden Direction Function \n");
-  //GetGoldenDirection();
- // CenterStepper();
+ GetGoldenDirection();
+ CenterStepper();
   
   Serial2.println("Main Program is About to Begin");
 }
